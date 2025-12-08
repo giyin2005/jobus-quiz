@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KLZ13NYNST"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-KLZ13NYNST');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobus 職場遊戲中心</title>
+    <style>
+        body { font-family: "Helvetica Neue", sans-serif; margin: 0; padding: 20px; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        h1 { color: #2c3e50; margin-bottom: 10px; }
+        p { color: #666; margin-bottom: 30px; }
+        
+        .grid { display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; max-width: 600px; }
+        
+        .game-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s;
+            text-decoration: none; /* 讓整個卡片變成連結 */
+            color: inherit;
+        }
+        
+        .game-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+        
+        .icon { font-size: 2.5rem; margin-right: 20px; }
+        .info h3 { margin: 0 0 5px 0; color: #d62976; }
+        .info span { font-size: 0.9rem; color: #555; }
+    </style>
+</head>
+<body>
+
+    <h1>🎮 Jobus 遊戲大廳</h1>
+    <p>精選職場生存模擬，你是哪一種社畜？</p>
+
+    <div class="grid">
+        <a href="/slave/" class="game-card">
+            <div class="icon">🤯</div>
+            <div class="info">
+                <h3>社畜覺醒：拒絕當免洗筷</h3>
+                <span>別太把自己當回事，測測你的奴性指數！</span>
+            </div>
+        </a>
+
+        <a href="/salary/" class="game-card">
+            <div class="icon">💰</div>
+            <div class="info">
+                <h3>加薪大作戰</h3>
+                <span>薪水追不上通膨，想提加薪又怕被拒絕...</span>
+            </div>
+        </a>
+        
+        <div class="game-card" style="opacity: 0.6; cursor: default;">
+            <div class="icon">🔒</div>
+            <div class="info">
+                <h3>更多遊戲開發中...</h3>
+                <span>敬請期待！</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 50px; font-size: 0.8rem; color: #aaa;">
+        &copy; 2025 Jobus 職場小旅行
+    </div>
+
+</body>
+</html>

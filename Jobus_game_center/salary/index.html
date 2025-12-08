@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>加薪大作戰：拒當職場便利貼 | Jobus 職場小旅行</title>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KLZ13NYNST"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-KLZ13NYNST');
+    </script>
+
+    <meta property="og:title" content="加薪大作戰：拒當職場便利貼">
+    <meta property="og:description" content="老闆說共體時艱你就信？5關測出你的談判戰力！">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80">
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #d62976; /* Jobus Pink */
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --success-color: #2ecc71;
+            --warning-color: #f1c40f;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'PingFang TC', 'Heiti TC', 'Microsoft JhengHei', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        /* Game Container */
+        .game-container {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            background-color: var(--card-bg);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        /* Image Section */
+        .image-frame {
+            width: 100%;
+            height: 320px; /* 修正高度比例 */
+            overflow: hidden;
+            position: relative;
+            background-color: #eee;
+        }
+
+        .image-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Content Section */
+        .content-area {
+            padding: 25px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        /* Options */
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: auto;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 1rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:active, .option-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Feedback Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            border-top: 6px solid var(--accent-color);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .modal-text {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .next-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        /* Ending Screen */
+        .ending-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border: 4px solid #fff;
+        }
+
+        .result-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .result-desc {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            max-width: 500px;
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .btn-primary, .btn-secondary, .btn-home {
+            padding: 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            text-align: center;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary-color);
+            border: none;
+        }
+
+        .btn-home {
+            background-color: transparent;
+            color: rgba(255,255,255,0.8);
+            border: 1px solid rgba(255,255,255,0.4);
+            margin-top: 10px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 0.8rem;
+            color: #999;
+            background: #f4f7f6;
+        }
+        
+        .footer-brand {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header id="game-header">
+        <span>加薪大作戰</span>
+        <span id="level-indicator">關卡 1/5</span>
+    </header>
+
+    <div class="game-container" id="game-screen">
+        <div class="image-frame">
+            <img id="scene-img" src="" alt="情境圖">
+        </div>
+        <div class="content-area">
+            <div class="question-text" id="question-text">
+                載入中...
+            </div>
+            <div class="options-grid" id="options-area">
+                </div>
+        </div>
+    </div>
+
+    <div class="ending-screen" id="ending-screen">
+        <div class="score-circle" id="final-score">0%</div>
+        <div class="result-title" id="result-title">分析中...</div>
+        <div class="result-desc" id="result-desc"></div>
+        
+        <div class="action-buttons">
+            <button class="btn-primary" onclick="shareGame()">📤 分享我的戰果</button>
+            <a href="https://www.instagram.com/jobus.asia/" target="_blank" class="btn-secondary">📸 追蹤 Jobus IG 看更多</a>
+            <a href="/" class="btn-home">🏠 回到遊戲大廳</a>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="feedback-modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modal-title"></div>
+            <div class="modal-text" id="modal-text"></div>
+            <button class="next-btn" onclick="nextLevel()">下一關</button>
+        </div>
+    </div>
+
+    <footer>
+        Powered by <span class="footer-brand">Jobus 職場小旅行</span>
+    </footer>
+
+    <script>
+        // 遊戲資料 - 已在 feedbackTitle 加入 Emoji
+        const gameData = [
+            {
+                imgId: "1488190211105-8b0e65b80b4e",
+                question: "最近覺得薪水追不上通膨，想提加薪但又怕被拒絕... 心裡的小劇場開始暴走，你會怎麼想？",
+                options: [
+                    {
+                        text: "A. 算了啦，現在景氣不好，有工作就偷笑了，不要當出頭鳥。",
+                        type: "slave",
+                        feedbackTitle: "⚠️ 奴性堅強",
+                        feedbackText: "親，老闆最愛你這種員工了。「不行」不是世界末日，你的職涯才是！"
+                    },
+                    {
+                        text: "B. 直接衝去辦公室，不加薪就離職！老子不爽很久了！",
+                        type: "impulse",
+                        feedbackTitle: "🤔 先冷靜點",
+                        feedbackText: "裸辭很帥，但下個月卡費來的時候就不帥了。談判需要籌碼，不是情緒。"
+                    },
+                    {
+                        text: "C. 告訴自己：被拒絕也沒損失，至少讓老闆知道我有企圖心。",
+                        type: "smart",
+                        feedbackTitle: "✅ 心態正確",
+                        feedbackText: "沒錯！如果沒拿到錢，至少賺到了「積極進取」的印象分數。"
+                    }
+                ]
+            },
+            {
+                imgId: "1551288049-bebda4e38f71",
+                question: "決定要談了！但在敲門之前，你準備帶什麼東西進去會議室？",
+                options: [
+                    {
+                        text: "A. 一張手寫的記帳單，哭訴房租漲價、貓罐頭也漲價...",
+                        type: "slave",
+                        feedbackTitle: "⚠️ 是在情緒勒索？",
+                        feedbackText: "老闆不是慈善家，你的生活費不是他的 KPI。請用專業說服他。"
+                    },
+                    {
+                        text: "B. 整理好的「戰績表」，列出過去一年的專案成效與數據。",
+                        type: "smart",
+                        feedbackTitle: "💡 專業喔！",
+                        feedbackText: "數據會說話！這才是談判桌上最強的武器，證明你「值得」這個價。"
+                    },
+                    {
+                        text: "C. 隔壁部門小陳的薪資條，質問為什麼他領比較多！",
+                        type: "impulse",
+                        feedbackTitle: "🛑 職場大忌",
+                        feedbackText: "比較心態最要不得，這樣只會讓老闆覺得你愛計較，而不是有能力。"
+                    }
+                ]
+            },
+            {
+                imgId: "1573496359142-b8d87734a5a2",
+                question: "走進會議室，老闆正看著你。這時你的肢體語言是...",
+                options: [
+                    {
+                        text: "A. 眼神飄忽，音量很小，坐得只有椅子三分之一...",
+                        type: "slave",
+                        feedbackTitle: "⚠️ 氣勢先輸一半",
+                        feedbackText: "如果你自己都覺得不值得加薪，老闆怎麼會覺得值得？抬頭挺胸！"
+                    },
+                    {
+                        text: "B. 眼神堅定，保持微笑，展現對工作的熱情與自信。",
+                        type: "smart",
+                        feedbackTitle: "✨ 自帶氣場",
+                        feedbackText: "自信是會傳染的！讓老闆覺得投資你是個「穩賺不賠」的生意。"
+                    },
+                    {
+                        text: "C. 雙手抱胸，翹著二郎腿，一臉「你欠我錢」的樣子。",
+                        type: "impulse",
+                        feedbackTitle: "🤨 太派了吧",
+                        feedbackText: "我們是來談加薪，不是來討債的。過度防衛只會讓氣氛變僵。"
+                    }
+                ]
+            },
+            {
+                imgId: "1495364141860-b0d039005f49",
+                question: "你已經準備好了，但總覺得時機不對。什麼時候開口比較好？",
+                options: [
+                    {
+                        text: "A. 等公司業績翻倍、老闆心情大好、星座運勢五顆星的那天...",
+                        type: "slave",
+                        feedbackTitle: "⚠️ 你要等到退休嗎？",
+                        feedbackText: "完美的時機不存在！等待只會讓你錯失機會，別再拖延症發作了。"
+                    },
+                    {
+                        text: "B. 下午三點老闆剛被客戶罵完，正需要人安慰的時候。",
+                        type: "impulse",
+                        feedbackTitle: "💣 自殺突擊隊？",
+                        feedbackText: "雖然要勇敢，但也不要選在老闆心情最差的時候去當砲灰啊！"
+                    },
+                    {
+                        text: "C. 不必等完美時刻，挑個專案剛結束、成效不錯的時候就上！",
+                        type: "smart",
+                        feedbackTitle: "🎯 精準打擊",
+                        feedbackText: "打鐵趁熱！在你的價值被看見的時候提出，成功率最高。"
+                    }
+                ]
+            },
+            {
+                imgId: "1486406146926-c627a92ad1ab",
+                question: "結局揭曉：老闆說「目前預算有限，沒辦法」。你離開會議室後會做什麼？",
+                options: [
+                    {
+                        text: "A. 躲到廁所偷哭，發誓再也不提加薪，乖乖當社畜。",
+                        type: "slave",
+                        feedbackTitle: "🥺 別灰心啦",
+                        feedbackText: "一次失敗不代表永遠。這次不行，下次再來！"
+                    },
+                    {
+                        text: "B. 剛剛有問清楚「要達到什麼標準才能加」，以此為目標！",
+                        type: "smart",
+                        feedbackTitle: "🚀 這就是成長型思維",
+                        feedbackText: "把「拒絕」變成「導航」。只要方向清楚，下一次加薪就是囊中物！"
+                    },
+                    {
+                        text: "C. 馬上開 104 更新履歷，還要發 IG 限動罵公司爛透了。",
+                        type: "impulse",
+                        feedbackTitle: "🪃 小心迴力鏢",
+                        feedbackText: "騎驢找馬可以，但公開抱怨只會顯得不專業，圈子很小的～"
+                    }
+                ]
+            }
+        ];
+
+        let currentLevel = 0;
+        let score = 0;
+        
+        function initGame() {
+            renderLevel();
+        }
+
+        function renderLevel() {
+            if (currentLevel >= gameData.length) {
+                showEnding();
+                return;
+            }
+
+            const data = gameData[currentLevel];
+            
+            document.getElementById('level-indicator').textContent = `關卡 ${currentLevel + 1}/${gameData.length}`;
+
+            // 更新圖片
+            const imgElement = document.getElementById('scene-img');
+            imgElement.style.opacity = '0.5';
+            imgElement.src = `https://images.unsplash.com/photo-${data.imgId}?auto=format&fit=crop&w=800&q=80`;
+            
+            imgElement.onload = function() {
+                this.style.opacity = '1';
+            };
+            
+            imgElement.onerror = function() {
+                this.src = `https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=80`;
+                this.style.opacity = '1';
+            };
+
+            document.getElementById('question-text').textContent = data.question;
+
+            const optionsArea = document.getElementById('options-area');
+            optionsArea.innerHTML = '';
+            
+            data.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt.text;
+                btn.onclick = () => handleAnswer(index);
+                optionsArea.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(index) {
+            const data = gameData[currentLevel];
+            const selected = data.options[index];
+
+            if (selected.type === 'smart') score += 3;
+            if (selected.type === 'impulse') score += 1;
+            if (selected.type === 'slave') score += 0;
+
+            const modal = document.getElementById('feedback-modal');
+            document.getElementById('modal-title').textContent = selected.feedbackTitle;
+            
+            // 設定標題顏色
+            let titleColor = '#e74c3c'; // Default red for slave
+            if (selected.type === 'smart') titleColor = '#2ecc71';
+            else if (selected.type === 'impulse') titleColor = '#f1c40f';
+            document.getElementById('modal-title').style.color = titleColor;
+
+            document.getElementById('modal-text').textContent = selected.feedbackText;
+            
+            modal.classList.add('active');
+        }
+
+        function nextLevel() {
+            document.getElementById('feedback-modal').classList.remove('active');
+            currentLevel++;
+            renderLevel();
+        }
+
+        function showEnding() {
+            document.getElementById('game-header').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'none';
+            const endingScreen = document.getElementById('ending-screen');
+            endingScreen.style.display = 'flex';
+
+            let title, desc, finalScoreText;
+            
+            const percentage = Math.round((score / 15) * 100);
+            finalScoreText = `${percentage}%`;
+
+            if (score >= 12) {
+                title = "加薪談判專家";
+                desc = "太強了！你完全掌握了職場談判的精髓。你知道「拒絕」只是過程，數據才是武器。老闆不給你加薪是他的損失，準備好你的戰績表，勇敢出擊吧！";
+            } else if (score >= 7) {
+                title = "潛力談判股";
+                desc = "你有概念，但偶爾還是會被情緒或恐懼綁架。記得，職場上「會吵的孩子有糖吃」是建立在「有理有據」之上。再多一點自信，下次加薪名單一定有你！";
+            } else {
+                title = "職場佛系社畜";
+                desc = "親愛的，你的善良在職場可能會被當成軟弱。老闆不是肚子裡的蛔蟲，你不說，他真的以為你很滿意現在的薪水。試著跨出舒適圈，為自己的價值發聲吧！";
+            }
+
+            document.getElementById('final-score').textContent = finalScoreText;
+            document.getElementById('result-title').textContent = title;
+            document.getElementById('result-desc').textContent = desc;
+
+            if(typeof gtag === 'function') { 
+                gtag('event', 'game_complete', { 
+                    'game_name': document.title,
+                    'score_category': title
+                });
+            }
+        }
+
+        async function shareGame() {
+            const shareData = {
+                title: '加薪大作戰：拒當職場便利貼',
+                text: `我的職場談判戰力是指數 ${document.getElementById('final-score').textContent}！你敢來測測看嗎？`,
+                url: window.location.href
+            };
+
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    const dummy = document.createElement('input');
+                    document.body.appendChild(dummy);
+                    dummy.value = window.location.href;
+                    dummy.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(dummy);
+                    alert('連結已複製！趕快傳給同事測測看！');
+                }
+            } catch (err) {
+                console.log('Share canceled');
+            }
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nano Banana Pro 職場咒語包</title>
+    
+    <!-- 1. Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. React & ReactDOM (CDN) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- 3. Babel Standalone (CDN) - 用於瀏覽器端編譯 JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        /* 美化 Textarea 卷軸 */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #d1d5db; 
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af; 
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- 4. Icons Components (將 Lucide Icons 轉為內嵌 SVG，確保單檔可執行) ---
+        const Icon = ({ children, className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                {children}
+            </svg>
+        );
+
+        const Megaphone = (props) => <Icon {...props}><path d="m3 11 18-5v12L3 14v-3z" /><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" /></Icon>;
+        const Presentation = (props) => <Icon {...props}><path d="M2 3h20" /><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3" /><path d="m7 21 5-5 5 5" /></Icon>;
+        const Smile = (props) => <Icon {...props}><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" x2="9.01" y1="9" y2="9" /><line x1="15" x2="15.01" y1="9" y2="9" /></Icon>;
+        const User = (props) => <Icon {...props}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></Icon>;
+        const Star = (props) => <Icon {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></Icon>;
+        const Copy = (props) => <Icon {...props}><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></Icon>;
+        const Check = (props) => <Icon {...props}><polyline points="20 6 9 17 4 12" /></Icon>;
+        const RefreshCcw = (props) => <Icon {...props}><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" /><path d="M16 16h5v5" /></Icon>;
+        const Edit3 = (props) => <Icon {...props}><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></Icon>;
+        const Lightbulb = (props) => <Icon {...props}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" /><path d="M9 18h6" /><path d="M10 22h4" /></Icon>;
+        const Zap = (props) => <Icon {...props}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></Icon>;
+        const AlertTriangle = (props) => <Icon {...props}><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></Icon>;
+        const ArrowRight = (props) => <Icon {...props}><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></Icon>;
+        const Briefcase = (props) => <Icon {...props}><rect width="20" height="14" x="2" y="7" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></Icon>;
+
+        // --- Main App Component ---
+        const PromptPackApp = () => {
+          const [activeTab, setActiveTab] = useState('marketing');
+          const [copiedId, setCopiedId] = useState(null);
+          const [userInputs, setUserInputs] = useState({});
+
+          // 初始化或重設某個 prompt 的輸入值
+          const resetInputs = (promptId, fields) => {
+            const defaults = {};
+            fields.forEach(field => {
+              defaults[field.id] = field.defaultValue;
+            });
+            setUserInputs(prev => ({
+              ...prev,
+              [promptId]: defaults
+            }));
+          };
+
+          const handleInputChange = (promptId, fieldId, value) => {
+            setUserInputs(prev => ({
+              ...prev,
+              [promptId]: {
+                ...prev[promptId],
+                [fieldId]: value
+              }
+            }));
+          };
+
+          // 動態生成 Prompt 的函數
+          const generatePrompt = (template, fields, promptId) => {
+            let result = template;
+            const currentInputs = userInputs[promptId] || {};
+            
+            fields.forEach(field => {
+              // 如果使用者有輸入，用輸入值；否則用預設值
+              const value = currentInputs[field.id] !== undefined ? currentInputs[field.id] : field.defaultValue;
+              // 替換模板中的 {key}
+              result = result.replace(new RegExp(`{${field.id}}`, 'g'), value);
+            });
+            return result;
+          };
+
+          // Data structure
+          const categories = [
+            {
+              id: 'marketing',
+              label: '行銷人必備',
+              icon: <Megaphone className="w-5 h-5" />,
+              color: 'bg-yellow-100 text-yellow-700',
+              description: '適用：社群貼文、廣告素材、節慶賀圖',
+              prompts: [
+                {
+                  id: 'mkt-1',
+                  title: '節慶促銷海報 (文字強化版)',
+                  logic: '[結構化中文] + [文字渲染指令]',
+                  template: `生成一張高品質的商業海報，主題是 {holiday}。
+畫面主體：精緻的 {product}。
+背景設定：{background}，營造 {vibe} 的氛圍。
+
+【⚠️文字生成強制要求】：
+1. 請在畫面中央清晰生成繁體中文「{text}」。
+2. 確保文字拼寫完全正確，筆畫清晰，不可出現亂碼。
+3. 文字樣式：使用發光的 {font}。
+4. 確保文字與背景有高對比度，易於閱讀。
+
+視覺風格：{style}。`,
+                  fields: [
+                    { id: 'holiday', label: '節慶/活動名稱', defaultValue: '中秋節', placeholder: '例如：聖誕節特賣' },
+                    { id: 'product', label: '主推產品', defaultValue: '廣式月餅與精緻茶具', placeholder: '例如：紅色針織圍巾' },
+                    { id: 'background', label: '背景元素', defaultValue: '深藍色夜空與一輪明亮的滿月，點綴金色桂花', placeholder: '例如：雪景與聖誕樹' },
+                    { id: 'text', label: '海報文字 (建議4字內)', defaultValue: '中秋快樂', placeholder: '例如：聖誕快樂' },
+                    { id: 'vibe', label: '整體氛圍', defaultValue: '高級、溫馨且傳統', placeholder: '例如：歡樂、溫暖' },
+                    { id: 'font', label: '字體風格', defaultValue: '金色書法字體', placeholder: '例如：可愛手寫體' },
+                    { id: 'style', label: '攝影風格', defaultValue: '高解析度產品攝影質感，景深自然，強調光影層次', placeholder: '例如：3D 卡通渲染' },
+                  ]
+                },
+                {
+                  id: 'mkt-2',
+                  title: '在地美食/餐廳宣傳 (文字強化版)',
+                  logic: '[招牌特寫] + [防亂碼指令]',
+                  template: `繪製一張 {location} 風格的場景插畫。
+畫面描述：場景熱鬧，充滿人潮與美食攤販，畫面正中央有一個醒目的招牌。
+
+【⚠️招牌文字指令】：
+1. 招牌上必須精準顯示繁體中文：「{text}」。
+2. 請確保「{text}」這幾個字的寫法正確，不要寫錯字。
+
+風格設定：{style}。色彩飽和溫暖，招牌帶有霓虹燈光效果，文字清晰可見。`,
+                  fields: [
+                    { id: 'location', label: '地點/場景', defaultValue: '台灣夜市', placeholder: '例如：日本居酒屋' },
+                    { id: 'text', label: '招牌文字 (建議4字內)', defaultValue: '夜市美食', placeholder: '例如：深夜食堂' },
+                    { id: 'style', label: '藝術風格', defaultValue: '吉卜力動畫風格（Ghibli style）', placeholder: '例如：水彩手繪風' },
+                  ]
+                }
+              ]
+            },
+            {
+              id: 'planning',
+              label: '企劃人救星',
+              icon: <Presentation className="w-5 h-5" />,
+              color: 'bg-blue-100 text-blue-700',
+              description: '適用：簡報製作、流程解說、教學圖解',
+              prompts: [
+                {
+                  id: 'plan-1',
+                  title: '飲品/成分製作流程圖',
+                  logic: '[結構分層] + [繁中標籤]',
+                  template: `請生成一張「{subject}」的成分剖面圖解。
+容器：{container}。
+分層內容（由下而上）：{layers}。請依照正確比例繪製各層厚度。
+
+【⚠️標籤指令】：
+請在各分層旁拉出指引線，並標註對應的繁體中文標籤：「{labels}」。
+文字必須清晰，使用深色字體搭配淺色背景，易於閱讀。
+
+風格設定：{style}，背景純白，線條俐落，適合放入專業商務簡報中。`,
+                  fields: [
+                    { id: 'subject', label: '飲品名稱', defaultValue: '拿鐵（Latte）', placeholder: '例如：調酒' },
+                    { id: 'container', label: '容器', defaultValue: '透明玻璃杯', placeholder: '例如：高腳杯' },
+                    { id: 'layers', label: '分層內容 (建議用逗號隔開)', defaultValue: '濃縮咖啡, 熱牛奶, 奶泡', placeholder: '例如：冰塊, 可樂, 蘭姆酒' },
+                    { id: 'labels', label: '對應標籤 (繁中)', defaultValue: '濃縮咖啡, 熱牛奶, 奶泡', placeholder: '例如：冰塊, 可樂, 蘭姆酒' },
+                    { id: 'style', label: '圖表風格', defaultValue: '極簡向量扁平設計（Flat Design）', placeholder: '例如：手繪粉筆風格' },
+                  ]
+                },
+                {
+                  id: 'plan-2',
+                  title: '商業模型/漏斗示意圖',
+                  logic: '[形狀定義] + [文字順序]',
+                  template: `生成一張標準的「{modelName}」示意圖。
+結構描述：{structure}。
+
+【⚠️文字標示】：
+請依序清楚標示以下繁體中文：「{steps}」。
+確保文字水平排列，拼寫正確無誤。
+
+風格設定：{style}，背景乾淨，圖表立體且專業，適合用於行銷提案 PPT。`,
+                  fields: [
+                    { id: 'modelName', label: '模型名稱', defaultValue: '行銷漏斗', placeholder: '例如：SWOT 分析' },
+                    { id: 'structure', label: '結構描述', defaultValue: '倒三角形的漏斗形狀，分為四個層級', placeholder: '例如：田字型矩陣' },
+                    { id: 'steps', label: '各階段文字 (繁中)', defaultValue: '曝光, 興趣, 慾望, 行動', placeholder: '優勢, 劣勢, 機會, 威脅' },
+                    { id: 'style', label: '設計風格', defaultValue: '現代科技感 3D 風格，使用漸層藍色與紫色', placeholder: '例如：商務扁平風' },
+                  ]
+                }
+              ]
+            },
+            {
+              id: 'branding',
+              label: '品牌 IP 利器',
+              icon: <Smile className="w-5 h-5" />,
+              color: 'bg-pink-100 text-pink-700',
+              description: '適用：吉祥物設計、貼圖製作、連環漫畫',
+              warning: '注意：使用此功能前，建議先在對話框上傳一張你的草稿或角色原圖。',
+              prompts: [
+                {
+                  id: 'brand-1',
+                  title: '吉祥物動作延伸 (需參考圖)',
+                  logic: '[參考圖] + [動作] + [風格]',
+                  template: `基於我上傳的角色草稿圖片，生成一組該角色的 {renderType}。
+【⚠️角色一致性】：請嚴格保持原草稿中的特徵（例如：{features}），不要改變角色的長相或身體比例。
+
+動作：{action}。
+表情：{expression}。
+視覺風格：{style}。
+光線：柔和的攝影棚打光。背景：模糊的現代化辦公室。`,
+                  fields: [
+                    { id: 'action', label: '角色動作', defaultValue: '坐在辦公桌前，正在使用筆記型電腦開會的樣子', placeholder: '例如：在海邊喝可樂' },
+                    { id: 'expression', label: '表情', defaultValue: '專注且可愛', placeholder: '例如：開懷大笑' },
+                    { id: 'renderType', label: '生成類型', defaultValue: '3D 擬真公仔圖', placeholder: '例如：2D 線條貼圖' },
+                    { id: 'features', label: '需保留特徵', defaultValue: '毛色、眼睛形狀、配件', placeholder: '例如：紅帽子、大鼻子' },
+                    { id: 'style', label: '渲染風格', defaultValue: '類似 Pixar 皮克斯動畫的高質感 3D 渲染', placeholder: '例如：日式賽璐璐風格' },
+                  ]
+                }
+              ]
+            },
+            {
+              id: 'bonus',
+              label: '職場形象照',
+              icon: <User className="w-5 h-5" />,
+              color: 'bg-purple-100 text-purple-700',
+              description: '沒空去相館拍形象照？用這招！(需上傳生活照)',
+              prompts: [
+                {
+                  id: 'bonus-1',
+                  title: 'LinkedIn 專業頭像生成',
+                  logic: '[照片轉換] + [服裝] + [背景]',
+                  template: `將上傳的照片轉換為 {targetStyle} 風格。
+人物處理：保留原照片人物的五官特徵與神韻，但提升膚質至精修質感。妝容：{makeup}。髮型：整理得俐落整齊。
+服裝更換：將衣著改為{clothing}，展現專業經理人氣勢。
+背景：{background}。
+燈光：{lighting}，讓臉部立體且眼神有光。`,
+                  fields: [
+                    { id: 'targetStyle', label: '目標風格', defaultValue: 'LinkedIn 專業商務形象照', placeholder: '例如：雜誌封面人物' },
+                    { id: 'clothing', label: '服裝', defaultValue: '深藍色或黑色的合身西裝外套，內搭白色襯衫', placeholder: '例如：Smart Casual 淺色襯衫' },
+                    { id: 'background', label: '背景', defaultValue: '淺灰色的專業攝影棚背景', placeholder: '例如：模糊的現代辦公室背景' },
+                    { id: 'makeup', label: '妝容/修飾', defaultValue: '自然乾淨的職場妝', placeholder: '例如：清新裸妝' },
+                    { id: 'lighting', label: '燈光', defaultValue: '林布蘭光（Rembrandt lighting）', placeholder: '例如：自然柔和窗光' },
+                  ]
+                }
+              ]
+            }
+          ];
+
+          // 複製功能
+          const handleCopy = (text, id) => {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+              document.execCommand('copy');
+              setCopiedId(id);
+              setTimeout(() => setCopiedId(null), 2000);
+            } catch (err) {
+              console.error('Copy failed', err);
+            }
+            document.body.removeChild(textArea);
+          };
+
+          const currentCategory = categories.find(c => c.id === activeTab);
+
+          return (
+            <div className="min-h-screen bg-gray-50 font-sans text-gray-800 pb-20">
+              {/* Header Section */}
+              <header className="bg-gradient-to-r from-yellow-400 to-orange-400 p-6 pb-20 shadow-lg">
+                <div className="max-w-3xl mx-auto text-center">
+                  <div className="inline-flex items-center justify-center bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-white text-sm font-bold mb-4 border border-white/30">
+                    <Star className="w-4 h-4 mr-1 fill-current" /> Nano Banana Pro 專用
+                  </div>
+                  <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 drop-shadow-md">
+                    職場神隊友咒語包
+                  </h1>
+                </div>
+              </header>
+
+              {/* Main Content Container */}
+              <main className="max-w-3xl mx-auto -mt-16 px-4">
+                
+                {/* Intro Card */}
+                <div className="bg-white rounded-2xl shadow-md p-6 mb-8 border border-gray-100 text-center relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-orange-400"></div>
+                  <div className="flex justify-center mb-3">
+                    <div className="bg-orange-50 p-3 rounded-full">
+                      <Briefcase className="w-6 h-6 text-orange-500" />
+                    </div>
+                  </div>
+                  <h2 className="text-lg font-bold text-gray-800 mb-2">
+                    Jobus 職場小旅行 × AI 效率工具
+                  </h2>
+                  <p className="text-gray-600 text-sm leading-relaxed max-w-xl mx-auto">
+                    本工具由 <strong>Jobus 職場小旅行</strong> 團隊精心製作。
+                    <br />
+                    專為社群小編、企劃與品牌人設計，解決 AI 生圖「繁體中文亂碼」與「指令複雜」的痛點。
+                    選擇下方情境，簡單填空，即可一鍵生成精準 Prompt！
+                  </p>
+                </div>
+                
+                {/* Navigation Tabs */}
+                <div className="flex flex-wrap justify-center gap-2 mb-6">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setActiveTab(cat.id)}
+                      className={`flex items-center px-4 py-3 rounded-xl font-bold transition-all shadow-sm
+                        ${activeTab === cat.id 
+                          ? 'bg-white text-gray-900 ring-2 ring-yellow-400 translate-y-[-2px] shadow-md' 
+                          : 'bg-white/80 text-gray-500 hover:bg-white hover:text-gray-700'}`}
+                    >
+                      <span className="mr-2">{cat.icon}</span>
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Active Category Content */}
+                <div className="space-y-8 animate-fadeIn">
+                  {/* Category Description Card */}
+                  <div className={`p-4 rounded-xl border-l-4 ${currentCategory.color.replace('text', 'border')} bg-white shadow-sm flex flex-col md:flex-row md:items-center justify-between`}>
+                    <div>
+                      <h2 className="text-xl font-bold flex items-center mb-1">
+                        {currentCategory.icon} 
+                        <span className="ml-2">{currentCategory.label}</span>
+                      </h2>
+                      <p className="text-gray-600 text-sm">{currentCategory.description}</p>
+                    </div>
+                    {currentCategory.warning && (
+                       <div className="mt-2 md:mt-0 md:ml-4 text-xs bg-red-50 text-red-600 px-3 py-2 rounded border border-red-100 max-w-xs">
+                         {currentCategory.warning}
+                       </div>
+                    )}
+                  </div>
+
+                  {/* Prompts List */}
+                  {currentCategory.prompts.map((prompt) => {
+                    const finalPrompt = generatePrompt(prompt.template, prompt.fields, prompt.id);
+                    const inputs = userInputs[prompt.id] || {};
+
+                    return (
+                      <div key={prompt.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
+                        
+                        {/* Prompt Header */}
+                        <div className="p-5 border-b border-gray-100 bg-gray-50/50 flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                              <Edit3 className="w-5 h-5 text-gray-400" />
+                              {prompt.title}
+                            </h3>
+                          </div>
+                          <button 
+                            onClick={() => resetInputs(prompt.id, prompt.fields)}
+                            className="text-xs flex items-center text-gray-400 hover:text-gray-600 transition-colors self-start md:self-auto"
+                          >
+                            <RefreshCcw className="w-3 h-3 mr-1" /> 重設預設值
+                          </button>
+                        </div>
+                        
+                        <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {/* Left Column: Inputs */}
+                          <div className="space-y-4">
+                            <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                              1. 填寫需求
+                            </div>
+                            {prompt.fields.map((field) => (
+                              <div key={field.id} className="space-y-1">
+                                <label htmlFor={`${prompt.id}-${field.id}`} className="block text-xs font-semibold text-gray-600">
+                                  {field.label}
+                                </label>
+                                <input
+                                  type="text"
+                                  id={`${prompt.id}-${field.id}`}
+                                  placeholder={field.placeholder}
+                                  value={inputs[field.id] !== undefined ? inputs[field.id] : field.defaultValue}
+                                  onChange={(e) => handleInputChange(prompt.id, field.id, e.target.value)}
+                                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent outline-none transition-all placeholder-gray-300"
+                                />
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Right Column: Preview & Copy */}
+                          <div className="flex flex-col h-full">
+                             <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 flex justify-between items-center">
+                              <span>2. 預覽結果 (即時更新)</span>
+                              <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px]">Nano Banana Pro</span>
+                            </div>
+                            <div className="flex-grow relative group">
+                              <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/50 to-orange-50/50 rounded-xl -z-10" />
+                              <textarea 
+                                readOnly
+                                value={finalPrompt}
+                                className="w-full h-full min-h-[250px] p-4 bg-white/80 border-2 border-dashed border-gray-200 rounded-xl text-sm leading-relaxed font-mono text-gray-700 resize-none focus:outline-none focus:border-yellow-400 transition-colors"
+                              />
+                            </div>
+                            
+                            <div className="mt-4">
+                              <button
+                                onClick={() => handleCopy(finalPrompt, prompt.id)}
+                                className={`w-full flex items-center justify-center px-5 py-3 rounded-xl font-bold text-sm transition-all duration-200 transform active:scale-95
+                                  ${copiedId === prompt.id 
+                                    ? 'bg-green-500 text-white shadow-green-200 ring-4 ring-green-100' 
+                                    : 'bg-gray-900 text-white hover:bg-gray-800 shadow-lg shadow-gray-200 hover:shadow-xl'}`}
+                              >
+                                {copiedId === prompt.id ? (
+                                  <>
+                                    <Check className="w-5 h-5 mr-2" />
+                                    已複製指令！快去貼上
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="w-5 h-5 mr-2" />
+                                    複製完整指令
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Tips Section */}
+                <div className="mt-12 mb-8 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl p-6 border border-blue-100">
+                  <h3 className="text-lg font-bold text-blue-900 mb-4 flex items-center">
+                    <Lightbulb className="w-5 h-5 mr-2 text-yellow-500 fill-current" />
+                    提高文字成功率的秘訣 (必看！)
+                  </h3>
+                  <ul className="space-y-3">
+                     <li className="flex items-start">
+                      <div className="bg-white p-1 rounded-full shadow-sm mr-3 mt-0.5">
+                        <Zap className="w-3 h-3 text-yellow-500" />
+                      </div>
+                      <p className="text-sm text-blue-800">
+                        <span className="font-bold">模型設定 (超重要)：</span> 請務必將模型切換為 <span className="font-mono bg-blue-200 px-1 rounded text-blue-900 font-bold">思考型 (Thinking)</span> 或 <span className="font-mono bg-blue-200 px-1 rounded text-blue-900 font-bold">Nano Banana Pro</span>，繁中理解力最強！
+                      </p>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="bg-white p-1 rounded-full shadow-sm mr-3 mt-0.5">
+                        <AlertTriangle className="w-3 h-3 text-orange-500" />
+                      </div>
+                      <p className="text-sm text-blue-800">
+                        <span className="font-bold">指令結構很重要：</span> 我們已經將指令設計成「條列式結構」，請盡量不要破壞格式。這種寫法能讓 AI 更清楚「哪裡是指令、哪裡是文字」。
+                      </p>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="bg-white p-1 rounded-full shadow-sm mr-3 mt-0.5">
+                        <ArrowRight className="w-3 h-3 text-blue-600" />
+                      </div>
+                      <p className="text-sm text-blue-800">
+                        <span className="font-bold">字數限制：</span> 文字越短，成功率越高。建議控制在 4 個字以內（如：中秋快樂、夜市美食）。
+                      </p>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="bg-white p-1 rounded-full shadow-sm mr-3 mt-0.5">
+                        <ArrowRight className="w-3 h-3 text-blue-600" />
+                      </div>
+                      <p className="text-sm text-blue-800">
+                        <span className="font-bold">還是有錯字？</span> 別灰心！直接對對話框說：「<span className="bg-blue-200 px-1 rounded">圖片很棒，但招牌上的字寫錯了，請修正為『正確文字』</span>」，通常修正一次就會完美了。
+                      </p>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Footer */}
+                <footer className="text-center text-gray-400 text-xs pb-8 border-t border-gray-200 pt-8">
+                  <p>© 2025 Jobus 職場小旅行 版權所有</p>
+                  <p className="mt-1">Designed for Google Gemini Nano Banana Pro</p>
+                </footer>
+
+              </main>
+            </div>
+          );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PromptPackApp />);
+    </script>
+</body>
+</html>
