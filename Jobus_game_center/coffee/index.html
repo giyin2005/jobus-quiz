@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Chat 萬用邀約神器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .template-card {
+            transition: all 0.2s ease;
+        }
+        .template-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+        /* Active Tab Indicator styling */
+        .tab-btn.active {
+            background-color: #2563EB; /* blue-600 */
+            color: white;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            border-color: transparent;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-6 px-3 sm:py-8 sm:px-6 lg:px-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">☕ Coffee Chat 萬用邀約神器</h1>
+            <p class="text-sm sm:text-base text-gray-600">依照您的求職進度，選擇對應的模板。</p>
+        </div>
+
+        <!-- Navigation Tabs (Optimized for Mobile) -->
+        <div class="flex flex-col sm:flex-row justify-center gap-3 mb-8" id="tabs">
+            <button onclick="switchTab('invitation')" class="tab-btn active px-4 py-3 sm:px-6 rounded-xl sm:rounded-full text-sm font-bold border border-transparent transition-colors flex items-center justify-center shadow-sm" data-target="invitation">
+                <span class="bg-white text-blue-600 rounded-full w-5 h-5 flex items-center justify-center text-xs mr-2 shrink-0">1</span>
+                發起邀約 (The Ask)
+            </button>
+            <button onclick="switchTab('followup')" class="tab-btn px-4 py-3 sm:px-6 rounded-xl sm:rounded-full text-sm font-bold bg-white text-gray-500 border border-gray-300 hover:bg-gray-50 transition-colors flex items-center justify-center shadow-sm" data-target="followup">
+                <span class="bg-gray-200 text-gray-600 rounded-full w-5 h-5 flex items-center justify-center text-xs mr-2 shrink-0">2</span>
+                關係維護 (Follow-up)
+            </button>
+        </div>
+
+        <!-- Content Sections -->
+        
+        <!-- STAGE 1: 发起邀约 (Invitation) -->
+        <div id="invitation" class="section-content space-y-6">
+            
+            <!-- Category 1: Social Media -->
+            <div class="space-y-4">
+                <div class="flex items-center space-x-2 text-blue-800 border-b-2 border-blue-100 pb-2 mb-4">
+                    <span class="bg-blue-100 text-blue-800 font-bold px-2 py-1 rounded text-xs sm:text-sm shrink-0">對象 1</span>
+                    <h2 class="text-lg sm:text-xl font-bold truncate">社群開發：陌生前輩與創作者</h2>
+                </div>
+                <p class="text-xs text-gray-500 ml-1 -mt-2 mb-4">(KOL、觀點領袖、陌生開發)</p>
+
+                <!-- Template: Content Creator -->
+                <div class="template-card bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6">
+                    <!-- Flex Header for Mobile Responsiveness -->
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-3">
+                         <span class="self-start text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded sm:order-last shrink-0">策略：粉絲心態破冰</span>
+                         <h3 class="text-lg font-bold text-gray-900 sm:order-first">私訊有在發文的前輩</h3>
+                    </div>
+                    
+                    <p class="text-sm text-gray-500 mb-4">這類人通常有分享熱忱，稱讚他的「觀點」是最好的破冰方式，證明你是鐵粉。</p>
+                    <div class="bg-gray-50 rounded-lg p-4 font-mono text-sm text-gray-700 mb-4 whitespace-pre-wrap leading-relaxed border border-gray-200" id="text-li-1">Hi [前輩稱呼]，我是 [你的名字]，目前是 [你的身分]。
+
+冒昧打擾了！最近在您的版上拜讀了關於 [文章主題/觀點] 的分享，特別是對於 [具體哪個觀點] 非常有共鳴，這也啟發了我對 [某領域] 的思考。
+
+目前我正在規劃轉職 [目標職位]，希望能佔用您 15-20 分鐘的時間喝杯咖啡（如果不便見面，線上通話也完全沒問題！），向您請教關於 [具體 1-2 個問題] 的經驗。
+
+知道您工作繁忙，若您願意撥冗，我會配合您的時間。非常感謝！</div>
+                    <div class="flex justify-end">
+                        <button onclick="copyToClipboard('text-li-1', this)" class="copy-btn w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="far fa-copy mr-2"></i>複製模板
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category 2: Alumni -->
+            <div class="space-y-4">
+                <div class="flex items-center space-x-2 text-green-800 border-b-2 border-green-100 pb-2 mb-4 pt-4">
+                    <span class="bg-green-100 text-green-800 font-bold px-2 py-1 rounded text-xs sm:text-sm shrink-0">對象 2</span>
+                    <h2 class="text-lg sm:text-xl font-bold truncate">人情連結：校友與社團學長姐</h2>
+                </div>
+                <p class="text-xs text-gray-500 ml-1 -mt-2 mb-4">(校友、社團前輩、共同圈子)</p>
+
+                <!-- Template: Alumni -->
+                <div class="template-card bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6">
+                    <!-- Flex Header -->
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-3">
+                        <span class="self-start text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded sm:order-last shrink-0">策略：共同背景破冰</span>
+                        <h3 class="text-lg font-bold text-gray-900 sm:order-first">私訊學長姐 (強調共同回憶)</h3>
+                    </div>
+
+                    <p class="text-sm text-gray-500 mb-4">利用「學校/社團」當作橋樑降低戒心，強調你是來請教學習的學弟妹。</p>
+                    <div class="bg-gray-50 rounded-lg p-4 font-mono text-sm text-gray-700 mb-4 whitespace-pre-wrap leading-relaxed border border-gray-200" id="text-li-2">Hi [學長/姐稱呼]，我是 [學校/社團] 的學弟/妹 [你的名字]。
+
+在 LinkedIn 上看到您在 [對方公司] 擔任 [職位]，發展得非常好，是我們 [系所/社團] 的榜樣！
+
+因為我目前也計畫往 [該產業] 發展，但在 [具體遇到的困難/迷惘點] 遇到了一些瓶頸。不知道是否方便向學長/姐請教 15-20 分鐘，聽聽您當初入行的建議？（線上語音或配合您方便的地點都可以！）
+
+貿然私訊打擾，先謝謝學長/姐！</div>
+                    <div class="flex justify-end">
+                        <button onclick="copyToClipboard('text-li-2', this)" class="copy-btn w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="far fa-copy mr-2"></i>複製模板
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category 3: Industry Peers -->
+            <div class="space-y-4">
+                <div class="flex items-center space-x-2 text-gray-800 border-b-2 border-gray-200 pb-2 mb-4 pt-4">
+                    <span class="bg-gray-200 text-gray-800 font-bold px-2 py-1 rounded text-xs sm:text-sm shrink-0">對象 3</span>
+                    <h2 class="text-lg sm:text-xl font-bold truncate">專業連結：職場領域前輩</h2>
+                </div>
+                <p class="text-xs text-gray-500 ml-1 -mt-2 mb-4">(業界前輩、目標公司員工)</p>
+
+                <!-- Template: Professional DM -->
+                <div class="template-card bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6">
+                    <!-- Flex Header -->
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-3">
+                        <span class="self-start text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded sm:order-last shrink-0">策略：專業請益 (LinkedIn 私訊)</span>
+                        <h3 class="text-lg font-bold text-gray-900 sm:order-first">私訊業界前輩 (強調專業與上進心)</h3>
+                    </div>
+
+                    <p class="text-sm text-gray-500 mb-4">適用於 LinkedIn 或專業社群的陌生開發。重點在於展現你的「上進心」與「專業度」，讓對方覺得你是潛力股。</p>
+                    <div class="bg-gray-50 rounded-lg p-4 font-mono text-sm text-gray-700 mb-4 whitespace-pre-wrap leading-relaxed border border-gray-200" id="text-email-1">Hi [前輩稱呼]，我是 [你的名字]，目前任職於 [目前公司/身分]。
+
+冒昧私訊您，是因為在 LinkedIn 上關注您的職涯歷程許久。特別是您從 [A領域] 成功跨轉到 [B領域] 的經驗讓我非常佩服，這也是我目前正努力的方向。
+
+我目前已經自學了 [相關技能]，但在 [具體卡關的點，例如：作品集準備方向] 上感到有些迷惘。不知道是否方便向您請教 15-20 分鐘，聽聽您對新人的建議？（線上語音或配合您方便的地點都可以！）
+
+知道您工作繁忙，若您願意撥冗，我會全力配合您的時間。非常感謝！</div>
+                    <div class="flex justify-end">
+                        <button onclick="copyToClipboard('text-email-1', this)" class="copy-btn w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="far fa-copy mr-2"></i>複製模板
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- STAGE 2: 关系维护 (Follow-up) -->
+        <div id="followup" class="section-content space-y-6 hidden">
+             
+             <div class="flex items-center space-x-2 text-green-700 border-b border-green-200 pb-2">
+                <i class="far fa-handshake text-xl"></i>
+                <h2 class="text-lg sm:text-xl font-bold">面談後跟進</h2>
+                <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full ml-2 shrink-0">關鍵步驟</span>
+            </div>
+
+            <!-- Template 5: 24小時內感謝信 -->
+            <div class="template-card bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6">
+                 <!-- Flex Header -->
+                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-3">
+                    <span class="self-start text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded sm:order-last shrink-0">時機：面談後 24 小時內</span>
+                    <h3 class="text-lg font-bold text-gray-900 sm:order-first">01. 即時感謝信 (Thank You Note)</h3>
+                </div>
+
+                <p class="text-sm text-gray-500 mb-4">一定要提到一個「記憶點」，證明你有認真聽。</p>
+                <div class="bg-gray-50 rounded-lg p-4 font-mono text-sm text-gray-700 mb-4 whitespace-pre-wrap leading-relaxed border border-gray-200" id="text-thx-1">Hi [前輩稱呼]，
+
+非常謝謝您今天撥空跟我分享！
+
+今天收穫非常多，特別是您提到關於「[填寫一個當天最讓你印象深刻的觀點]」的那段分析，完全顛覆了我原本的想像，讓我對 [職位/產業] 有了更務實的認識。
+
+我會照著您的建議，先去研究 [某書/某工具/某方向]，之後有進度再跟您報告！再次感謝您的提點！
+
+[你的名字]</div>
+                <div class="flex justify-end">
+                    <button onclick="copyToClipboard('text-thx-1', this)" class="copy-btn w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="far fa-copy mr-2"></i>複製模板
+                    </button>
+                </div>
+            </div>
+
+             <!-- Template 6: 回報進度 -->
+            <div class="template-card bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6">
+                <!-- Flex Header -->
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-3">
+                    <span class="self-start text-xs font-semibold text-yellow-600 bg-yellow-50 px-2 py-1 rounded sm:order-last shrink-0">時機：面談後 2 週至 1 個月</span>
+                    <h3 class="text-lg font-bold text-gray-900 sm:order-first">02. 回報執行成果 (建立長期關係)</h3>
+                </div>
+
+                <p class="text-sm text-gray-500 mb-4">這招最強。讓前輩覺得他的建議「有用」，他會更有成就感。</p>
+                <div class="bg-gray-50 rounded-lg p-4 font-mono text-sm text-gray-700 mb-4 whitespace-pre-wrap leading-relaxed border border-gray-200" id="text-thx-2">Hi [前輩稱呼]，好久不見！
+
+我是上次跟您請教過的 [你的名字]。想跟您回報一下，上次您建議我去看的 [某本書/某課程]，我已經完成了！
+
+裡面關於 [某個知識點] 的部分對我幫助很大，我試著把它應用在我的 [期末專案/作品集] 上，目前的成效是 [簡單描述成果]。
+
+真的非常謝謝您當初的指引，幫我少走了很多冤枉路。祝您最近工作順利！
+
+[你的名字]</div>
+                <div class="flex justify-end">
+                    <button onclick="copyToClipboard('text-thx-2', this)" class="copy-btn w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="far fa-copy mr-2"></i>複製模板
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tips Section -->
+        <div class="mt-8 bg-blue-50 border border-blue-100 rounded-xl p-5 sm:p-6">
+            <h4 class="font-bold text-blue-800 mb-3"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i>邀約成功 3 大心法</h4>
+            <ul class="space-y-2 text-sm text-blue-900">
+                <li class="flex items-start"><span class="mr-2">1.</span> <span><strong>明確請求：</strong>不要說「想跟你聊聊」，要說「想請教關於 A 專案的執行經驗」。</span></li>
+                <li class="flex items-start"><span class="mr-2">2.</span> <span><strong>給予彈性：</strong>一定要補上一句「線上聊也完全沒問題」，降低對方見面的壓力。</span></li>
+                <li class="flex items-start"><span class="mr-2">3.</span> <span><strong>證明價值：</strong>透過提到對方的文章或成就，證明你是有做功課而來的，不是亂槍打鳥。</span></li>
+            </ul>
+        </div>
+        
+        <div class="mt-8 text-center text-xs text-gray-400">
+            &copy; Coffee Chat 邀約小幫手
+        </div>
+
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            // Hide all content
+            document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
+            // Show selected content
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Update tab styles to inactive
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-600', 'text-white', 'shadow-sm');
+                // Revert to inactive style
+                btn.classList.add('bg-white', 'text-gray-500', 'border', 'border-gray-300');
+                
+                // Reset number badge
+                const badge = btn.querySelector('span');
+                if(badge) {
+                     badge.classList.remove('bg-white', 'text-blue-600');
+                     badge.classList.add('bg-gray-200', 'text-gray-600');
+                }
+            });
+            
+            // Highlight active tab
+            const activeBtn = document.querySelector(`button[data-target="${tabId}"]`);
+            activeBtn.classList.remove('bg-white', 'text-gray-500', 'border', 'border-gray-300');
+            activeBtn.classList.add('active', 'bg-blue-600', 'text-white', 'shadow-sm'); // Added active class
+             
+             // Update active badge
+            const activeBadge = activeBtn.querySelector('span');
+            if(activeBadge) {
+                 activeBadge.classList.remove('bg-gray-200', 'text-gray-600');
+                 activeBadge.classList.add('bg-white', 'text-blue-600');
+            }
+        }
+
+        function copyToClipboard(elementId, btnElement) {
+            const text = document.getElementById(elementId).innerText;
+            
+            // Create a temporary textarea element to copy the text
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            
+            // Visual feedback
+            const originalText = btnElement.innerHTML;
+            const originalClasses = btnElement.className;
+            
+            btnElement.innerHTML = '<i class="fas fa-check mr-2"></i>已複製！';
+            btnElement.classList.remove('text-blue-700', 'bg-blue-100');
+            btnElement.classList.add('text-green-700', 'bg-green-100');
+            
+            setTimeout(() => {
+                btnElement.innerHTML = originalText;
+                // Revert classes logic simplified for specific button type used
+                btnElement.className = originalClasses;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
