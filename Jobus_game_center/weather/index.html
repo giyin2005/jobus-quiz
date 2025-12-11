@@ -9,13 +9,15 @@
 
     body{
         margin:0;
+        /* 1. 基礎字體調大，且使用較黑的顏色增加對比 */
         font-family:"Noto Sans TC", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
         background:linear-gradient(#d9efff,#f3f8ff);
         min-height:100vh;
         overflow-x:hidden;
+        color: #222; /* 字體顏色加深，對比度更好 */
     }
 
-    /* 淡淡飄動雲朵背景 */
+    /* 雲朵背景保持不變 */
     .clouds{
         position:fixed;
         inset:0;
@@ -33,33 +35,15 @@
         opacity:0.7;
         animation:moveCloud 40s linear infinite;
     }
-    .cloud::before,
-    .cloud::after{
-        content:"";
-        position:absolute;
-        background:#fff;
-        border-radius:50%;
+    .cloud::before, .cloud::after{
+        content:""; position:absolute; background:#fff; border-radius:50%;
     }
-    .cloud::before{
-        width:110px;
-        height:80px;
-        top:-25px;
-        left:5px;
-    }
-    .cloud::after{
-        width:130px;
-        height:85px;
-        top:-30px;
-        left:90px;
-    }
+    .cloud::before{ width:110px; height:80px; top:-25px; left:5px; }
+    .cloud::after{ width:130px; height:85px; top:-30px; left:90px; }
     .cloud.c1{top:40px;left:-260px;animation-duration:50s;}
     .cloud.c2{top:140px;left:-260px;animation-duration:60s;}
     .cloud.c3{top:220px;left:-260px;animation-duration:70s;}
-
-    @keyframes moveCloud{
-        0%{transform:translateX(0);}
-        100%{transform:translateX(140vw);}
-    }
+    @keyframes moveCloud{ 0%{transform:translateX(0);} 100%{transform:translateX(140vw);} }
 
     /* 主要內容容器 */
     .container{
@@ -67,32 +51,35 @@
         z-index:10;
         max-width:520px;
         margin:0 auto;
-        padding:20px 16px 32px;
+        padding:20px 16px 40px; /* 底部留白多一點 */
     }
     h1{
         text-align:center;
-        font-size:24px;
-        margin:10px 0 4px;
-        color: #333;
+        /* 2. 標題加大 */
+        font-size:28px; 
+        margin:12px 0 6px;
+        color: #111;
+        font-weight: 800; /* 加粗 */
     }
     .subtitle-emoji{
         text-align:center;
-        font-size:26px;
-        margin-bottom:14px;
+        font-size:32px; /* emoji 稍微加大 */
+        margin-bottom:18px;
     }
 
     .card{
         background:#ffffff;
-        border-radius:16px;
-        padding:16px 18px;
-        box-shadow:0 4px 10px rgba(0,0,0,0.08);
-        margin-bottom:14px;
+        border-radius:18px;
+        padding:20px 22px; /* 卡片內距加大 */
+        box-shadow:0 6px 14px rgba(0,0,0,0.1);
+        margin-bottom:18px;
     }
     .card-title{
-        font-weight:600;
-        margin-bottom:6px;
-        font-size:16px;
-        color: #333;
+        font-weight:700;
+        margin-bottom:10px;
+        /* 3. 卡片小標題加大 */
+        font-size:19px; 
+        color: #222;
     }
 
     /* 搜尋輸入 + 建議 */
@@ -102,18 +89,18 @@
     }
     #searchInput{
         width:100%;
-        padding:12px 14px;
-        font-size:18px;
+        padding:14px 16px;
+        /* 4. 輸入框文字加大，老人家打字看比較清楚 */
+        font-size:20px; 
         border-radius:12px;
-        border:1px solid #3A8DFF;
+        border:2px solid #3A8DFF; /* 邊框加粗一點點 */
         outline:none;
         background:#fff;
+        color: #000;
     }
     #suggestions{
         position:absolute;
-        left:0;
-        right:0;
-        top:100%;
+        left:0; right:0; top:100%;
         margin-top:4px;
         background:#fff;
         border-radius:12px;
@@ -124,164 +111,160 @@
         z-index:20;
     }
     .s-item{
-        padding:10px 14px;
+        padding:14px 16px; /* 選單點擊區域加大 */
         cursor:pointer;
-        font-size:16px;
+        font-size:19px; /* 選單文字加大 */
         border-bottom: 1px solid #f0f0f0;
+        color: #333;
     }
     .s-item:last-child{ border-bottom: none; }
-    .s-item:hover{
-        background:#eef4ff;
-        color: #3A8DFF;
-    }
+    .s-item:hover{ background:#eef4ff; color: #3A8DFF; }
 
     .btn-row{
         display:flex;
-        gap:8px;
-        margin-top:12px;
+        gap:10px;
+        margin-top:16px;
     }
 
-    .main-btn{
+    .main-btn, .ghost-btn{
         flex:1;
-        padding:12px 16px;
-        font-size:16px;
+        padding:14px 16px; /* 按鈕變大顆 */
+        /* 5. 按鈕文字加大 */
+        font-size:18px; 
+        font-weight: 600;
         border-radius:999px;
+        cursor:pointer;
+        transition: background 0.2s;
+    }
+    .main-btn{
         border:none;
         background:#3A8DFF;
         color:#fff;
-        cursor:pointer;
-        transition: background 0.2s;
     }
     .main-btn:hover{ background:#2a75d9; }
     
     .ghost-btn{
-        flex:1;
-        padding:12px 16px;
-        font-size:15px;
-        border-radius:999px;
-        border:1px solid #3A8DFF;
+        border:2px solid #3A8DFF;
         background:#fff;
         color:#3A8DFF;
-        cursor:pointer;
-        transition: background 0.2s;
     }
     .ghost-btn:hover{ background:#f0f7ff; }
-
-    .main-btn:disabled,
-    .ghost-btn:disabled{
-        opacity:0.6;
-        cursor:default;
-    }
+    .main-btn:disabled, .ghost-btn:disabled{ opacity:0.6; cursor:default; }
 
     /* loading spinner */
     .loading{
         display:none;
-        margin-top:10px;
-        font-size:14px;
+        margin-top:14px;
+        font-size:16px; /* Loading 文字加大 */
         align-items:center;
-        gap:6px;
-        color:#555;
+        gap:8px;
+        color:#444;
+        font-weight: 500;
     }
     .spinner{
-        width:16px;
-        height:16px;
+        width:20px; height:20px;
         border-radius:50%;
-        border:2px solid rgba(58,141,255,0.3);
+        border:3px solid rgba(58,141,255,0.3);
         border-top-color:#3A8DFF;
         animation:spin 0.8s linear infinite;
     }
-    @keyframes spin{
-        to{transform:rotate(360deg);}
-    }
+    @keyframes spin{ to{transform:rotate(360deg);} }
 
     /* 天氣摘要卡片 */
     #weatherSummaryCard{
         display:none;
-        line-height:1.6;
-        font-size:15px;
-        color: #333;
+        /* 6. 行高加大，避免文字放大後擠在一起 */
+        line-height:1.7; 
+        /* 7. 核心天氣資訊文字加大 */
+        font-size:19px; 
+        color: #111; /* 純黑增加閱讀性 */
         border: 2px solid transparent; 
     }
     
-    /* 標題區塊：城市 + 時間 */
     .summary-header {
-        margin-bottom: 12px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid #eee;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ddd;
     }
     #summaryCity {
-        font-size: 19px;
-        font-weight: 700;
-        color: #222;
+        font-size: 24px; /* 地點名稱超大 */
+        font-weight: 800;
+        color: #000;
     }
     #summaryTime {
-        font-size: 14px;
-        color: #666;
-        margin-top: 2px;
+        font-size: 16px;
+        color: #555;
+        margin-top: 4px;
     }
 
     /* 列表式資訊 */
     .info-row {
-        margin-bottom: 6px;
+        margin-bottom: 10px; /* 行距拉開 */
         display: flex;
-        align-items: flex-start;
+        align-items: flex-start; /* 文字若換行，圖示保持在上方 */
     }
     .info-icon {
-        min-width: 24px;
+        min-width: 32px; /* 圖示區域加大 */
         text-align: center;
-        margin-right: 6px;
+        margin-right: 8px;
+        font-size: 20px; /* emoji 加大 */
     }
     .info-text {
         flex: 1;
+        word-break: break-word; /* 避免長文字破版 */
     }
 
     /* 底部總結 */
     #weatherBottomNote {
-        margin-top: 12px;
-        font-weight: 600;
-        color: #333;
-        background: #f4f6f8;
-        padding: 10px;
-        border-radius: 8px;
-        font-size: 15px;
+        margin-top: 16px;
+        font-weight: 700;
+        color: #000;
+        background: #eef6fc; /* 背景色對比調強 */
+        padding: 14px;
+        border-radius: 12px;
+        font-size: 19px; /* 總結文字加大 */
+        line-height: 1.6;
     }
 
     /* 通勤按鈕 */
     #commuteBtns{
         display:none;
-        flex-wrap:wrap;
-        gap:10px;
+        flex-wrap:wrap; /* 關鍵：空間不夠會自動換行 */
+        gap:12px;
         justify-content:center;
-        margin-top:4px;
+        margin-top:8px;
     }
     .cm-btn{
         flex:1 1 45%;
-        min-width:130px;
-        padding:10px 12px;
-        border-radius:14px;
+        min-width:140px; /* 按鈕最小寬度加大 */
+        padding:14px 12px;
+        border-radius:16px;
         border:2px solid #3A8DFF;
         background:#fff;
         color:#3A8DFF;
-        font-size:16px;
+        /* 8. 通勤選項文字加大 */
+        font-size:18px; 
+        font-weight: 600;
         cursor:pointer;
-        box-shadow:0 2px 6px rgba(0,0,0,0.05);
+        box-shadow:0 3px 8px rgba(0,0,0,0.08);
         transition: all 0.2s;
     }
-    .cm-btn:hover{
-        background: #3A8DFF;
-        color: #fff;
-    }
+    .cm-btn:hover{ background: #3A8DFF; color: #fff; }
+    
     #commuteResult{
-        margin-top:12px;
-        font-size:16px;
+        margin-top:16px;
+        font-size:19px; /* 建議結果文字加大 */
         font-weight:600;
-        line-height: 1.5;
+        line-height: 1.6;
+        color: #222;
     }
 
     @media (max-width:360px){
-        h1{font-size:22px;}
-        #searchInput{font-size:16px;}
-        .cm-btn{font-size:15px;}
+        /* 針對超小手機稍微縮一點點，避免完全塞不下 */
+        h1{font-size:24px;}
+        #searchInput{font-size:18px;}
+        #summaryCity{font-size:22px;}
+        .info-text{font-size:18px;}
     }
 </style>
 </head>
@@ -513,7 +496,6 @@ searchInput.addEventListener("input", () => {
             searchInput.value = selectedName;
             suggestions.style.display = "none";
             
-            // 直接觸發搜尋
             const area = districts.find(a => a.name === selectedName);
             if(area){
                 fetchWeather(area.lat, area.lon, area.name);
@@ -528,7 +510,7 @@ document.addEventListener("click", (e)=>{
     }
 });
 
-// ========== 事件：手動搜尋按鈕 (保留作為備用) ==========
+// ========== 事件：手動搜尋按鈕 ==========
 getWeatherBtn.addEventListener("click", () => {
     const text = searchInput.value.trim();
     if(!text){
@@ -681,7 +663,7 @@ function getWeatherStatus(code) {
     }
 }
 
-// ========== 天氣摘要與指標 (邏輯修正版) ==========
+// ========== 天氣摘要與指標 ==========
 function updateWeatherSummary(label, c, extra){
     const card = document.getElementById("weatherSummaryCard");
     const tNow = c.temperature_2m;
@@ -700,22 +682,18 @@ function updateWeatherSummary(label, c, extra){
     else if(tNow >= 16) clothes = "長袖或薄外套最剛好 🙂";
     else                clothes = "蠻冷的，記得穿厚一點 🧣";
 
-    // 2. 帶傘建議 (邏輯修正)
+    // 2. 帶傘建議
     let umbrella;
     if (rainProb === 0) {
-        // 只有真正的 0% 才說完全沒雨
         umbrella = "完全沒雨，不用帶傘，輕便出門吧 👍";
         currentWeatherType = "ok";
     } else if (rainProb <= 30) {
-        // 1% ~ 30%：機率低，但語氣保留
         umbrella = "降雨機率不高，嫌重可以不帶，或帶摺疊傘備用 ☁️";
         currentWeatherType = "ok"; 
     } else if (rainProb <= 60) {
-        // 31% ~ 60%
         umbrella = "出門建議帶把傘，避免突發陣雨 🌦️";
         currentWeatherType = "rain";
     } else {
-        // > 60%
         umbrella = "降雨機率高，出門一定要帶傘 ☔";
         currentWeatherType = "rain";
     }
@@ -734,7 +712,7 @@ function updateWeatherSummary(label, c, extra){
     // 若雨大，風大也算雨天
     if(rainProb >= 50) currentWeatherType = "rain";
 
-    // 4. 通勤提醒一句
+    // 4. 通勤提醒
     let noteLine;
     if(currentWeatherType === "rain"){
         noteLine = "雨勢關係，建議預留緩衝時間，或選擇不淋雨的交通工具！";
