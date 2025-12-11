@@ -4,20 +4,29 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>通勤天氣小幫手 🌤</title>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P7PY1RNXJQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // 設定您的 ID，並啟用基本追蹤
+  gtag('config', 'G-P7PY1RNXJQ');
+</script>
 <style>
     *{box-sizing:border-box;}
 
     body{
         margin:0;
-        /* 1. 基礎字體調大，且使用較黑的顏色增加對比 */
         font-family:"Noto Sans TC", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
         background:linear-gradient(#d9efff,#f3f8ff);
         min-height:100vh;
         overflow-x:hidden;
-        color: #222; /* 字體顏色加深，對比度更好 */
+        color: #222; 
     }
 
-    /* 雲朵背景保持不變 */
+    /* 雲朵背景 */
     .clouds{
         position:fixed;
         inset:0;
@@ -51,34 +60,32 @@
         z-index:10;
         max-width:520px;
         margin:0 auto;
-        padding:20px 16px 40px; /* 底部留白多一點 */
+        padding:20px 16px 40px;
     }
     h1{
         text-align:center;
-        /* 2. 標題加大 */
-        font-size:28px; 
+        font-size:28px; /* 大字體 */
         margin:12px 0 6px;
         color: #111;
-        font-weight: 800; /* 加粗 */
+        font-weight: 800;
     }
     .subtitle-emoji{
         text-align:center;
-        font-size:32px; /* emoji 稍微加大 */
+        font-size:32px;
         margin-bottom:18px;
     }
 
     .card{
         background:#ffffff;
         border-radius:18px;
-        padding:20px 22px; /* 卡片內距加大 */
+        padding:20px 22px;
         box-shadow:0 6px 14px rgba(0,0,0,0.1);
         margin-bottom:18px;
     }
     .card-title{
         font-weight:700;
         margin-bottom:10px;
-        /* 3. 卡片小標題加大 */
-        font-size:19px; 
+        font-size:19px; /* 大字體 */
         color: #222;
     }
 
@@ -90,10 +97,9 @@
     #searchInput{
         width:100%;
         padding:14px 16px;
-        /* 4. 輸入框文字加大，老人家打字看比較清楚 */
-        font-size:20px; 
+        font-size:20px; /* 大字體 */
         border-radius:12px;
-        border:2px solid #3A8DFF; /* 邊框加粗一點點 */
+        border:2px solid #3A8DFF;
         outline:none;
         background:#fff;
         color: #000;
@@ -111,9 +117,9 @@
         z-index:20;
     }
     .s-item{
-        padding:14px 16px; /* 選單點擊區域加大 */
+        padding:14px 16px;
         cursor:pointer;
-        font-size:19px; /* 選單文字加大 */
+        font-size:19px; /* 大字體 */
         border-bottom: 1px solid #f0f0f0;
         color: #333;
     }
@@ -128,9 +134,8 @@
 
     .main-btn, .ghost-btn{
         flex:1;
-        padding:14px 16px; /* 按鈕變大顆 */
-        /* 5. 按鈕文字加大 */
-        font-size:18px; 
+        padding:14px 16px;
+        font-size:18px; /* 大字體 */
         font-weight: 600;
         border-radius:999px;
         cursor:pointer;
@@ -155,7 +160,7 @@
     .loading{
         display:none;
         margin-top:14px;
-        font-size:16px; /* Loading 文字加大 */
+        font-size:16px;
         align-items:center;
         gap:8px;
         color:#444;
@@ -173,11 +178,9 @@
     /* 天氣摘要卡片 */
     #weatherSummaryCard{
         display:none;
-        /* 6. 行高加大，避免文字放大後擠在一起 */
         line-height:1.7; 
-        /* 7. 核心天氣資訊文字加大 */
-        font-size:19px; 
-        color: #111; /* 純黑增加閱讀性 */
+        font-size:19px; /* 大字體 */
+        color: #111;
         border: 2px solid transparent; 
     }
     
@@ -199,19 +202,19 @@
 
     /* 列表式資訊 */
     .info-row {
-        margin-bottom: 10px; /* 行距拉開 */
+        margin-bottom: 10px;
         display: flex;
-        align-items: flex-start; /* 文字若換行，圖示保持在上方 */
+        align-items: flex-start;
     }
     .info-icon {
-        min-width: 32px; /* 圖示區域加大 */
+        min-width: 32px;
         text-align: center;
         margin-right: 8px;
-        font-size: 20px; /* emoji 加大 */
+        font-size: 20px;
     }
     .info-text {
         flex: 1;
-        word-break: break-word; /* 避免長文字破版 */
+        word-break: break-word;
     }
 
     /* 底部總結 */
@@ -219,31 +222,30 @@
         margin-top: 16px;
         font-weight: 700;
         color: #000;
-        background: #eef6fc; /* 背景色對比調強 */
+        background: #eef6fc;
         padding: 14px;
         border-radius: 12px;
-        font-size: 19px; /* 總結文字加大 */
+        font-size: 19px; /* 大字體 */
         line-height: 1.6;
     }
 
     /* 通勤按鈕 */
     #commuteBtns{
         display:none;
-        flex-wrap:wrap; /* 關鍵：空間不夠會自動換行 */
+        flex-wrap:wrap;
         gap:12px;
         justify-content:center;
         margin-top:8px;
     }
     .cm-btn{
         flex:1 1 45%;
-        min-width:140px; /* 按鈕最小寬度加大 */
+        min-width:140px;
         padding:14px 12px;
         border-radius:16px;
         border:2px solid #3A8DFF;
         background:#fff;
         color:#3A8DFF;
-        /* 8. 通勤選項文字加大 */
-        font-size:18px; 
+        font-size:18px; /* 大字體 */
         font-weight: 600;
         cursor:pointer;
         box-shadow:0 3px 8px rgba(0,0,0,0.08);
@@ -253,14 +255,13 @@
     
     #commuteResult{
         margin-top:16px;
-        font-size:19px; /* 建議結果文字加大 */
+        font-size:19px; /* 大字體 */
         font-weight:600;
         line-height: 1.6;
         color: #222;
     }
 
     @media (max-width:360px){
-        /* 針對超小手機稍微縮一點點，避免完全塞不下 */
         h1{font-size:24px;}
         #searchInput{font-size:18px;}
         #summaryCity{font-size:22px;}
@@ -528,6 +529,12 @@ getWeatherBtn.addEventListener("click", () => {
 
 // ========== 事件：定位按鈕 ==========
 geoBtn.addEventListener("click", () => {
+    
+    // 🔴 GA4 事件追蹤：紀錄定位使用
+    if(typeof gtag === 'function'){
+        gtag('event', 'use_geolocation');
+    }
+
     if(!navigator.geolocation){
         alert("此裝置不支援定位功能");
         return;
@@ -574,6 +581,14 @@ async function fetchWeather(lat, lon, label){
     try{
         setLoading(true, "正在查詢天氣...");
         
+        // 🔴 GA4 事件追蹤：紀錄搜尋地點
+        if(typeof gtag === 'function'){
+            gtag('event', 'search_weather', {
+                'event_category': 'Engagement',
+                'event_label': label // 例如：台北市 大安區
+            });
+        }
+
         if(label !== "目前位置") {
             searchInput.value = label;
         }
@@ -763,6 +778,14 @@ document.querySelectorAll(".cm-btn").forEach(btn=>{
     btn.addEventListener("click", () => {
         const type = btn.dataset.type;
         const msg = buildCommuteAdvice(type, currentWeatherType);
+
+        // 🔴 GA4 事件追蹤：紀錄通勤選擇
+        if(typeof gtag === 'function'){
+            gtag('event', 'select_commute', {
+                'commute_mode': type,           // 例如：mrt, scooter
+                'weather_context': currentWeatherType // 例如：rain, ok, wind
+            });
+        }
         
         const resultBox = document.getElementById("commuteResult");
         resultBox.style.opacity = 0;
