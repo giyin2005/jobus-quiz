@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>今天要怎麼通勤？讓天氣告訴你 🌤</title>
+<title>通勤天氣小幫手 🌤</title>
 <style>
     *{box-sizing:border-box;}
 
@@ -194,13 +194,13 @@
         to{transform:rotate(360deg);}
     }
 
-    /* 天氣摘要卡片 (新版樣式) */
+    /* 天氣摘要卡片 */
     #weatherSummaryCard{
         display:none;
         line-height:1.6;
         font-size:15px;
         color: #333;
-        border: 2px solid transparent; /* 預留邊框位置 */
+        border: 2px solid transparent; 
     }
     
     /* 標題區塊：城市 + 時間 */
@@ -322,8 +322,7 @@
             <div id="summaryTime"></div>
         </div>
         
-        <div id="infoList">
-            </div>
+        <div id="infoList"></div>
 
         <div id="weatherBottomNote">天氣正常，選一個你最舒服的通勤方式就好。</div>
     </div>
@@ -344,9 +343,8 @@
 
 <script>
 // ============================================
-//  全台 368 鄉鎮市區行政區經緯度資料庫 (壓縮版)
+//  全台 368 鄉鎮市區行政區經緯度資料庫
 // ============================================
-// 為了不讓程式碼過長，這裡使用完整列表。
 const districts = [
   {name: "基隆市 仁愛區", lat: 25.128, lon: 121.742}, {name: "基隆市 信義區", lat: 25.127, lon: 121.758}, {name: "基隆市 中正區", lat: 25.143, lon: 121.768},
   {name: "基隆市 中山區", lat: 25.148, lon: 121.733}, {name: "基隆市 安樂區", lat: 25.138, lon: 121.718}, {name: "基隆市 暖暖區", lat: 25.097, lon: 121.739},
@@ -589,7 +587,7 @@ async function fetchLocationName(lat, lon) {
     }
 }
 
-// ========== 呼叫 Open-Meteo 取得天氣 (API 升級) ==========
+// ========== 呼叫 Open-Meteo 取得天氣 ==========
 async function fetchWeather(lat, lon, label){
     try{
         setLoading(true, "正在查詢天氣...");
@@ -598,7 +596,6 @@ async function fetchWeather(lat, lon, label){
             searchInput.value = label;
         }
 
-        // 新增 weather_code 與 hourly precipitation_probability
         const url =
           `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
           `&current=temperature_2m,precipitation,wind_speed_10m,weather_code` +
@@ -614,7 +611,6 @@ async function fetchWeather(lat, lon, label){
         const extra = {
           tMax: d && d.temperature_2m_max ? d.temperature_2m_max[0] : null,
           tMin: d && d.temperature_2m_min ? d.temperature_2m_min[0] : null,
-          // 取得當前小時的降雨機率
           rainProb: getHourlyProb(h)
         };
 
@@ -622,7 +618,6 @@ async function fetchWeather(lat, lon, label){
         document.getElementById("commuteBtns").style.display = "flex";
         document.getElementById("commuteResult").textContent = "";
         
-        // 平滑捲動
         document.getElementById("weatherSummaryCard").scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     }catch(e){
@@ -636,7 +631,6 @@ async function fetchWeather(lat, lon, label){
 function getHourlyProb(hourlyData) {
     if (!hourlyData || !hourlyData.precipitation_probability) return 0;
     const currentHour = new Date().getHours();
-    // Open-Meteo hourly array starts at 00:00 today. index = currentHour
     return hourlyData.precipitation_probability[currentHour] || 0;
 }
 
@@ -657,14 +651,13 @@ function getCurrentFormattedTime() {
     const mins = now.getMinutes().toString().padStart(2, '0');
     const ampm = hours >= 12 ? "下午" : "上午";
     hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
+    hours = hours ? hours : 12; 
     
     return `${day}${ampm}${hours}:${mins}`;
 }
 
 // ========== WMO 天氣代碼轉換 ==========
 function getWeatherStatus(code) {
-    // 參考 Open-Meteo WMO Code table
     switch(code) {
         case 0: return { icon: "☀️", text: "晴朗" };
         case 1: 
@@ -688,16 +681,13 @@ function getWeatherStatus(code) {
     }
 }
 
-// ========== 天氣摘要與指標 (紅框核心修改) ==========
+// ========== 天氣摘要與指標 (邏輯修正版) ==========
 function updateWeatherSummary(label, c, extra){
     const card = document.getElementById("weatherSummaryCard");
     const tNow = c.temperature_2m;
     const wCode = c.weather_code;
     const wSpeed = c.wind_speed_10m;
-    
-    // 從 extra 取得降雨機率 (依需求改為 %)
     const rainProb = extra.rainProb; 
-    
     const tMax = extra.tMax ?? tNow;
     const tMin = extra.tMin ?? tNow;
 
@@ -710,17 +700,24 @@ function updateWeatherSummary(label, c, extra){
     else if(tNow >= 16) clothes = "長袖或薄外套最剛好 🙂";
     else                clothes = "蠻冷的，記得穿厚一點 🧣";
 
-    // 2. 帶傘建議 (邏輯微調：看降雨機率)
+    // 2. 帶傘建議 (邏輯修正)
     let umbrella;
-    if(rainProb >= 50) {
-        umbrella = "降雨機率高，出門一定要帶傘 ☔";
-        currentWeatherType = "rain";
-    } else if(rainProb > 20) {
-        umbrella = "可能有雨，帶把摺疊傘比較安心 🌦️";
-        currentWeatherType = "rain"; 
-    } else {
+    if (rainProb === 0) {
+        // 只有真正的 0% 才說完全沒雨
         umbrella = "完全沒雨，不用帶傘，輕便出門吧 👍";
         currentWeatherType = "ok";
+    } else if (rainProb <= 30) {
+        // 1% ~ 30%：機率低，但語氣保留
+        umbrella = "降雨機率不高，嫌重可以不帶，或帶摺疊傘備用 ☁️";
+        currentWeatherType = "ok"; 
+    } else if (rainProb <= 60) {
+        // 31% ~ 60%
+        umbrella = "出門建議帶把傘，避免突發陣雨 🌦️";
+        currentWeatherType = "rain";
+    } else {
+        // > 60%
+        umbrella = "降雨機率高，出門一定要帶傘 ☔";
+        currentWeatherType = "rain";
     }
 
     // 3. 風速建議
@@ -747,7 +744,7 @@ function updateWeatherSummary(label, c, extra){
         noteLine = "天氣正常，選一個你最舒服的通勤方式就好。";
     }
 
-    // ===== 寫入畫面 (依照紅框樣式) =====
+    // ===== 寫入畫面 =====
     document.getElementById("summaryCity").textContent = label;
     document.getElementById("summaryTime").textContent = getCurrentFormattedTime();
 
@@ -783,7 +780,7 @@ function updateWeatherSummary(label, c, extra){
     card.style.display = "block";
 }
 
-// ========== 通勤建議 (保持原有邏輯) ==========
+// ========== 通勤建議 ==========
 document.querySelectorAll(".cm-btn").forEach(btn=>{
     btn.addEventListener("click", () => {
         const type = btn.dataset.type;
