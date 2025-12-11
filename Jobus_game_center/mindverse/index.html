@@ -37,8 +37,8 @@
 
     <script>
         /**
-         * 心理宇宙 Mindverse - Enhanced Version
-         * 優化內容：完整結果卡片、RWD 排版修正、Safe Area 支援、統一排版引擎
+         * 心理宇宙 Mindverse - Final Version
+         * 特色：原版圖標設計 (Icons Restored) + 完整結果卡片 + RWD 排版修正
          */
 
         // --- 核心系統與變數 ---
@@ -71,7 +71,7 @@
             }
         };
 
-        // --- 1. 資料庫 (擴充為完整版結果卡) ---
+        // --- 1. 資料庫 (完整版結果卡) ---
 
         // (A) Big5 Data
         const big5Data = {
@@ -96,9 +96,7 @@
                 {q:"派對上...", a:"認識陌生人(E)", b:"找熟人(I)", d:'ei', v:2}, {q:"你更相信...", a:"直覺與靈感(N)", b:"經驗與數據(S)", d:'sn', v:2},
                 {q:"朋友訴苦...", a:"給予建議(T)", b:"給予安慰(F)", d:'tf', v:2}, {q:"工作環境...", a:"井然有序(J)", b:"彈性自由(P)", d:'jp', v:2}
             ],
-            // 簡化範例，實際專案可擴充 16 型完整資料
             results: {
-                // E/I + S/N + T/F + J/P
                 'ISTJ': { t:'皇家衛士', e:'🛡️', oneLine:"一絲不苟的邏輯執行者。", teamRole:"流程守護者，確保SOP被執行。", careMost:"秩序與責任。", coopTips:["請給出明確指令與期限","不要隨意變更計畫"], careerHint:["適合有制度、講求精準的環境"] },
                 'ISFJ': { t:'守護天使', e:'🕯️', oneLine:"溫暖且盡責的幕後推手。", teamRole:"照顧者，補足團隊細節。", careMost:"和諧與他人的需求。", coopTips:["給予真誠的感謝","避免公開批評"], careerHint:["適合助人、行政或醫療領域"] },
                 'INFJ': { t:'神秘先知', e:'🔮', oneLine:"洞察人性，深邃的理想主義者。", teamRole:"精神領袖，看見長遠願景。", careMost:"意義與深層連結。", coopTips:["給他們時間獨處思考","尊重他們的直覺"], careerHint:["適合諮商、寫作或非營利組織"] },
@@ -277,7 +275,6 @@
 
         // --- 繪圖引擎 (Helper Functions) ---
         
-        // 1. 增強版自動換行 (支援 maxWidth)
         function wrapText(txt, x, y, maxW, lh) {
             if(!txt) return y;
             const chars = txt.split(''); 
@@ -294,19 +291,17 @@
                 }
             }
             ctx.fillText(line, x, cy);
-            return cy + lh; // 回傳下一行的 y
+            return cy + lh; 
         }
 
-        // 2. 繪製段落 (自動標題樣式)
         function drawSectionTitle(title, x, y, color='#fff') {
             ctx.fillStyle = color;
             ctx.font = 'bold 18px "Noto Sans TC"';
-            ctx.textAlign = 'left'; // 段落通常靠左
+            ctx.textAlign = 'left';
             ctx.fillText(title, x, y);
-            return y + 30; // 標題下方間距
+            return y + 30;
         }
 
-        // 3. 繪製條列清單
         function drawBulletList(list, x, y, maxW, lh=24) {
             ctx.textAlign = 'left';
             ctx.font = '16px "Noto Sans TC"';
@@ -315,44 +310,36 @@
             if(!list || list.length===0) return cy;
             list.forEach(item => {
                 const bullet = "• ";
-                // 簡單處理，如果內容很長，手動 wrap
                 const chars = item.split('');
                 let line = bullet;
                 for(let n=0; n<chars.length; n++) {
                     const test = line + chars[n];
                     if(ctx.measureText(test).width > maxW && n>0) {
                         ctx.fillText(line, x, cy);
-                        line = "  " + chars[n]; // 縮排
+                        line = "  " + chars[n]; 
                         cy += lh;
                     } else {
                         line = test;
                     }
                 }
                 ctx.fillText(line, x, cy);
-                cy += lh * 1.2; // 項目間距
+                cy += lh * 1.2;
             });
             return cy + 10;
         }
 
-        // 4. RWD 卡片按鈕 (修正文字擠壓)
         function drawCard(x, y, w, h, t, txt, c, act) { 
             const hover=Math.abs(mouse.x - x) < w/2 && Math.abs(mouse.y - (y+h/2)) < h/2;
             ctx.strokeStyle=hover?c:'#555'; ctx.lineWidth=2; ctx.fillStyle=hover?'rgba(255,255,255,0.12)':'rgba(30,30,30,0.85)';
             ctx.beginPath();
             ctx.roundRect(x-w/2, y, w, h, 15); ctx.fill(); ctx.stroke();
-            
-            // Letter (A/B)
             ctx.fillStyle=c; ctx.font='30px Orbitron'; ctx.textAlign='center'; 
             ctx.fillText(t, x, y+45);
-            
-            // Wrapped text
             ctx.fillStyle='#fff'; ctx.font='20px "Noto Sans TC"';
             wrapText(txt, x, y+85, w-40, 26);
-            
             hitZones.push({t:'rect', x:x-w/2, y:y, w:w, h:h, action:act});
         }
 
-        // 5. 通用按鈕
         function drawBtn(x, y, txt, color, act, w=200) {
             const h=50;
             const hover = Math.abs(mouse.x - x) < w/2 && Math.abs(mouse.y - (y+h/2)) < h/2;
@@ -398,26 +385,63 @@
                 ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='700 10px Orbitron'; ctx.fillText("M I N D V E R S E", cx, cy+15); ctx.textBaseline='alphabetic';
             }
         }
+        
+        // ✅ [RESTORED] Original Icon Drawing Logic
         function drawPlanetIcon(n, x, y, hover) {
             const scale=hover?1.2:1.0;
             ctx.save(); ctx.translate(x, y); ctx.scale(scale, scale);
             if(hover){ctx.shadowColor=n.glow; ctx.shadowBlur=30;}
-            ctx.fillStyle='rgba(10,10,20,0.8)'; ctx.beginPath(); ctx.arc(0,0,50,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle='rgba(10,10,20,0.8)'; ctx.beginPath();
+            ctx.arc(0,0,50,0,Math.PI*2); ctx.fill();
             ctx.shadowBlur=0; ctx.lineWidth=3; ctx.strokeStyle=n.color;
-            
-            // Icons logic (simplified from original)
-            if(n.type==='pentagon'){ ctx.beginPath(); for(let i=0;i<5;i++){const a=(i/5)*Math.PI*2-Math.PI/2;ctx.lineTo(Math.cos(a)*35,Math.sin(a)*35);}ctx.closePath();ctx.stroke(); }
-            else if(n.type==='hexagon'){ ctx.beginPath(); for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2;ctx.lineTo(Math.cos(a)*35,Math.sin(a)*35);}ctx.closePath();ctx.stroke(); }
-            else if(n.type==='nonagon'){ ctx.beginPath(); for(let i=0;i<9;i++){const a=(i/9)*Math.PI*2-Math.PI/2;ctx.lineTo(Math.cos(a)*38,Math.sin(a)*38);}ctx.closePath();ctx.stroke(); }
-            else if(n.type==='radar'){ ctx.beginPath();ctx.arc(0,0,35,0,Math.PI*2);ctx.stroke(); }
-            else if(n.type==='rainbow'){ const gr=ctx.createLinearGradient(-35,-35,35,35);gr.addColorStop(0,'#f00');gr.addColorStop(1,'#f0f');ctx.fillStyle=gr;ctx.beginPath();ctx.arc(0,0,35,0,Math.PI*2);ctx.fill(); }
-            else if(n.type==='core'){ ctx.fillStyle='#ff3333';ctx.beginPath();ctx.arc(0,0,35,0,Math.PI*2);ctx.fill(); }
+
+            // 1. BIG5 (Pentagon)
+            if(n.type==='pentagon'){ 
+                ctx.beginPath(); for(let i=0;i<5;i++){const a=(i/5)*Math.PI*2-Math.PI/2;ctx.lineTo(Math.cos(a)*35,Math.sin(a)*35);}ctx.closePath();ctx.stroke(); 
+                ctx.lineWidth=1;ctx.beginPath();for(let i=0;i<5;i++){const a=(i/5)*Math.PI*2-Math.PI/2;ctx.lineTo(Math.cos(a)*20,Math.sin(a)*20);}ctx.closePath();ctx.stroke();
+            }
+            // 2. RIASEC (Hexagon)
+            else if(n.type==='hexagon'){ 
+                ctx.beginPath(); for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2;ctx.lineTo(Math.cos(a)*35,Math.sin(a)*35);}ctx.closePath();ctx.stroke(); 
+                ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-35);ctx.lineTo(0,35);ctx.stroke();
+            }
+            // 3. ENNEAGRAM (Nonagon)
+            else if(n.type==='nonagon'){ 
+                ctx.beginPath(); for(let i=0;i<9;i++){const a=(i/9)*Math.PI*2-Math.PI/2;ctx.lineTo(Math.cos(a)*38,Math.sin(a)*38);}ctx.closePath();ctx.stroke();
+                ctx.lineWidth=1;ctx.beginPath();for(let i=0;i<3;i++){const a=(i/3)*Math.PI*2-Math.PI/2;ctx.lineTo(Math.cos(a)*38,Math.sin(a)*38);}ctx.closePath();ctx.stroke(); 
+            }
+            // 4. ANIMAL (Radar + Paw Print)
+            else if(n.type==='radar'){ 
+                ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,35,0,Math.PI*2);ctx.stroke();
+                ctx.beginPath();ctx.arc(0,0,22,0,Math.PI*2);ctx.stroke(); 
+                ctx.fillStyle=n.color;
+                ctx.beginPath();ctx.ellipse(0,5,8,6,0,0,Math.PI*2);ctx.fill();
+                ctx.beginPath();ctx.arc(-10,-5,4,0,Math.PI*2);ctx.fill();
+                ctx.beginPath();ctx.arc(0,-10,4,0,Math.PI*2);ctx.fill();
+                ctx.beginPath();ctx.arc(10,-5,4,0,Math.PI*2);ctx.fill();
+            }
+            // 5. COLOR (Rainbow Gradient)
+            else if(n.type==='rainbow'){ 
+                const gr=ctx.createLinearGradient(-35,-35,35,35);
+                gr.addColorStop(0,'#f00');gr.addColorStop(0.2,'#ff0');gr.addColorStop(0.4,'#0f0');gr.addColorStop(0.6,'#0ff');gr.addColorStop(0.8,'#00f');gr.addColorStop(1,'#f0f');
+                ctx.fillStyle=gr;ctx.beginPath();ctx.arc(0,0,35,0,Math.PI*2);ctx.fill();
+            }
+            // 6. MBTI (Core - Red + Orange)
+            else if(n.type==='core'){ 
+                ctx.fillStyle='#ff3333';ctx.beginPath();ctx.arc(0,0,35,0,Math.PI*2);ctx.fill();
+                ctx.fillStyle='#ff6600';ctx.beginPath();ctx.arc(0,0,18,0,Math.PI*2);ctx.fill();
+            }
             
             ctx.strokeStyle=n.color; ctx.lineWidth=1; ctx.globalAlpha=0.5; ctx.beginPath(); ctx.arc(0,0,50,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1;
             ctx.restore();
-            ctx.fillStyle = hover ? '#fff' : 'rgba(255,255,255,0.7)'; ctx.font = (hover ? 'bold ' : '') + '16px "Noto Sans TC"'; ctx.textAlign='center'; 
-            ctx.fillText(n.label, x, y+65*scale);
+            
+            // Label always visible
+            ctx.fillStyle = hover ? '#fff' : 'rgba(255,255,255,0.7)'; 
+            ctx.font = (hover ? 'bold ' : '') + '16px "Noto Sans TC"'; 
+            ctx.textAlign='center'; ctx.shadowColor='#000'; ctx.shadowBlur=4;
+            ctx.fillText(n.label, x, y+65*scale); ctx.shadowBlur=0;
         }
+
         function drawStars() {
             ctx.fillStyle = styles.bg; ctx.fillRect(0,0,width,height);
             if(Math.random() < 0.03) shootingStars.push(new ShootingStar());
@@ -637,7 +661,7 @@
                 drawBtn(cx+90, cy+80, "不喜歡", '#555', ()=>{ nextRIASEC(); }, 140);
             } else {
                 const sorted = Object.entries(st.scores).sort((a,b)=>b[1]-a[1]);
-                const code = sorted.slice(0,3).map(x=>x[0]).join('');
+                const code = sorted.slice(0,3).map(x=>x[0]).join('-');
                 const top3 = sorted.slice(0,3);
                 
                 drawHexagon(cx, SAFE_TOP + 100, 60, st.scores);
