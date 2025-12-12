@@ -276,8 +276,9 @@
                 ctx.scale(camera.zoom, camera.zoom); ctx.translate(-width/2-camera.x, -height/2-camera.y);
                 drawLobby(); ctx.restore();
                 if(camera.zoom < 1.5) {
-                    ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font='12px Orbitron'; ctx.textAlign='center';
-                    ctx.fillText("Copyright © JOBUS ASIA 2025", width/2, height-SAFE_BOTTOM/2);
+                    // 👇 改這裡：直接用白色 '#ffffff'
+    ctx.fillStyle='#ffffff'; ctx.font='12px Orbitron'; ctx.textAlign='center';
+    ctx.fillText("Copyright © JOBUS ASIA 2025-26", width/2, height-SAFE_BOTTOM/2);
                 }
             } else {
                 if(currentScene==='BIG5') drawBig5();
@@ -504,17 +505,39 @@
                 const hx = cx - sw/2 + (sw * (st.ans-1)/4);
                 
                 hitZones.push({
-                    t:'rect', x:cx-sw/2-20, y:sy-30, w:sw+40, h:60,
-                    action: (mx, my) => {
-                        const ratio = (mx - (cx - sw/2)) / sw;
-                        st.ans = Math.max(1, Math.min(5, Math.round(ratio*4+1)));
-                    }
-                });
+    t:'rect', x:cx-sw/2-20, y:sy-30, w:sw+40, h:60,
+    action: (mx, my) => {
+        const ratio = (mx - (cx - sw/2)) / sw;
+        st.ans = Math.max(1, Math.min(5, Math.round(ratio*4+1)));
+    }
+});
+
+// ===== 1. 繪製 5 個刻度小點 =====
+for(let i=0; i<5; i++){
+    let tickX = (cx - sw/2) + (sw * (i/4)); 
+    ctx.beginPath(); 
+    ctx.arc(tickX, sy+3, 3, 0, Math.PI*2); 
+    ctx.fillStyle='#666'; 
+    ctx.fill();
+}
+
+// ===== 2. 繪製 5 個選項文字 =====
+const options = ["不同意", "稍不同意", "普通", "稍同意", "同意"];
+ctx.font = '12px "Noto Sans TC"'; 
+ctx.fillStyle = '#aaa';          
+ctx.textAlign = 'center';        
+
+for(let i=0; i<5; i++){
+    let tickX = (cx - sw/2) + (sw * (i/4)); 
+    ctx.fillText(options[i], tickX, sy + 40);
+}
+
+// ===== 3. 最後畫藍色圓點 (這段要放在最後，才會蓋在刻度上) =====
+ctx.beginPath(); 
+ctx.arc(hx, sy+3, 12, 0, Math.PI*2); 
+ctx.fillStyle='#00f3ff'; 
+ctx.fill();
                 
-                ctx.beginPath(); ctx.arc(hx, sy+3, 12, 0, Math.PI*2); ctx.fillStyle='#00f3ff'; ctx.fill();
-                ctx.fillStyle='#888'; ctx.font='16px "Noto Sans TC"'; 
-                ctx.textAlign='left'; ctx.fillText("不同意", cx-sw/2, sy+40);
-                ctx.textAlign='right'; ctx.fillText("同意", cx+sw/2, sy+40);
                 
                 drawBtn(cx, height-SAFE_BOTTOM-80, "下一題", styles.nodes.BIG5.color, () => {
                     const sc = st.ans - 3; st.scores[q.k] += q.rev ? -sc : sc;
