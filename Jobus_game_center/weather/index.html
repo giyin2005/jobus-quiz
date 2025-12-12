@@ -625,10 +625,24 @@ async function fetchWeather(lat, lon, label){
     }
 }
 
+// 修改後的降雨機率邏輯：校正回歸 (Look-ahead)
+// 說明：同時檢查「現在」與「下一小時」，顯示比較嚴重的那個機率
 function getHourlyProb(hourlyData) {
     if (!hourlyData || !hourlyData.precipitation_probability) return 0;
-    const currentHour = new Date().getHours();
-    return hourlyData.precipitation_probability[currentHour] || 0;
+    
+    const now = new Date();
+    const currentHour = now.getHours();
+    
+    // 1. 取得「當下小時」的機率
+    const probCurrent = hourlyData.precipitation_probability[currentHour] || 0;
+    
+    // 2. 取得「下一小時」的機率 (如果已經過了 23 點，就只看當下)
+    const probNext = (currentHour < 23) 
+        ? (hourlyData.precipitation_probability[currentHour + 1] || 0) 
+        : 0;
+
+    // 3. 取兩者中的「最大值」回傳
+    return Math.max(probCurrent, probNext);
 }
 
 function setLoading(isLoading, text="查詢中..."){
@@ -697,19 +711,26 @@ function updateWeatherSummary(label, c, extra){
     else if(tNow >= 16) clothes = "長袖或薄外套最剛好 🙂";
     else                clothes = "蠻冷的，記得穿厚一點 🧣";
 
-    // 2. 帶傘建議
+    // 2. 帶傘建議 (修正版：文字加入「未來一小時」提示)
     let umbrella;
-    if (rainProb === 0) {
-        umbrella = "完全沒雨，不用帶傘，輕便出門吧 👍";
+    
+    // 定義是否為雨天代碼
+    const isRainingCode = (wCode >= 51);
+
+    if (rainProb === 0 && !isRainingCode) {
+        umbrella = "未來一小時完全沒雨，不用帶傘，輕便出門吧 👍";
         currentWeatherType = "ok";
-    } else if (rainProb <= 30) {
-        umbrella = "降雨機率不高，嫌重可以不帶，或帶摺疊傘備用 ☁️";
+    } else if (rainProb <= 30 && !isRainingCode) {
+        umbrella = "未來一小時降雨機率不高，嫌重可以不帶，或帶摺疊傘備用 ☁️";
         currentWeatherType = "ok"; 
-    } else if (rainProb <= 60) {
-        umbrella = "出門建議帶把傘，避免突發陣雨 🌦️";
-        currentWeatherType = "rain";
     } else {
-        umbrella = "降雨機率高，出門一定要帶傘 ☔";
+        // 機率 > 30% 或 天氣代碼顯示有雨
+        if(rainProb <= 60){
+             // 🔴 這裡加入了「未來一小時」的說明
+             umbrella = "未來一小時可能有雨，建議帶把傘比較保險 🌦️";
+        } else {
+             umbrella = "未來一小時降雨機率高，出門一定要帶傘 ☔";
+        }
         currentWeatherType = "rain";
     }
 
@@ -753,7 +774,7 @@ function updateWeatherSummary(label, c, extra){
         </div>
         <div class="info-row">
             <div class="info-icon">🌧</div>
-            <div class="info-text">降雨：${rainProb}%</div>
+            <div class="info-text">降雨機率：${rainProb}%</div>
         </div>
         <div class="info-row">
             <div class="info-icon">👕</div>
