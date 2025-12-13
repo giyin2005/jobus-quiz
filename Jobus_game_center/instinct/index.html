@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>你比市場準嗎？ - 職場感知力測驗 v1.3</title>
+    <title>你比市場準嗎？ - 職場感知力測驗 v1.6</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
@@ -13,28 +13,35 @@
         .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .slide-in-right { animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .pulse-text { animation: pulseText 2s infinite; }
         
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes slideInRight { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes pulseText { 
+            0%, 100% { opacity: 1; transform: scale(1); } 
+            50% { opacity: 0.7; transform: scale(0.98); } 
+        }
 
         /* 自訂滑桿軌道邏輯 */
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 32px;
-            width: 32px;
+            height: 36px; 
+            width: 36px;
             border-radius: 50%;
             background: #ffffff;
             cursor: pointer;
             border: 4px solid #4F46E5;
-            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4);
-            margin-top: -14px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.5); 
+            margin-top: -16px; 
+            position: relative;
+            z-index: 20;
         }
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
-            height: 6px;
+            height: 8px; 
             cursor: pointer;
-            background: transparent;
+            background: transparent; 
         }
     </style>
 </head>
@@ -202,7 +209,7 @@ function render(state) {
         case 'intro':   App.innerHTML = ViewIntro(); break;
         case 'game':    App.innerHTML = ViewGame(state); break;
         case 'reveal':  App.innerHTML = ViewReveal(state); break;
-        case 'result':  App.innerHTML = ViewResult(state); break; // 邏輯已更新
+        case 'result':  App.innerHTML = ViewResult(state); break;
     }
     bindEvents(state);
 }
@@ -251,7 +258,7 @@ function ViewIntro() {
             <div class="relative z-10 flex flex-col h-full justify-between fade-in">
                 <div class="mt-8">
                     <span class="inline-block px-3 py-1 bg-gray-900 text-white text-[10px] font-bold tracking-widest rounded-full mb-6">
-                        BETA v1.3
+                        BETA v1.6
                     </span>
                     <h1 class="text-5xl font-black text-gray-900 mb-2 leading-none tracking-tight">
                         你比市場<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">更準嗎？</span>
@@ -321,26 +328,30 @@ function ViewGame(state) {
                     </div>
 
                     <div class="text-center w-full max-w-xs">
-                        <p class="text-gray-400 text-sm font-bold tracking-wider mb-2 uppercase">你的直覺機率</p>
-                        <div class="text-8xl font-black text-indigo-600 tracking-tighter mb-8 tabular-nums">
+                        <div class="mb-4 pulse-text flex justify-center items-center text-indigo-500 font-bold bg-indigo-50 inline-block px-4 py-1 rounded-full text-sm mx-auto">
+                            <span>👇 左右滑動以輸入直覺</span>
+                        </div>
+
+                        <div class="text-8xl font-black text-indigo-600 tracking-tighter mb-6 tabular-nums relative inline-block">
                             ${state.userGuess}<span class="text-4xl text-indigo-300 ml-1">%</span>
+                            <span class="absolute -right-6 top-1/2 transform -translate-y-1/2 text-2xl opacity-50">👆</span>
                         </div>
                         
-                        <div class="relative h-16 w-full flex items-center">
-                             <div class="absolute left-0 right-0 top-1/2 h-3 bg-gray-200 rounded-full overflow-hidden transform -translate-y-1/2 pointer-events-none shadow-inner">
+                        <div class="relative h-20 w-full flex items-center">
+                             <div class="absolute left-0 right-0 top-1/2 h-4 bg-gray-200 rounded-full overflow-hidden transform -translate-y-1/2 pointer-events-none shadow-inner">
                                  <div class="h-full bg-indigo-500 transition-all duration-75" style="width: ${state.userGuess}%"></div>
                              </div>
                              
                              <input id="guess-slider" type="range" min="0" max="100" value="${state.userGuess}" class="z-10 relative w-full h-full opacity-0 cursor-pointer">
                              
-                             <div class="absolute top-1/2 h-8 w-8 bg-white border-4 border-indigo-600 rounded-full shadow-lg transform -translate-y-1/2 -translate-x-1/2 pointer-events-none transition-all duration-75 flex items-center justify-center" style="left: ${state.userGuess}%">
-                                <div class="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                             <div class="absolute top-1/2 h-9 w-9 bg-white border-4 border-indigo-600 rounded-full shadow-xl transform -translate-y-1/2 -translate-x-1/2 pointer-events-none transition-all duration-75 flex items-center justify-center" style="left: ${state.userGuess}%">
+                                <div class="w-2.5 h-2.5 bg-indigo-600 rounded-full"></div>
                              </div>
                         </div>
                         
-                        <div class="flex justify-between text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-widest px-1">
-                            <span>不可能 (0%)</span>
-                            <span>絕對會 (100%)</span>
+                        <div class="flex justify-between text-sm font-bold text-gray-500 mt-2 px-1">
+                            <span>0% 不可能</span>
+                            <span>100% 絕對會</span>
                         </div>
                     </div>
                 </div>
@@ -428,128 +439,117 @@ function ViewReveal(state) {
     `;
 }
 
-// 修正版 ViewResult：修復「忽冷忽熱」導致的邏輯誤判
 function ViewResult(state) {
-    // 1. 計算帶正負號的平均 (判斷整體方向)
     const totalDiff = state.history.reduce((acc, curr) => acc + curr.diff, 0);
     const avgDiff = totalDiff / state.history.length;
-
-    // 2. 計算「絕對值」的平均 (判斷波動程度)
-    // 解決問題關鍵：如果 avgAbsDiff 很大，代表玩家猜測與市場差距大，不是「同步」
     const totalAbsDiff = state.history.reduce((acc, curr) => acc + Math.abs(curr.diff), 0);
     const avgAbsDiff = totalAbsDiff / state.history.length;
     
     let persona = {};
     
-    // 邏輯優化：優先檢查絕對誤差
     if (avgAbsDiff < 15) { 
-        // 絕對誤差很小 -> 真的準 -> 現實錨點
         persona = { 
-            emoji: "⚓️",
+            // 修正：使用 DiceBear Notion 風格的頭像作為「屬性圖片」，取代原本的 Emoji
+            img: "https://api.dicebear.com/9.x/notionists/svg?seed=Anchor&backgroundColor=e0e7ff",
             title: "現實錨點", 
             titleEn: "The Reality Anchor",
             color: "text-indigo-600",
             tag: "精準同步",
-            desc: "你不是普通，你是「精準」。這代表你對局勢的判斷與集體智慧 (Wisdom of Crowd) 高度重疊。在混亂的專案裡，你就是那個最清醒、最能客觀評估風險的人。", 
+            desc: "你不是普通，你是「精準」。<br>這代表你對局勢的判斷與集體智慧 (Wisdom of Crowd) 高度重疊。在混亂的專案裡，你就是那個最清醒、最能客觀評估風險的人。", 
             advice: "💡 <b>你的優勢：</b>你是團隊的「定海神針」。<br>當大家意見分歧時，你的直覺通常就是最接近事實的答案。請更有自信地站出來統合意見。"
         };
     } else if (avgDiff >= 15) { 
-        // 絕對誤差大，且方向明顯偏正 -> 樂觀
         persona = { 
-            emoji: "🚀",
+            img: "https://api.dicebear.com/9.x/notionists/svg?seed=Rocket&backgroundColor=ffedd5",
             title: "機遇獵人", 
             titleEn: "The Opportunity Hunter",
             color: "text-orange-500",
             tag: "開創型",
-            desc: "你看到的未來，比大部分人更光明。你對於「可能性」非常敏感，這讓你成為極佳的業務或產品開創者，因為你總能看見別人看不見的機會。", 
+            desc: "你看到的未來，比大部分人更光明。<br>你對於「可能性」非常敏感，這讓你成為極佳的業務或產品開創者，因為你總能看見別人看不見的機會。", 
             advice: "💡 <b>你的優勢：</b>你敢做夢，也敢衝。<br>你需要配一個「現實錨點」型的副手。當你說「下週可以上線」時，讓他幫你檢查是不是漏了什麼細節。"
         };
     } else if (avgDiff <= -15) { 
-        // 絕對誤差大，且方向明顯偏負 -> 保守
         persona = { 
-            emoji: "🛡️",
+            img: "https://api.dicebear.com/9.x/notionists/svg?seed=Shield&backgroundColor=ccfbf1",
             title: "風險守門員", 
             titleEn: "The Risk Guardian",
             color: "text-teal-600",
             tag: "防禦型",
-            desc: "你比市場更謹慎，這不是壞事。你擁有極強的「危機嗅覺」，往往在專案還沒開始前，你就已經聞到了燒焦味。你是防止公司翻車的關鍵煞車皮。", 
+            desc: "你比市場更謹慎，這不是壞事。<br>你擁有極強的「危機嗅覺」，往往在專案還沒開始前，你就已經聞到了燒焦味。你是防止公司翻車的關鍵煞車皮。", 
             advice: "💡 <b>你的優勢：</b>你不會讓團隊陷入絕境。<br>小心別變成「氣氛殺手」。試著把「我覺得不行」改成「如果我們要成功，必須先解決這三個隱憂...」。"
         };
     } else {
-        // [新增情況] 絕對誤差大 (>15)，但平均誤差小 (例如 -15~15 之間)
-        // 代表：有時候超樂觀，有時候超保守，正負抵銷了，導致 avgDiff 接近 0。
-        // 這不是「同步」，這是「獨行俠」。
         persona = {
-            emoji: "🦄",
+            img: "https://api.dicebear.com/9.x/notionists/svg?seed=Magic&backgroundColor=f3e8ff",
             title: "直覺獨行俠",
             titleEn: "The Intuitive Maverick",
             color: "text-purple-600",
             tag: "獨立思考",
-            desc: "你的判斷完全不隨波逐流。有時你比市場極度樂觀，有時又極度保守。這代表你擁有非常獨特的視角，不受群體共識影響，是標準的「反向操作」潛力股。",
+            desc: "你的判斷完全不隨波逐流。<br>有時你比市場極度樂觀，有時又極度保守。這代表你擁有非常獨特的視角，不受群體共識影響，是標準的「反向操作」潛力股。",
             advice: "💡 <b>你的優勢：</b>你看見了別人沒看見的盲點。<br>你的觀點通常很有衝擊性，建議在發表意見時多準備一些數據佐證，因為你的直覺對大多數人來說可能太過前衛。"
         };
     }
 
     return `
-        <div class="flex flex-col h-full bg-white p-6 overflow-y-auto fade-in">
-            <div class="mt-4 text-center">
-                <p class="text-gray-400 text-[10px] font-bold tracking-[0.2em] uppercase mb-4">— 你的職場感知力分析 —</p>
-                
-                <div class="bg-gray-50 rounded-[2rem] p-8 mb-6 border border-gray-100 shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-gray-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 -mr-10 -mt-10"></div>
+        <div class="flex flex-col h-full bg-white relative fade-in overflow-hidden">
+            
+            <div class="flex-grow overflow-y-auto px-6 pt-6 pb-24 scroll-smooth">
+                <div class="text-center mt-2">
+                    <p class="text-gray-400 text-xs font-bold tracking-[0.2em] uppercase mb-6">— 你的職場感知力分析 —</p>
                     
-                    <div class="relative z-10">
-                        <div class="text-6xl mb-4 filter drop-shadow-md animate-bounce" style="animation-duration: 2s">${persona.emoji}</div>
+                    <div class="bg-gray-50 rounded-[2.5rem] p-8 mb-8 border border-gray-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-40 h-40 bg-gray-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 -mr-10 -mt-10"></div>
                         
-                        <span class="inline-block px-3 py-1 bg-white border border-gray-200 text-gray-500 text-[10px] font-bold tracking-wider rounded-full mb-3 shadow-sm uppercase">
-                            ${persona.tag}
-                        </span>
-                        
-                        <h2 class="text-3xl font-black mb-1 ${persona.color} leading-tight">
-                            ${persona.title}
-                        </h2>
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-4 opacity-70">${persona.titleEn}</p>
+                        <div class="relative z-10">
+                            <div class="mb-6 mx-auto w-32 h-32 relative">
+                                <div class="absolute inset-0 bg-white/50 rounded-full animate-pulse"></div>
+                                <img src="${persona.img}" alt="${persona.title}" class="relative z-10 w-full h-full rounded-full shadow-lg border-4 border-white object-cover">
+                            </div>
+                            
+                            <span class="inline-block px-4 py-1.5 bg-white border border-gray-200 text-gray-600 text-xs font-bold tracking-wider rounded-full mb-4 shadow-sm uppercase">
+                                ${persona.tag}
+                            </span>
+                            
+                            <h2 class="text-4xl font-black mb-2 ${persona.color} leading-tight">
+                                ${persona.title}
+                            </h2>
+                            <p class="text-gray-400 text-sm font-bold uppercase tracking-wider mb-6 opacity-80">${persona.titleEn}</p>
 
-                        <div class="w-12 h-1 bg-gray-200 mx-auto rounded-full mb-4"></div>
+                            <div class="w-16 h-1 bg-gray-200 mx-auto rounded-full mb-6"></div>
 
-                        <p class="text-gray-600 text-sm leading-relaxed text-justify mb-0">
-                            ${persona.desc}
+                            <p class="text-gray-700 text-lg leading-relaxed text-justify mb-2 tracking-wide font-medium">
+                                ${persona.desc}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-50 p-6 rounded-2xl border-l-4 border-indigo-500 text-left mb-8 shadow-sm">
+                        <p class="text-indigo-900 text-base font-medium leading-relaxed">
+                            ${persona.advice}
                         </p>
                     </div>
-                </div>
 
-                <div class="bg-indigo-50 p-5 rounded-2xl border-l-4 border-indigo-500 text-left mb-8 shadow-sm">
-                    <p class="text-indigo-900 text-sm font-medium leading-relaxed">
-                        ${persona.advice}
-                    </p>
-                </div>
-            </div>
-
-            <div class="space-y-4 mb-8 px-4">
-                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">數據體檢</h3>
-                
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-600 text-sm font-medium">整體傾向 (Bias)</span>
-                    <span class="font-black text-gray-900 text-xl font-mono tracking-tight">${avgDiff > 0 ? '+' : ''}${Math.round(avgDiff)}%</span>
-                </div>
-                
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-600 text-sm font-medium">離群程度 (Volatility)</span>
-                    <span class="font-bold text-gray-500 text-sm bg-gray-100 px-2 py-1 rounded">
-                        ${Math.round(avgAbsDiff)}%
-                    </span>
-                </div>
-
-                <div class="flex justify-between items-center mt-2">
-                    <span class="text-gray-600 text-sm font-medium">最終判定</span>
-                    <span class="font-bold text-white text-xs ${persona.color.replace('text-', 'bg-')} px-3 py-1 rounded-full shadow-sm">
-                        ${persona.title}
-                    </span>
+                    <div class="space-y-5 px-2 mb-4">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-gray-200 pb-3 text-left">數據體檢</h3>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-base font-bold">整體傾向 (Bias)</span>
+                            <span class="font-black text-gray-900 text-2xl font-mono tracking-tight">${avgDiff > 0 ? '+' : ''}${Math.round(avgDiff)}%</span>
+                        </div>
+                        
+                         <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-base font-bold">離群程度 (Volatility)</span>
+                            <span class="font-bold text-gray-600 text-base bg-gray-100 px-3 py-1 rounded">
+                                ${Math.round(avgAbsDiff)}%
+                            </span>
+                        </div>
+                        
+                        </div>
                 </div>
             </div>
             
-            <div class="mt-auto pb-4">
-                <button id="btn-restart" class="w-full bg-gray-900 text-white text-lg font-bold py-4 rounded-2xl shadow-lg transform transition active:scale-[0.98] mb-4 hover:bg-gray-800">
+            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent pt-12 z-20">
+                <button id="btn-restart" class="w-full bg-gray-900 text-white text-xl font-bold py-5 rounded-2xl shadow-xl transform transition active:scale-[0.98] hover:bg-gray-800">
                     再測一次
                 </button>
             </div>
