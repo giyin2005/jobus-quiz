@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>通勤天氣小幫手 🌤 (Level 6: 邏輯修正最終版)</title>
+<title>通勤天氣小幫手 🌤 (Level 7: 智慧快取防護版)</title>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-P7PY1RNXJQ"></script>
 <script>
@@ -66,10 +66,18 @@
     
     .main-btn{ background:#3A8DFF; color:#fff; }
     .main-btn:hover{ background:#2a75d9; }
+    
+    /* 按鈕停用狀態 (Loading) */
+    .main-btn:disabled, .ghost-btn:disabled { 
+        opacity: 0.6; 
+        cursor: not-allowed; 
+        filter: grayscale(100%); 
+        background: #ccc; 
+        color: #666;
+    }
+
     .ghost-btn{ border:2px solid #3A8DFF; background:#fff; color:#3A8DFF; }
     .ghost-btn:hover{ background:#f0f7ff; }
-    
-    .main-btn:disabled, .ghost-btn:disabled { opacity: 0.6; cursor: not-allowed; filter: grayscale(100%); }
 
     /* ========== 骨架屏 ========== */
     .skeleton-wrapper { display: none; }
@@ -406,7 +414,6 @@ const districts = [
   {name: "連江縣 南竿鄉", lat: 26.155, lon: 119.927}, {name: "連江縣 北竿鄉", lat: 26.223, lon: 119.989},
   {name: "連江縣 莒光鄉", lat: 25.973, lon: 119.940}, {name: "連江縣 東引鄉", lat: 26.368, lon: 120.493}
 ];
-
 // 請貼回完整的 districts 陣列
 
 async function fetchWeatherData(lat, lon) {
@@ -424,12 +431,9 @@ async function fetchWeatherData(lat, lon) {
     }
 }
 
-// 🌐 雙重搜尋機制：Open-Meteo 失敗時，自動切換到 OpenStreetMap (Nominatim)
+// 雙重搜尋機制
 async function fetchGlobalLocations(keyword) {
-    // 1. 優先嘗試 Open-Meteo
     let results = await searchOpenMeteo(keyword);
-
-    // 2. 如果沒結果，切換到 Nominatim
     if(results.length === 0) {
         console.log("Open-Meteo found nothing, trying Nominatim...");
         results = await searchNominatim(keyword);
@@ -437,7 +441,6 @@ async function fetchGlobalLocations(keyword) {
     return results;
 }
 
-// 來源 A: Open-Meteo
 async function searchOpenMeteo(keyword) {
     const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(keyword)}&count=5&language=zh&format=json`;
     try {
@@ -454,7 +457,6 @@ async function searchOpenMeteo(keyword) {
     } catch(e) { return []; }
 }
 
-// 來源 B: OpenStreetMap (Nominatim)
 async function searchNominatim(keyword) {
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(keyword)}&format=json&accept-language=zh-TW&limit=5`;
     try {
@@ -467,10 +469,7 @@ async function searchNominatim(keyword) {
             lon: parseFloat(item.lon),
             geoRisk: false
         }));
-    } catch(e) {
-        console.error("Nominatim search failed:", e);
-        return [];
-    }
+    } catch(e) { return []; }
 }
 
 function findNearestDistrict(lat, lon) {
@@ -490,16 +489,16 @@ function findNearestDistrict(lat, lon) {
 
 /**
  * =====================================================================
- * MODULE 2: RULE ENGINE (邏輯引擎修正)
+ * MODULE 2: RULE ENGINE
  * =====================================================================
  */
 const RISK_LEVELS = {
-    SNOW: 'SNOW',           // 下雪
-    EXTREME_COLD: 'EXTREME_COLD', // 極凍 (即使沒下雪)
-    HIGH: 'HIGH',           // 大雨
-    MEDIUM: 'MEDIUM',       // 飄雨/厚雲
-    LOW_GEO: 'LOW_GEO',     // 地形風險
-    LOW: 'LOW'              // 穩定
+    SNOW: 'SNOW',
+    EXTREME_COLD: 'EXTREME_COLD', 
+    HIGH: 'HIGH',
+    MEDIUM: 'MEDIUM',
+    LOW_GEO: 'LOW_GEO',
+    LOW: 'LOW'
 };
 
 function getRainRiskLevel(weatherData, district) {
@@ -507,26 +506,22 @@ function getRainRiskLevel(weatherData, district) {
     const h = weatherData.hourly;
     const rainProb = getHourlyProb(h);
     
-    // 1. 優先檢查下雪
+    // 1. 下雪
     const snowCodes = [71, 73, 75, 77, 85, 86];
     if (snowCodes.includes(c.weather_code) || (c.snowfall && c.snowfall > 0)) {
         return RISK_LEVELS.SNOW;
     }
-    
-    // 2. [邏輯修正] 檢查極凍狀態 (即使沒下雪，零下0度也是危險天氣)
+    // 2. 極凍
     if (c.temperature_2m <= 0) {
         return RISK_LEVELS.EXTREME_COLD;
     }
-
-    // 3. 檢查大雨
+    // 3. 大雨
     if (rainProb >= 30) return RISK_LEVELS.HIGH;
-    
-    // 4. 檢查飄雨/厚雲
+    // 4. 飄雨/厚雲
     const drizzleCodes = [51, 53, 55, 61, 63, 65, 80, 81, 82];
     if (drizzleCodes.includes(c.weather_code) || c.cloud_cover >= 75) {
         return RISK_LEVELS.MEDIUM;
     }
-    
     // 5. 地形風險
     if (district.geoRisk === true) return RISK_LEVELS.LOW_GEO;
 
@@ -544,7 +539,7 @@ function getHourlyProb(hourlyData) {
 
 /**
  * =====================================================================
- * MODULE 3: COPY RESOLVER (文案層 - 修正對應邏輯)
+ * MODULE 3: COPY RESOLVER
  * =====================================================================
  */
 function getCopyByRiskLevel(level) {
@@ -555,7 +550,7 @@ function getCopyByRiskLevel(level) {
                 note: "路面易結冰濕滑，通勤時間請務必預留緩衝，注意保暖！",
                 type: "snow"
             };
-        case RISK_LEVELS.EXTREME_COLD: // 新增極凍文案
+        case RISK_LEVELS.EXTREME_COLD: 
             return {
                 umbrella: "免帶傘，但請帶暖暖包 🔥",
                 note: "雖然沒下雪，但戶外極度寒冷，請盡量減少暴露在室外的時間。",
@@ -599,7 +594,6 @@ function getClothesAdvice(temp) {
 }
 
 function getWindAdvice(speed, temp) {
-    // [修正] 風寒效應：低溫時微風也很刺骨
     if (temp < 10 && speed > 5) return "寒風刺骨！體感溫度極低，請保護好頭部與雙手 🌬️";
     if (speed > 15) return "風大，騎車小心側風 ⚠️";
     return "微風，不影響通勤 🍃";
@@ -668,7 +662,6 @@ const ui = {
         window.currentWeatherType = copy.type; 
         window.currentTemp = c.temperature_2m; 
         
-        // 狀態判定優先級
         if (window.currentWeatherType !== 'rain' && 
             window.currentWeatherType !== 'snow' && 
             window.currentWeatherType !== 'freezing') {
@@ -687,7 +680,7 @@ const ui = {
 };
 
 // =====================================================================
-//  APP CONTROLLER
+//  APP CONTROLLER (Search & Logic)
 // =====================================================================
 
 function debounce(func, timeout = 500){
@@ -702,36 +695,28 @@ let currentLocalResults = [];
 
 const handleGlobalSearch = debounce(async (v) => {
     if(v.length < 2) return; 
-    
     renderSuggestions(currentLocalResults, true); 
-    
     const globalResults = await fetchGlobalLocations(v);
-    
     renderSuggestions(currentLocalResults, false, globalResults);
 }, 600); 
 
 function renderSuggestions(localList, isLoadingGlobal = false, globalList = []) {
     let html = "";
-
     if(localList.length > 0) {
         html += `<div class="s-header">📍 台灣地區</div>`;
         html += localList.map(a => `<div class="s-item" data-src="local">${a.name}</div>`).join("");
     }
-
     if(isLoadingGlobal) {
         html += `<div class="s-header s-global">🌏 正在搜尋全球城市...</div>`;
     }
-
     if(globalList.length > 0) {
         html += `<div class="s-header s-global">🌏 全球結果</div>`;
         html += globalList.map(a => `<div class="s-item" data-src="global" data-lat="${a.lat}" data-lon="${a.lon}">${a.name}</div>`).join("");
     }
-    
     if(!html) {
         ui.suggestions.style.display="none"; 
         return;
     }
-
     ui.suggestions.innerHTML = html;
     ui.suggestions.style.display = "block";
 
@@ -761,7 +746,6 @@ function renderSuggestions(localList, isLoadingGlobal = false, globalList = []) 
 ui.search.addEventListener("input", () => {
     const v = ui.search.value.trim();
     if(!v) { ui.suggestions.style.display="none"; return; }
-    
     currentLocalResults = districts.filter(a => a.name.includes(v));
     renderSuggestions(currentLocalResults);
     handleGlobalSearch(v);
@@ -774,18 +758,13 @@ document.addEventListener("click", (e) => {
 document.getElementById("geoBtn").addEventListener("click", () => {
     if(typeof gtag === 'function') gtag('event', 'use_geolocation');
     if(!navigator.geolocation) { alert("不支援定位"); return; }
-    
     ui.toggleLoading(true);
     navigator.geolocation.getCurrentPosition(
         (pos) => {
             const nearest = findNearestDistrict(pos.coords.latitude, pos.coords.longitude);
-            console.log("定位:", nearest.name);
             executeQuery(nearest);
         },
-        (err) => {
-            ui.toggleLoading(false);
-            alert("無法定位，請手動搜尋");
-        },
+        (err) => { ui.toggleLoading(false); alert("無法定位"); },
         { timeout: 5000 }
     );
 });
@@ -793,34 +772,73 @@ document.getElementById("geoBtn").addEventListener("click", () => {
 document.getElementById("getWeatherBtn").addEventListener("click", () => {
     const text = ui.search.value.trim();
     if(!text) return alert("請輸入地區");
-    
     const area = districts.find(a => a.name === text || a.name.includes(text));
-    if(area) {
-        executeQuery(area);
-    } else {
-        alert("請從選單中點選搜尋結果");
-    }
+    if(area) executeQuery(area);
+    else alert("請從選單中點選搜尋結果");
 });
 
+// [LEVEL 7] 核心修改：智慧快取 & 按鈕鎖定
 async function executeQuery(district) {
+    const btn = document.getElementById("getWeatherBtn");
+    
+    // 1. 防手抖 (Button Cooldown)
+    btn.disabled = true;
+    const originalText = btn.innerText;
+    btn.innerText = "查詢中...";
+
     try {
         ui.toggleLoading(true);
         if(typeof gtag === 'function') gtag('event', 'search_weather', { 'event_label': district.name });
         ui.search.value = district.name;
 
-        const weatherData = await fetchWeatherData(district.lat, district.lon);
+        // 2. 檢查快取 (Smart Caching)
+        const CACHE_DURATION = 15 * 60 * 1000; // 15分鐘
+        const cacheKey = `weather_${district.lat.toFixed(2)}_${district.lon.toFixed(2)}`;
+        const cached = localStorage.getItem(cacheKey);
+        
+        let weatherData;
+        let isFromCache = false;
+
+        if (cached) {
+            const { timestamp, data } = JSON.parse(cached);
+            if (new Date().getTime() - timestamp < CACHE_DURATION) {
+                console.log("🚀 Using Local Cache");
+                weatherData = data;
+                isFromCache = true;
+            }
+        }
+
+        // 3. 沒快取才去呼叫 API
+        if (!weatherData) {
+            console.log("🌍 Fetching New Data");
+            weatherData = await fetchWeatherData(district.lat, district.lon);
+            // 寫入快取
+            localStorage.setItem(cacheKey, JSON.stringify({
+                timestamp: new Date().getTime(),
+                data: weatherData
+            }));
+        }
+
+        // 4. 渲染畫面
         const riskLevel = getRainRiskLevel(weatherData, district);
         const copy = getCopyByRiskLevel(riskLevel);
 
+        // 如果是快取秒開，可以不用 setTimeout，但為了動畫順暢保留 300ms
         setTimeout(() => { 
             ui.toggleLoading(false);
             ui.render(district.name, weatherData, district, riskLevel, copy);
-        }, 400);
+        }, 300);
 
     } catch (e) {
         console.error(e);
         ui.toggleLoading(false);
-        alert("資料讀取失敗");
+        alert("資料讀取失敗，請稍後再試");
+    } finally {
+        // 5. 解鎖按鈕
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerText = originalText;
+        }, 1000); // 至少鎖1秒
     }
 }
 
@@ -828,9 +846,7 @@ document.querySelectorAll(".cm-btn").forEach(btn => {
     btn.addEventListener("click", () => {
         const type = btn.dataset.type;
         const msg = getCommuteMsg(type, window.currentWeatherType || 'ok', window.currentTemp);
-        
         if(typeof gtag === 'function') gtag('event', 'select_commute', { 'mode': type });
-
         const box = document.getElementById("commuteResult");
         box.style.opacity = 0;
         setTimeout(() => {
@@ -840,23 +856,16 @@ document.querySelectorAll(".cm-btn").forEach(btn => {
     });
 });
 
-// [重點修正] 通勤建議邏輯 (Logic Fix: 溫度優先於天氣)
 function getCommuteMsg(mode, weather, temp){
-    const isFreezing = (temp < 10); // 10度以下
-    const isExtremeCold = (temp <= 0); // 0度以下 (北海道/極地)
+    const isFreezing = (temp < 10); 
+    const isExtremeCold = (temp <= 0); 
 
     if(mode === "scooter"){
-        // 優先順序 1: 極端溫度
         if(isExtremeCold) return "路面可能有黑冰打滑，騎車極度危險，請改道！";
         if(weather === "snow") return "下雪騎車極度危險！請改搭大眾運輸。";
-        
-        // 優先順序 2: 天氣狀況
         if(weather === "rain") return "路滑慢行，注意標線打滑，雨衣穿好。";
         if(weather === "wind") return "風大抓穩龍頭，避開空曠路段。";
-        
-        // 優先順序 3: 一般寒冷
         if(isFreezing) return "寒風刺骨，騎車請務必戴防風手套與口罩！";
-        
         return "天氣不錯，騎車兜風去上班吧。";
     }
     if(mode === "car"){
@@ -876,17 +885,11 @@ function getCommuteMsg(mode, weather, temp){
         return "上車選個窗邊位，欣賞街景。";
     }
     if(mode === "walk"){
-        // 優先順序 1: 溫度絕對優先
         if(isExtremeCold) return "太冷了！戶外行走容易失溫，請搭車代步。";
-        
-        // 優先順序 2: 惡劣天氣
         if(weather === "snow") return "雪地行走困難且易滑倒，建議改搭車。";
         if(weather === "rain") return "走路鞋子會濕，建議換搭車或穿防水鞋。";
         if(weather === "wind") return "風大行走困難且易凌亂，建議改搭車。";
-        
-        // 優先順序 3: 輕微寒冷
         if(isFreezing) return "氣溫偏低，走路請戴口罩圍巾，避免吸入冷風。";
-        
         return "今天適合走路，提早一站下車運動一下！";
     }
     if(mode === "cafe"){
