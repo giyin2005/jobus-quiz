@@ -3,31 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>你比市場準嗎？ - 職場感知力測驗 v3.4</title>
+    <title>你比市場準嗎？ - 職場感知力測驗 v3.7</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* 動畫類 */
-        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .slide-in-right { animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .pulse-text { animation: pulseText 2s infinite; }
         
-        /* 隱藏 Scrollbar 但保留滑動功能 */
+        /* 隱藏 Scrollbar */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes slideInRight { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes pulseText { 
             0%, 100% { opacity: 1; transform: scale(1); } 
             50% { opacity: 0.7; transform: scale(0.98); } 
         }
 
-        /* 關鍵修正：防止滑動時頁面捲動 */
         input[type=range] {
             touch-action: none; 
             -webkit-appearance: none;
@@ -35,23 +33,22 @@
             background: transparent;
         }
 
-        /* 自訂滑桿軌道邏輯 - 加大尺寸 */
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 48px; /* 再加大 */
-            width: 48px;
+            height: 44px; 
+            width: 44px;
             border-radius: 50%;
             background: #ffffff;
             cursor: pointer;
             border: 5px solid #4F46E5;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.5); 
-            margin-top: -20px; 
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4); 
+            margin-top: -18px; 
             position: relative;
             z-index: 20;
         }
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
-            height: 12px; /* 軌道加粗 */
+            height: 10px; 
             cursor: pointer;
             background: transparent; 
         }
@@ -60,7 +57,7 @@
 <body class="bg-gray-100 text-gray-800 h-screen flex justify-center items-center overflow-hidden">
 
     <div id="app" class="w-full max-w-md h-full bg-white relative shadow-2xl flex flex-col overflow-hidden sm:rounded-[2.5rem] sm:h-[95vh] sm:border-8 sm:border-gray-900">
-        </div>
+    </div>
 
 <script>
 /**
@@ -68,7 +65,6 @@
  * CONFIG: 設定區
  * =================================================================
  */
-// 已填入您的 Worker 網址
 const WORKER_URL = "https://prediction-game-api.giyin2005.workers.dev/"; 
 
 /**
@@ -125,7 +121,7 @@ const DataService = {
 
 /**
  * ------------------------------------------------------------------
- * 2. State Management (狀態管理)
+ * 2. State Management
  * ------------------------------------------------------------------
  */
 class GameStore {
@@ -171,7 +167,7 @@ const store = new GameStore();
 
 /**
  * ------------------------------------------------------------------
- * 3. UI Layer (渲染層)
+ * 3. UI Layer (v3.7 Fixes)
  * ------------------------------------------------------------------
  */
 const App = document.getElementById('app');
@@ -197,7 +193,7 @@ function bindEvents(state) {
             const display = document.getElementById('val-display');
             const track = document.getElementById('track-fill');
             const thumb = document.getElementById('thumb-visual');
-            if(display) display.innerHTML = `${val}<span class="text-4xl text-indigo-300 ml-1">%</span>`;
+            if(display) display.innerHTML = `${val}<span class="text-3xl text-indigo-300 ml-1">%</span>`;
             if(track) track.style.width = `${val}%`;
             if(thumb) thumb.style.left = `${val}%`;
         };
@@ -210,22 +206,21 @@ function bindEvents(state) {
     if (restartBtn) restartBtn.onclick = () => store.initGame();
 }
 
-/** Views - 字體全面放大 (v3.4) */
-
 function ViewLoading(state) {
     return `<div class="flex flex-col items-center justify-center h-full space-y-4 bg-gray-50"><div class="relative"><div class="w-16 h-16 border-4 border-gray-200 border-t-indigo-600 rounded-full animate-spin"></div><div class="absolute top-0 left-0 w-16 h-16 border-4 border-transparent border-b-indigo-300 rounded-full animate-spin" style="animation-duration: 1.5s"></div></div><p class="text-gray-500 text-lg animate-pulse tracking-wide font-medium">${state.loadingText}</p></div>`;
 }
 
 function ViewIntro() {
-    return `<div class="flex flex-col h-full p-8 relative overflow-hidden bg-white"><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div><div class="absolute bottom-0 right-0 w-64 h-64 bg-purple-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div><div class="relative z-10 flex flex-col h-full justify-between fade-in"><div class="mt-8"><span class="inline-block px-3 py-1 bg-gray-900 text-white text-xs font-bold tracking-widest rounded-full mb-6">BETA v3.4</span><h1 class="text-6xl font-black text-gray-900 mb-4 leading-none tracking-tight">你比市場<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">更準嗎？</span></h1><p class="text-gray-500 text-2xl font-medium mt-4">職場感知力測驗</p></div><div class="flex-grow flex items-center justify-center"><div class="text-center space-y-6"><div class="text-9xl animate-bounce drop-shadow-2xl filter grayscale-[0.2]">🔮</div><div class="space-y-4"><p class="text-indigo-900 font-bold text-2xl">你的直覺 vs 大眾共識</p><p class="text-gray-500 text-lg max-w-xs mx-auto leading-relaxed">這不是考試，而是看你在充滿雜訊的職場中，是否擁有看透局勢的「絕對音感」。</p></div></div></div><div class="mb-4"><button id="btn-start" class="w-full bg-gray-900 text-white text-2xl font-bold py-6 rounded-2xl shadow-xl transform transition active:scale-[0.98] hover:bg-gray-800 border border-gray-800 flex items-center justify-center gap-2">開始測驗 <span class="text-gray-400 text-2xl">→</span></button><p class="text-center text-sm text-gray-400 mt-4 opacity-60">*測驗結果僅供參考，無任何投資建議</p></div></div></div>`;
+    return `<div class="flex flex-col h-full p-8 relative overflow-hidden bg-white"><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div><div class="absolute bottom-0 right-0 w-64 h-64 bg-purple-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div><div class="relative z-10 flex flex-col h-full justify-between fade-in"><div class="mt-6"><span class="inline-block px-3 py-1 bg-gray-900 text-white text-xs font-bold tracking-widest rounded-full mb-4">BETA v3.7</span><h1 class="text-5xl font-black text-gray-900 mb-2 leading-none tracking-tight">你比市場<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">更準嗎？</span></h1><p class="text-gray-500 text-xl font-medium mt-4">職場感知力測驗</p></div><div class="flex-grow flex items-center justify-center"><div class="text-center space-y-4"><div class="text-8xl animate-bounce drop-shadow-2xl filter grayscale-[0.2] mb-4">🔮</div><div class="space-y-3"><p class="text-indigo-900 font-bold text-2xl">你的直覺 vs 大眾共識</p><p class="text-gray-500 text-lg max-w-xs mx-auto leading-relaxed">這不是考試，而是看你在充滿雜訊的職場中，是否擁有看透局勢的「絕對音感」。</p></div></div></div><div class="mb-2"><button id="btn-start" class="w-full bg-gray-900 text-white text-2xl font-bold py-5 rounded-2xl shadow-xl transform transition active:scale-[0.98] hover:bg-gray-800 border border-gray-800 flex items-center justify-center gap-2">開始測驗 <span class="text-gray-400 text-2xl">→</span></button><p class="text-center text-sm text-gray-400 mt-4 opacity-60">*測驗結果僅供參考，無任何投資建議</p></div></div></div>`;
 }
 
 function ViewGame(state) {
     const q = state.questions[state.currentQIndex];
     const progress = ((state.currentQIndex + 1) / state.questions.length) * 100;
-    return `<div class="flex flex-col h-full bg-gray-50 fade-in"><div class="w-full h-1.5 bg-gray-200"><div class="h-full bg-indigo-600 transition-all duration-300 ease-out" style="width: ${progress}%"></div></div><div class="px-6 pt-6 flex justify-between items-center"><span class="text-gray-400 text-sm font-bold tracking-widest uppercase">Q ${state.currentQIndex + 1} / ${state.questions.length}</span><span class="text-indigo-600 text-sm font-bold bg-indigo-100 px-3 py-1 rounded-full border border-indigo-200">${q.category}</span></div><div class="flex-grow flex flex-col px-6 py-4"><div class="bg-white rounded-[1.5rem] p-8 shadow-sm border border-gray-100 mb-6 slide-in-right"><h2 class="text-3xl font-bold text-gray-900 mb-4 leading-snug">${q.displayTitle}</h2><p class="text-gray-600 text-xl leading-relaxed">${q.introText}</p></div><div class="flex-grow flex flex-col justify-center items-center relative"><div class="absolute text-[12rem] font-black text-gray-200 select-none -z-10 opacity-30 transform -rotate-12">%</div><div class="text-center w-full max-w-xs"><div class="mb-6 pulse-text flex justify-center items-center text-indigo-600 font-bold bg-indigo-100 inline-block px-5 py-2 rounded-full text-lg mx-auto"><span>👇 左右滑動以輸入直覺</span></div><div id="val-display" class="text-9xl font-black text-indigo-600 tracking-tighter mb-8 tabular-nums relative inline-block">${state.userGuess}<span class="text-4xl text-indigo-300 ml-1">%</span></div><div class="relative h-24 w-full flex items-center"><div class="absolute left-0 right-0 top-1/2 h-5 bg-gray-200 rounded-full overflow-hidden transform -translate-y-1/2 pointer-events-none shadow-inner"><div id="track-fill" class="h-full bg-indigo-500 transition-none" style="width: ${state.userGuess}%"></div></div><input id="guess-slider" type="range" min="0" max="100" value="${state.userGuess}" class="z-10 relative w-full h-full opacity-0 cursor-pointer"><div id="thumb-visual" class="absolute top-1/2 h-12 w-12 bg-white border-4 border-indigo-600 rounded-full shadow-xl transform -translate-y-1/2 -translate-x-1/2 pointer-events-none transition-none flex items-center justify-center" style="left: ${state.userGuess}%"><div class="w-3 h-3 bg-indigo-600 rounded-full"></div></div></div><div class="flex justify-between text-lg font-bold text-gray-500 mt-2 px-1"><span>0% 不可能</span><span>100% 絕對會</span></div></div></div></div><div class="p-6 bg-gray-50 border-t border-gray-100"><button id="btn-confirm" class="w-full bg-gray-900 text-white text-2xl font-bold py-6 rounded-2xl shadow-lg transform transition active:scale-[0.98] hover:bg-gray-800 flex justify-center items-center gap-2">確認鎖定 <span class="text-lg opacity-50">🔒</span></button></div></div>`;
+    return `<div class="flex flex-col h-full bg-gray-50 fade-in"><div class="w-full h-1.5 bg-gray-200 flex-shrink-0"><div class="h-full bg-indigo-600 transition-all duration-300 ease-out" style="width: ${progress}%"></div></div><div class="px-6 pt-6 flex justify-between items-center flex-shrink-0"><span class="text-gray-400 text-sm font-bold tracking-widest uppercase">Q ${state.currentQIndex + 1} / ${state.questions.length}</span><span class="text-indigo-600 text-sm font-bold bg-indigo-100 px-3 py-1 rounded-full border border-indigo-200">${q.category}</span></div><div class="px-6 py-2 flex-shrink-0"><div class="bg-white rounded-[1.5rem] p-6 shadow-sm border border-gray-100 mt-4"><h2 class="text-2xl font-bold text-gray-900 mb-2 leading-snug">${q.displayTitle}</h2><p class="text-gray-600 text-lg leading-relaxed">${q.introText}</p></div></div><div class="flex-grow flex flex-col justify-center items-center relative"><div class="absolute text-[12rem] font-black text-gray-200 select-none -z-10 opacity-30 transform -rotate-12">%</div><div class="text-center w-full max-w-xs"><div class="mb-4 pulse-text flex justify-center items-center text-indigo-600 font-bold bg-indigo-100 inline-block px-4 py-1.5 rounded-full text-base mx-auto"><span>👇 左右滑動以輸入直覺</span></div><div id="val-display" class="text-7xl font-black text-indigo-600 tracking-tighter mb-6 tabular-nums relative inline-block">${state.userGuess}<span class="text-3xl text-indigo-300 ml-1">%</span></div><div class="relative h-16 w-full flex items-center"><div class="absolute left-0 right-0 top-1/2 h-5 bg-gray-200 rounded-full overflow-hidden transform -translate-y-1/2 pointer-events-none shadow-inner"><div id="track-fill" class="h-full bg-indigo-500 transition-none" style="width: ${state.userGuess}%"></div></div><input id="guess-slider" type="range" min="0" max="100" value="${state.userGuess}" class="z-10 relative w-full h-full opacity-0 cursor-pointer"><div id="thumb-visual" class="absolute top-1/2 h-11 w-11 bg-white border-4 border-indigo-600 rounded-full shadow-xl transform -translate-y-1/2 -translate-x-1/2 pointer-events-none transition-none flex items-center justify-center" style="left: ${state.userGuess}%"><div class="w-3 h-3 bg-indigo-600 rounded-full"></div></div></div><div class="flex justify-between text-base font-bold text-gray-500 mt-2 px-1"><span>0% 不可能</span><span>100% 絕對會</span></div></div></div><div class="p-4 bg-gray-50 border-t border-gray-100 flex-shrink-0"><button id="btn-confirm" class="w-full bg-gray-900 text-white text-2xl font-bold py-5 rounded-2xl shadow-lg transform transition active:scale-[0.98] hover:bg-gray-800 flex justify-center items-center gap-2">確認鎖定 <span class="text-lg opacity-50">🔒</span></button></div></div>`;
 }
 
+// v3.7 Fix: ViewReveal 改為「固定底部按鈕 + 內容可滑動」，解決跑版問題
 function ViewReveal(state) {
     const lastRecord = state.history[state.history.length - 1];
     const q = lastRecord.question;
@@ -234,16 +229,53 @@ function ViewReveal(state) {
     let diffText = ""; const diff = userVal - marketVal;
     if (Math.abs(diff) < 10) diffText = "英雄所見略同"; else if (diff > 0) diffText = "你比市場更樂觀"; else diffText = "你比市場更保守";
     const diffColorClass = diff > 0 ? "text-orange-500" : "text-blue-500";
-    return `<div class="flex flex-col h-full bg-gray-900 text-white slide-up relative overflow-hidden"><div class="absolute top-0 right-0 w-64 h-64 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-16 -mt-16 animate-pulse"></div><div class="p-8 flex-grow flex flex-col justify-center relative z-10"><h3 class="text-gray-400 text-sm font-bold uppercase tracking-widest mb-2">${q.category}</h3><h2 class="text-3xl font-bold mb-12 leading-snug text-white/90">${q.displayTitle}</h2><div class="space-y-12"><div><div class="flex justify-between items-end mb-3"><span class="text-lg text-indigo-300 font-medium">你的直覺</span><span class="text-6xl font-bold text-white leading-none">${userVal}%</span></div><div class="h-4 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-indigo-500 rounded-full transition-all duration-1000 ease-out" style="width: ${userVal}%"></div></div></div><div><div class="flex justify-between items-end mb-3"><div class="flex flex-col"><span class="text-lg text-emerald-300 font-medium mb-1">目前多數人的判斷</span><span class="inline-block self-start text-xs bg-gray-800 border border-gray-700 px-2 py-1 rounded text-gray-400 tracking-wider">即時市場數據</span></div><span class="text-6xl font-bold text-emerald-400 leading-none">${marketVal}%</span></div><div class="h-4 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 rounded-full transition-all duration-1000 ease-out" style="width: ${marketVal}%"></div></div></div></div><div class="mt-20 text-center"><div class="inline-block px-8 py-5 bg-gray-800/80 backdrop-blur-sm border border-gray-700 rounded-2xl"><span class="text-2xl font-bold text-gray-200 block mb-1">${diffText}</span><span class="text-lg ${diffColorClass} font-bold tracking-wider">(差異 ${diff > 0 ? '+' : ''}${diff}%)</span></div></div></div><div class="p-6 border-t border-gray-800 z-10 bg-gray-900"><button id="btn-next" class="w-full bg-white text-gray-900 text-2xl font-bold py-6 rounded-2xl shadow-lg transform transition active:scale-[0.98] hover:bg-gray-100">下一題 →</button></div></div>`;
+    
+    return `
+        <div class="flex flex-col h-full bg-gray-900 text-white slide-up relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-16 -mt-16 animate-pulse"></div>
+            
+            <div class="flex-grow overflow-y-auto px-8 pt-8 pb-32 scroll-smooth no-scrollbar relative z-10">
+                <h3 class="text-gray-400 text-sm font-bold uppercase tracking-widest mb-2">${q.category}</h3>
+                <h2 class="text-3xl font-bold mb-12 leading-snug text-white/90">${q.displayTitle}</h2>
+                <div class="space-y-12">
+                    <div>
+                        <div class="flex justify-between items-end mb-3"><span class="text-xl text-indigo-300 font-medium">你的直覺</span><span class="text-6xl font-bold text-white leading-none">${userVal}%</span></div>
+                        <div class="h-4 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-indigo-500 rounded-full transition-all duration-1000 ease-out" style="width: ${userVal}%"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-end mb-3">
+                            <div class="flex flex-col"><span class="text-xl text-emerald-300 font-medium mb-1">目前多數人的判斷</span><span class="inline-block self-start text-xs bg-gray-800 border border-gray-700 px-2 py-1 rounded text-gray-400 tracking-wider">即時市場數據</span></div>
+                            <span class="text-6xl font-bold text-emerald-400 leading-none">${marketVal}%</span>
+                        </div>
+                        <div class="h-4 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 rounded-full transition-all duration-1000 ease-out" style="width: ${marketVal}%"></div></div>
+                    </div>
+                </div>
+                <div class="mt-20 text-center">
+                    <div class="inline-block px-8 py-5 bg-gray-800/80 backdrop-blur-sm border border-gray-700 rounded-2xl">
+                        <span class="text-2xl font-bold text-gray-200 block mb-1">${diffText}</span>
+                        <span class="text-lg ${diffColorClass} font-bold tracking-wider">(差異 ${diff > 0 ? '+' : ''}${diff}%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
+                <div class="bg-gradient-to-t from-gray-900 via-gray-900/95 to-transparent p-6 pt-12 pointer-events-auto border-t border-gray-800">
+                    <button id="btn-next" class="w-full bg-white text-gray-900 text-2xl font-bold py-6 rounded-2xl shadow-lg transform transition active:scale-[0.98] hover:bg-gray-100">
+                        下一題 →
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
+// v3.7 Fix: 統一 ViewResult 數據體檢的排版樣式
 function ViewResult(state) {
     const totalDiff = state.history.reduce((acc, curr) => acc + curr.diff, 0);
     const avgDiff = totalDiff / state.history.length;
     const totalAbsDiff = state.history.reduce((acc, curr) => acc + Math.abs(curr.diff), 0);
     const avgAbsDiff = totalAbsDiff / state.history.length;
     
-    // 文案邏輯更新：將術語轉為問句與白話文
     const biasTitle = "你看事情有多樂觀？";
     const biasValue = avgDiff > 0 ? `比大眾樂觀 ${Math.round(avgDiff)}%` : (avgDiff < 0 ? `比大眾保守 ${Math.round(Math.abs(avgDiff))}%` : "與大眾完全一致");
     
@@ -292,18 +324,14 @@ function ViewResult(state) {
                     <div class="space-y-8 px-2 mb-6">
                         <h3 class="text-lg font-bold text-gray-400 uppercase tracking-wider border-b-2 border-gray-200 pb-3 text-left">數據體檢</h3>
                         
-                        <div class="flex flex-col gap-1">
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600 text-xl font-bold">${biasTitle}</span>
-                            </div>
-                            <span class="text-right font-black text-gray-900 text-3xl font-mono tracking-tight">${biasValue}</span>
+                        <div class="flex flex-col gap-2">
+                            <div class="flex justify-between items-center"><span class="text-gray-600 text-xl font-bold">${biasTitle}</span></div>
+                            <span class="block w-fit ml-auto bg-gray-100 text-gray-800 px-5 py-2 rounded-xl text-right font-bold text-3xl shadow-sm">${biasValue}</span>
                         </div>
                         
-                         <div class="flex flex-col gap-1">
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600 text-xl font-bold">${volTitle}</span>
-                            </div>
-                            <span class="text-right font-bold text-gray-600 text-2xl bg-gray-100 px-4 py-2 rounded-lg self-end mt-1">${volValue}</span>
+                         <div class="flex flex-col gap-2">
+                            <div class="flex justify-between items-center"><span class="text-gray-600 text-xl font-bold">${volTitle}</span></div>
+                            <span class="block w-fit ml-auto bg-gray-100 text-gray-800 px-5 py-2 rounded-xl text-right font-bold text-3xl shadow-sm">${volValue}</span>
                         </div>
                     </div>
                 </div>
