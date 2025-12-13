@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>通勤天氣小幫手 🌤 (Logic Fixed)</title>
+<title>通勤天氣小幫手 🌤 (Level 6: 邏輯修正最終版)</title>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-P7PY1RNXJQ"></script>
 <script>
@@ -51,9 +51,13 @@
     #searchInput:focus { box-shadow: 0 0 0 3px rgba(58,141,255,0.2); }
     
     #suggestions{ position:absolute; left:0; right:0; top:105%; background:#fff; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.15); max-height:280px; overflow-y:auto; display:none; z-index:100; border: 1px solid #eee; }
+    
     .s-item{ padding:14px 16px; cursor:pointer; font-size:18px; border-bottom: 1px solid #f5f5f5; color: #333; }
     .s-item:last-child{ border-bottom: none; }
     .s-item:hover{ background:#f0f7ff; color: #3A8DFF; font-weight: 600; }
+    
+    .s-header { padding: 8px 16px; font-size: 14px; color: #888; background: #fafafa; font-weight: 700; border-bottom: 1px solid #eee; }
+    .s-global { color: #555; }
 
     /* ========== 按鈕組 ========== */
     .btn-row{ display:flex; gap:10px; margin-top:16px; }
@@ -67,7 +71,7 @@
     
     .main-btn:disabled, .ghost-btn:disabled { opacity: 0.6; cursor: not-allowed; filter: grayscale(100%); }
 
-    /* ========== 骨架屏 (Skeleton Screen) ========== */
+    /* ========== 骨架屏 ========== */
     .skeleton-wrapper { display: none; }
     .skeleton {
         background: #f0f0f0;
@@ -86,7 +90,7 @@
     .sk-text { flex: 1; height: 24px; }
     .sk-note { width: 100%; height: 60px; margin-top: 15px; border-radius: 12px; }
 
-    /* ========== 真實天氣資料區 (預設隱藏) ========== */
+    /* ========== 真實天氣資料區 ========== */
     #weatherSummaryCard{ display:none; line-height:1.7; font-size:19px; color: #111; animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:translateY(0);} }
 
@@ -101,17 +105,9 @@
     #weatherBottomNote { margin-top: 16px; font-weight: 700; color: #000; background: #eef6fc; padding: 14px; border-radius: 12px; font-size: 19px; line-height: 1.6; }
 
     /* ========== 通勤按鈕樣式 ========== */
-    #commuteBtns {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        justify-content: center;
-        margin-top: 8px;
-    }
-    
+    #commuteBtns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 8px; }
     .cm-btn{ flex:1 1 45%; min-width:140px; padding:14px 12px; border-radius:16px; border:2px solid #3A8DFF; background:#fff; color:#3A8DFF; font-size:18px; font-weight: 600; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,0.08); transition: all 0.2s; }
     .cm-btn:hover{ background: #3A8DFF; color: #fff; transform: translateY(-2px); box-shadow: 0 5px 12px rgba(58,141,255,0.3); }
-    
     #commuteResult{ margin-top:16px; font-size:19px; font-weight:600; line-height: 1.6; color: #222; }
 
     .footer-copyright { text-align: center; padding: 20px 0 30px; font-size: 16px; color: #555555; }
@@ -138,7 +134,7 @@
     <div class="card">
         <div class="card-title">你要去哪裡？</div>
         <div class="search-wrapper">
-            <input id="searchInput" type="text" placeholder="輸入鄉鎮市區 (如：中正區)" autocomplete="off" />
+            <input id="searchInput" type="text" placeholder="搜尋 台灣行政區 或 全球城市 (如: 大阪)" autocomplete="off" />
             <div id="suggestions"></div>
         </div>
 
@@ -198,25 +194,23 @@
 <script>
 /**
  * =====================================================================
- * MODULE 1: DATA LAYER (全台368行政區完整版)
+ * MODULE 1: DATA LAYER (全台368行政區 + 全球搜尋)
  * =====================================================================
  */
 const districts = [
-  // --- 基隆市 (7) [全區高風險] ---
+  // --- 基隆市 ---
   {name: "基隆市 仁愛區", lat: 25.128, lon: 121.742, geoRisk: true}, {name: "基隆市 信義區", lat: 25.127, lon: 121.758, geoRisk: true},
   {name: "基隆市 中正區", lat: 25.143, lon: 121.768, geoRisk: true}, {name: "基隆市 中山區", lat: 25.148, lon: 121.733, geoRisk: true},
   {name: "基隆市 安樂區", lat: 25.138, lon: 121.718, geoRisk: true}, {name: "基隆市 暖暖區", lat: 25.097, lon: 121.739, geoRisk: true},
   {name: "基隆市 七堵區", lat: 25.094, lon: 121.706, geoRisk: true},
-
-  // --- 台北市 (12) ---
+  // --- 台北市 ---
   {name: "台北市 中正區", lat: 25.032, lon: 121.519}, {name: "台北市 大同區", lat: 25.063, lon: 121.513},
   {name: "台北市 中山區", lat: 25.064, lon: 121.533}, {name: "台北市 松山區", lat: 25.058, lon: 121.558},
   {name: "台北市 大安區", lat: 25.026, lon: 121.543}, {name: "台北市 萬華區", lat: 25.030, lon: 121.498},
   {name: "台北市 信義區", lat: 25.033, lon: 121.565}, {name: "台北市 士林區", lat: 25.092, lon: 121.525, geoRisk: true},
   {name: "台北市 北投區", lat: 25.132, lon: 121.500, geoRisk: true}, {name: "台北市 內湖區", lat: 25.083, lon: 121.594, geoRisk: true},
   {name: "台北市 南港區", lat: 25.055, lon: 121.617, geoRisk: true}, {name: "台北市 文山區", lat: 24.998, lon: 121.574, geoRisk: true},
-
-  // --- 新北市 (29) ---
+  // --- 新北市 ---
   {name: "新北市 板橋區", lat: 25.014, lon: 121.464}, {name: "新北市 三重區", lat: 25.061, lon: 121.488},
   {name: "新北市 中和區", lat: 24.993, lon: 121.500}, {name: "新北市 永和區", lat: 25.009, lon: 121.516},
   {name: "新北市 新莊區", lat: 25.036, lon: 121.450}, {name: "新北市 新店區", lat: 24.957, lon: 121.538},
@@ -232,8 +226,7 @@ const districts = [
   {name: "新北市 萬里區", lat: 25.176, lon: 121.636, geoRisk: true}, {name: "新北市 平溪區", lat: 25.026, lon: 121.739, geoRisk: true},
   {name: "新北市 雙溪區", lat: 25.034, lon: 121.865, geoRisk: true}, {name: "新北市 貢寮區", lat: 25.017, lon: 121.944, geoRisk: true},
   {name: "新北市 烏來區", lat: 24.865, lon: 121.551, geoRisk: true},
-
-  // --- 桃園市 (13) ---
+  // --- 桃園市 ---
   {name: "桃園市 桃園區", lat: 24.993, lon: 121.301}, {name: "桃園市 中壢區", lat: 24.965, lon: 121.226},
   {name: "桃園市 大溪區", lat: 24.881, lon: 121.286}, {name: "桃園市 楊梅區", lat: 24.908, lon: 121.146},
   {name: "桃園市 蘆竹區", lat: 25.047, lon: 121.291}, {name: "桃園市 大園區", lat: 25.062, lon: 121.196},
@@ -241,12 +234,9 @@ const districts = [
   {name: "桃園市 龍潭區", lat: 24.864, lon: 121.217}, {name: "桃園市 平鎮區", lat: 24.945, lon: 121.216},
   {name: "桃園市 新屋區", lat: 24.972, lon: 121.106}, {name: "桃園市 觀音區", lat: 25.036, lon: 121.082},
   {name: "桃園市 復興區", lat: 24.821, lon: 121.357, geoRisk: true},
-
-  // --- 新竹市 (3) ---
+  // --- 新竹縣市 ---
   {name: "新竹市 東區", lat: 24.798, lon: 121.000}, {name: "新竹市 北區", lat: 24.822, lon: 120.960},
   {name: "新竹市 香山區", lat: 24.768, lon: 120.925},
-
-  // --- 新竹縣 (13) ---
   {name: "新竹縣 竹北市", lat: 24.839, lon: 121.010}, {name: "新竹縣 竹東鎮", lat: 24.739, lon: 121.095},
   {name: "新竹縣 新埔鎮", lat: 24.829, lon: 121.072}, {name: "新竹縣 關西鎮", lat: 24.796, lon: 121.176},
   {name: "新竹縣 湖口鄉", lat: 24.902, lon: 121.042}, {name: "新竹縣 新豐鄉", lat: 24.898, lon: 120.985},
@@ -254,8 +244,7 @@ const districts = [
   {name: "新竹縣 北埔鄉", lat: 24.700, lon: 121.058}, {name: "新竹縣 寶山鄉", lat: 24.761, lon: 121.026},
   {name: "新竹縣 峨眉鄉", lat: 24.686, lon: 121.026}, {name: "新竹縣 尖石鄉", lat: 24.580, lon: 121.300, geoRisk: true},
   {name: "新竹縣 五峰鄉", lat: 24.612, lon: 121.114, geoRisk: true},
-
-  // --- 苗栗縣 (18) ---
+  // --- 苗栗縣 ---
   {name: "苗栗縣 苗栗市", lat: 24.564, lon: 120.820}, {name: "苗栗縣 頭份市", lat: 24.687, lon: 120.908},
   {name: "苗栗縣 苑裡鎮", lat: 24.442, lon: 120.655}, {name: "苗栗縣 通霄鎮", lat: 24.492, lon: 120.676},
   {name: "苗栗縣 竹南鎮", lat: 24.686, lon: 120.879}, {name: "苗栗縣 後龍鎮", lat: 24.613, lon: 120.786},
@@ -265,8 +254,7 @@ const districts = [
   {name: "苗栗縣 三義鄉", lat: 24.409, lon: 120.772}, {name: "苗栗縣 西湖鄉", lat: 24.545, lon: 120.748},
   {name: "苗栗縣 造橋鄉", lat: 24.639, lon: 120.864}, {name: "苗栗縣 三灣鄉", lat: 24.654, lon: 120.952},
   {name: "苗栗縣 獅潭鄉", lat: 24.542, lon: 120.923}, {name: "苗栗縣 泰安鄉", lat: 24.437, lon: 120.992, geoRisk: true},
-
-  // --- 台中市 (29) ---
+  // --- 台中市 ---
   {name: "台中市 中區", lat: 24.142, lon: 120.680}, {name: "台中市 東區", lat: 24.135, lon: 120.695},
   {name: "台中市 南區", lat: 24.120, lon: 120.665}, {name: "台中市 西區", lat: 24.144, lon: 120.665},
   {name: "台中市 北區", lat: 24.161, lon: 120.680}, {name: "台中市 北屯區", lat: 24.180, lon: 120.720},
@@ -282,8 +270,7 @@ const districts = [
   {name: "台中市 龍井區", lat: 24.204, lon: 120.545}, {name: "台中市 霧峰區", lat: 24.062, lon: 120.700},
   {name: "台中市 太平區", lat: 24.127, lon: 120.720}, {name: "台中市 大里區", lat: 24.099, lon: 120.686},
   {name: "台中市 和平區", lat: 24.276, lon: 121.050, geoRisk: true},
-
-  // --- 彰化縣 (26) ---
+  // --- 彰化縣 ---
   {name: "彰化縣 彰化市", lat: 24.081, lon: 120.538}, {name: "彰化縣 鹿港鎮", lat: 24.056, lon: 120.435},
   {name: "彰化縣 和美鎮", lat: 24.113, lon: 120.500}, {name: "彰化縣 線西鄉", lat: 24.131, lon: 120.467},
   {name: "彰化縣 伸港鄉", lat: 24.152, lon: 120.485}, {name: "彰化縣 福興鄉", lat: 24.040, lon: 120.443},
@@ -297,8 +284,7 @@ const districts = [
   {name: "彰化縣 田尾鄉", lat: 23.889, lon: 120.529}, {name: "彰化縣 埤頭鄉", lat: 23.887, lon: 120.461},
   {name: "彰化縣 芳苑鄉", lat: 23.927, lon: 120.323}, {name: "彰化縣 大城鄉", lat: 23.854, lon: 120.285},
   {name: "彰化縣 竹塘鄉", lat: 23.858, lon: 120.424}, {name: "彰化縣 溪州鄉", lat: 23.854, lon: 120.501},
-
-  // --- 南投縣 (13) ---
+  // --- 南投縣 ---
   {name: "南投縣 南投市", lat: 23.909, lon: 120.686}, {name: "南投縣 埔里鎮", lat: 23.966, lon: 120.968},
   {name: "南投縣 草屯鎮", lat: 23.978, lon: 120.683}, {name: "南投縣 竹山鎮", lat: 23.757, lon: 120.672},
   {name: "南投縣 集集鎮", lat: 23.829, lon: 120.785}, {name: "南投縣 名間鄉", lat: 23.873, lon: 120.673},
@@ -306,8 +292,7 @@ const districts = [
   {name: "南投縣 魚池鄉", lat: 23.897, lon: 120.936}, {name: "南投縣 國姓鄉", lat: 24.041, lon: 120.852},
   {name: "南投縣 水里鄉", lat: 23.812, lon: 120.854}, {name: "南投縣 信義鄉", lat: 23.693, lon: 120.970, geoRisk: true},
   {name: "南投縣 仁愛鄉", lat: 24.026, lon: 121.130, geoRisk: true},
-
-  // --- 雲林縣 (20) ---
+  // --- 雲林縣 ---
   {name: "雲林縣 斗六市", lat: 23.709, lon: 120.543}, {name: "雲林縣 斗南鎮", lat: 23.676, lon: 120.480},
   {name: "雲林縣 虎尾鎮", lat: 23.708, lon: 120.432}, {name: "雲林縣 西螺鎮", lat: 23.800, lon: 120.461},
   {name: "雲林縣 土庫鎮", lat: 23.677, lon: 120.392}, {name: "雲林縣 北港鎮", lat: 23.570, lon: 120.302},
@@ -318,11 +303,8 @@ const districts = [
   {name: "雲林縣 褒忠鄉", lat: 23.701, lon: 120.309}, {name: "雲林縣 台西鄉", lat: 23.704, lon: 120.198},
   {name: "雲林縣 元長鄉", lat: 23.652, lon: 120.311}, {name: "雲林縣 四湖鄉", lat: 23.638, lon: 120.226},
   {name: "雲林縣 口湖鄉", lat: 23.582, lon: 120.183}, {name: "雲林縣 水林鄉", lat: 23.576, lon: 120.246},
-
-  // --- 嘉義市 (2) ---
+  // --- 嘉義縣市 ---
   {name: "嘉義市 東區", lat: 23.484, lon: 120.463}, {name: "嘉義市 西區", lat: 23.479, lon: 120.432},
-
-  // --- 嘉義縣 (18) ---
   {name: "嘉義縣 太保市", lat: 23.460, lon: 120.332}, {name: "嘉義縣 朴子市", lat: 23.465, lon: 120.245},
   {name: "嘉義縣 布袋鎮", lat: 23.378, lon: 120.160}, {name: "嘉義縣 大林鎮", lat: 23.602, lon: 120.472},
   {name: "嘉義縣 民雄鄉", lat: 23.551, lon: 120.430}, {name: "嘉義縣 溪口鄉", lat: 23.601, lon: 120.393},
@@ -332,8 +314,7 @@ const districts = [
   {name: "嘉義縣 中埔鄉", lat: 23.425, lon: 120.509}, {name: "嘉義縣 竹崎鄉", lat: 23.522, lon: 120.551},
   {name: "嘉義縣 梅山鄉", lat: 23.583, lon: 120.557}, {name: "嘉義縣 番路鄉", lat: 23.453, lon: 120.596},
   {name: "嘉義縣 大埔鄉", lat: 23.298, lon: 120.603}, {name: "嘉義縣 阿里山鄉", lat: 23.350, lon: 120.730, geoRisk: true},
-
-  // --- 台南市 (37) ---
+  // --- 台南市 ---
   {name: "台南市 東區", lat: 22.991, lon: 120.227}, {name: "台南市 南區", lat: 22.955, lon: 120.185},
   {name: "台南市 北區", lat: 23.007, lon: 120.203}, {name: "台南市 安南區", lat: 23.047, lon: 120.184},
   {name: "台南市 安平區", lat: 22.997, lon: 120.167}, {name: "台南市 中西區", lat: 22.990, lon: 120.197},
@@ -353,8 +334,7 @@ const districts = [
   {name: "台南市 仁德區", lat: 22.971, lon: 120.252}, {name: "台南市 歸仁區", lat: 22.966, lon: 120.295},
   {name: "台南市 關廟區", lat: 22.963, lon: 120.328}, {name: "台南市 龍崎區", lat: 22.964, lon: 120.360},
   {name: "台南市 永康區", lat: 23.024, lon: 120.259},
-
-  // --- 高雄市 (38) ---
+  // --- 高雄市 ---
   {name: "高雄市 鹽埕區", lat: 22.625, lon: 120.285}, {name: "高雄市 鼓山區", lat: 22.651, lon: 120.278},
   {name: "高雄市 左營區", lat: 22.690, lon: 120.295}, {name: "高雄市 楠梓區", lat: 22.727, lon: 120.325},
   {name: "高雄市 三民區", lat: 22.648, lon: 120.307}, {name: "高雄市 新興區", lat: 22.628, lon: 120.302},
@@ -374,8 +354,7 @@ const districts = [
   {name: "高雄市 甲仙區", lat: 23.083, lon: 120.591}, {name: "高雄市 杉林區", lat: 22.970, lon: 120.536},
   {name: "高雄市 內門區", lat: 22.943, lon: 120.460}, {name: "高雄市 茂林區", lat: 22.886, lon: 120.662, geoRisk: true},
   {name: "高雄市 桃源區", lat: 23.160, lon: 120.760, geoRisk: true}, {name: "高雄市 那瑪夏區", lat: 23.230, lon: 120.690, geoRisk: true},
-
-  // --- 屏東縣 (33) ---
+  // --- 屏東縣 ---
   {name: "屏東縣 屏東市", lat: 22.669, lon: 120.486}, {name: "屏東縣 潮州鎮", lat: 22.550, lon: 120.542},
   {name: "屏東縣 東港鎮", lat: 22.467, lon: 120.452}, {name: "屏東縣 恆春鎮", lat: 22.002, lon: 120.744},
   {name: "屏東縣 萬丹鄉", lat: 22.589, lon: 120.485}, {name: "屏東縣 長治鄉", lat: 22.677, lon: 120.528},
@@ -393,16 +372,14 @@ const districts = [
   {name: "屏東縣 泰武鄉", lat: 22.593, lon: 120.632, geoRisk: true}, {name: "屏東縣 來義鄉", lat: 22.525, lon: 120.633, geoRisk: true},
   {name: "屏東縣 春日鄉", lat: 22.370, lon: 120.630, geoRisk: true}, {name: "屏東縣 獅子鄉", lat: 22.201, lon: 120.706, geoRisk: true},
   {name: "屏東縣 牡丹鄉", lat: 22.128, lon: 120.822, geoRisk: true},
-
-  // --- 宜蘭縣 (12) [全區高風險] ---
+  // --- 宜蘭縣 ---
   {name: "宜蘭縣 宜蘭市", lat: 24.757, lon: 121.752, geoRisk: true}, {name: "宜蘭縣 羅東鎮", lat: 24.675, lon: 121.767, geoRisk: true},
   {name: "宜蘭縣 蘇澳鎮", lat: 24.595, lon: 121.848, geoRisk: true}, {name: "宜蘭縣 頭城鎮", lat: 24.858, lon: 121.823, geoRisk: true},
   {name: "宜蘭縣 礁溪鄉", lat: 24.821, lon: 121.764, geoRisk: true}, {name: "宜蘭縣 壯圍鄉", lat: 24.779, lon: 121.794, geoRisk: true},
   {name: "宜蘭縣 員山鄉", lat: 24.743, lon: 121.720, geoRisk: true}, {name: "宜蘭縣 冬山鄉", lat: 24.634, lon: 121.792, geoRisk: true},
   {name: "宜蘭縣 五結鄉", lat: 24.693, lon: 121.797, geoRisk: true}, {name: "宜蘭縣 三星鄉", lat: 24.665, lon: 121.652, geoRisk: true},
   {name: "宜蘭縣 大同鄉", lat: 24.676, lon: 121.606, geoRisk: true}, {name: "宜蘭縣 南澳鄉", lat: 24.464, lon: 121.798, geoRisk: true},
-
-  // --- 花蓮縣 (13) ---
+  // --- 花蓮縣 ---
   {name: "花蓮縣 花蓮市", lat: 23.977, lon: 121.604}, {name: "花蓮縣 鳳林鎮", lat: 23.744, lon: 121.450},
   {name: "花蓮縣 玉里鎮", lat: 23.335, lon: 121.311}, {name: "花蓮縣 新城鄉", lat: 24.027, lon: 121.616},
   {name: "花蓮縣 吉安鄉", lat: 23.961, lon: 121.567}, {name: "花蓮縣 壽豐鄉", lat: 23.871, lon: 121.509},
@@ -410,8 +387,7 @@ const districts = [
   {name: "花蓮縣 瑞穗鄉", lat: 23.498, lon: 121.378}, {name: "花蓮縣 富里鄉", lat: 23.245, lon: 121.250},
   {name: "花蓮縣 秀林鄉", lat: 24.116, lon: 121.623, geoRisk: true}, {name: "花蓮縣 萬榮鄉", lat: 23.714, lon: 121.408, geoRisk: true},
   {name: "花蓮縣 卓溪鄉", lat: 23.350, lon: 121.140, geoRisk: true},
-
-  // --- 台東縣 (16) ---
+  // --- 台東縣 ---
   {name: "台東縣 台東市", lat: 22.756, lon: 121.147}, {name: "台東縣 成功鎮", lat: 23.100, lon: 121.373},
   {name: "台東縣 關山鎮", lat: 23.048, lon: 121.163}, {name: "台東縣 卑南鄉", lat: 22.787, lon: 121.092},
   {name: "台東縣 鹿野鄉", lat: 22.914, lon: 121.156}, {name: "台東縣 池上鄉", lat: 23.122, lon: 121.216},
@@ -420,41 +396,93 @@ const districts = [
   {name: "台東縣 綠島鄉", lat: 22.662, lon: 121.492}, {name: "台東縣 海端鄉", lat: 23.100, lon: 121.030, geoRisk: true},
   {name: "台東縣 延平鄉", lat: 22.902, lon: 121.083, geoRisk: true}, {name: "台東縣 金峰鄉", lat: 22.597, lon: 120.970, geoRisk: true},
   {name: "台東縣 達仁鄉", lat: 22.295, lon: 120.887, geoRisk: true}, {name: "台東縣 蘭嶼鄉", lat: 22.056, lon: 121.558},
-
-  // --- 澎湖縣 (6) ---
+  // --- 離島 ---
   {name: "澎湖縣 馬公市", lat: 23.565, lon: 119.563}, {name: "澎湖縣 湖西鄉", lat: 23.585, lon: 119.645},
   {name: "澎湖縣 白沙鄉", lat: 23.659, lon: 119.593}, {name: "澎湖縣 西嶼鄉", lat: 23.601, lon: 119.507},
   {name: "澎湖縣 望安鄉", lat: 23.371, lon: 119.501}, {name: "澎湖縣 七美鄉", lat: 23.207, lon: 119.429},
-
-  // --- 金門縣 (6) ---
   {name: "金門縣 金城鎮", lat: 24.416, lon: 118.317}, {name: "金門縣 金沙鎮", lat: 24.489, lon: 118.411},
   {name: "金門縣 金湖鎮", lat: 24.439, lon: 118.415}, {name: "金門縣 金寧鄉", lat: 24.456, lon: 118.328},
   {name: "金門縣 烈嶼鄉", lat: 24.426, lon: 118.243}, {name: "金門縣 烏坵鄉", lat: 24.991, lon: 119.444},
-
-  // --- 連江縣 (4) ---
   {name: "連江縣 南竿鄉", lat: 26.155, lon: 119.927}, {name: "連江縣 北竿鄉", lat: 26.223, lon: 119.989},
   {name: "連江縣 莒光鄉", lat: 25.973, lon: 119.940}, {name: "連江縣 東引鄉", lat: 26.368, lon: 120.493}
 ];
 
-// API 呼叫函式
+// 請貼回完整的 districts 陣列
+
 async function fetchWeatherData(lat, lon) {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-                `&current=temperature_2m,precipitation,wind_speed_10m,weather_code,cloud_cover` +
+                `&current=temperature_2m,precipitation,wind_speed_10m,weather_code,cloud_cover,snowfall` +
                 `&daily=temperature_2m_max,temperature_2m_min&hourly=precipitation_probability` +
                 `&forecast_days=1&timezone=auto`;
-    const res = await fetch(url);
-    return await res.json();
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("API Error");
+        return await res.json();
+    } catch (e) {
+        console.error("Fetch failed:", e);
+        throw e;
+    }
 }
 
-// 最近鄰搜索 (Local Search)
+// 🌐 雙重搜尋機制：Open-Meteo 失敗時，自動切換到 OpenStreetMap (Nominatim)
+async function fetchGlobalLocations(keyword) {
+    // 1. 優先嘗試 Open-Meteo
+    let results = await searchOpenMeteo(keyword);
+
+    // 2. 如果沒結果，切換到 Nominatim
+    if(results.length === 0) {
+        console.log("Open-Meteo found nothing, trying Nominatim...");
+        results = await searchNominatim(keyword);
+    }
+    return results;
+}
+
+// 來源 A: Open-Meteo
+async function searchOpenMeteo(keyword) {
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(keyword)}&count=5&language=zh&format=json`;
+    try {
+        const res = await fetch(url);
+        if(!res.ok) return [];
+        const data = await res.json();
+        if(!data.results) return [];
+        return data.results.map(item => ({
+            name: `${item.name} ${item.admin1 || ''} ${item.country || ''}`,
+            lat: item.latitude,
+            lon: item.longitude,
+            geoRisk: false
+        }));
+    } catch(e) { return []; }
+}
+
+// 來源 B: OpenStreetMap (Nominatim)
+async function searchNominatim(keyword) {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(keyword)}&format=json&accept-language=zh-TW&limit=5`;
+    try {
+        const res = await fetch(url);
+        if(!res.ok) return [];
+        const data = await res.json();
+        return data.map(item => ({
+            name: item.display_name, 
+            lat: parseFloat(item.lat),
+            lon: parseFloat(item.lon),
+            geoRisk: false
+        }));
+    } catch(e) {
+        console.error("Nominatim search failed:", e);
+        return [];
+    }
+}
+
 function findNearestDistrict(lat, lon) {
     let minDist = Infinity;
-    let nearest = districts[0];
-    for (const d of districts) {
-        const dist = Math.pow(d.lat - lat, 2) + Math.pow(d.lon - lon, 2);
-        if (dist < minDist) {
-            minDist = dist;
-            nearest = d;
+    let nearest = districts[0] || {name:"未知", lat:lat, lon:lon}; 
+    if(districts.length > 0){
+        for (const d of districts) {
+            const dist = Math.pow(d.lat - lat, 2) + Math.pow(d.lon - lon, 2);
+            if (dist < minDist) {
+                minDist = dist;
+                nearest = d;
+            }
         }
     }
     return nearest;
@@ -462,41 +490,46 @@ function findNearestDistrict(lat, lon) {
 
 /**
  * =====================================================================
- * MODULE 2: RULE ENGINE (規則引擎)
+ * MODULE 2: RULE ENGINE (邏輯引擎修正)
  * =====================================================================
  */
 const RISK_LEVELS = {
-    HIGH: 'HIGH',       // 明確下雨
-    MEDIUM: 'MEDIUM',   // 狀態/雲量保險
-    LOW_GEO: 'LOW_GEO', // 地形風險保險
-    LOW: 'LOW'          // 穩定
+    SNOW: 'SNOW',           // 下雪
+    EXTREME_COLD: 'EXTREME_COLD', // 極凍 (即使沒下雪)
+    HIGH: 'HIGH',           // 大雨
+    MEDIUM: 'MEDIUM',       // 飄雨/厚雲
+    LOW_GEO: 'LOW_GEO',     // 地形風險
+    LOW: 'LOW'              // 穩定
 };
 
 function getRainRiskLevel(weatherData, district) {
     const c = weatherData.current;
     const h = weatherData.hourly;
-    
-    // 計算通勤時段降雨機率 (Look-ahead)
     const rainProb = getHourlyProb(h);
     
-    // --- Layer 1: 機率層 ---
-    if (rainProb >= 30) {
-        return RISK_LEVELS.HIGH;
+    // 1. 優先檢查下雪
+    const snowCodes = [71, 73, 75, 77, 85, 86];
+    if (snowCodes.includes(c.weather_code) || (c.snowfall && c.snowfall > 0)) {
+        return RISK_LEVELS.SNOW;
+    }
+    
+    // 2. [邏輯修正] 檢查極凍狀態 (即使沒下雪，零下0度也是危險天氣)
+    if (c.temperature_2m <= 0) {
+        return RISK_LEVELS.EXTREME_COLD;
     }
 
-    // --- Layer 2: 狀態保險層 ---
-    // 51-65 為毛毛雨、雨天相關代碼
+    // 3. 檢查大雨
+    if (rainProb >= 30) return RISK_LEVELS.HIGH;
+    
+    // 4. 檢查飄雨/厚雲
     const drizzleCodes = [51, 53, 55, 61, 63, 65, 80, 81, 82];
     if (drizzleCodes.includes(c.weather_code) || c.cloud_cover >= 75) {
         return RISK_LEVELS.MEDIUM;
     }
+    
+    // 5. 地形風險
+    if (district.geoRisk === true) return RISK_LEVELS.LOW_GEO;
 
-    // --- Layer 3: 地形保險層 ---
-    if (district.geoRisk === true) {
-        return RISK_LEVELS.LOW_GEO;
-    }
-
-    // --- Fallback ---
     return RISK_LEVELS.LOW;
 }
 
@@ -511,11 +544,23 @@ function getHourlyProb(hourlyData) {
 
 /**
  * =====================================================================
- * MODULE 3: COPY RESOLVER (文案層)
+ * MODULE 3: COPY RESOLVER (文案層 - 修正對應邏輯)
  * =====================================================================
  */
-function getCopyByRiskLevel(level, rainProb) {
+function getCopyByRiskLevel(level) {
     switch (level) {
+        case RISK_LEVELS.SNOW:
+            return {
+                umbrella: "下雪了！帶傘擋雪 🌨️",
+                note: "路面易結冰濕滑，通勤時間請務必預留緩衝，注意保暖！",
+                type: "snow"
+            };
+        case RISK_LEVELS.EXTREME_COLD: // 新增極凍文案
+            return {
+                umbrella: "免帶傘，但請帶暖暖包 🔥",
+                note: "雖然沒下雪，但戶外極度寒冷，請盡量減少暴露在室外的時間。",
+                type: "freezing"
+            };
         case RISK_LEVELS.HIGH:
             return {
                 umbrella: "一定會濕！大傘準備好 ☔",
@@ -545,14 +590,17 @@ function getCopyByRiskLevel(level, rainProb) {
 }
 
 function getClothesAdvice(temp) {
-    if(temp >= 30) return "悶熱！穿透氣點，別中暑了 🥵";
-    if(temp >= 24) return "短袖即可，隨身帶件薄襯衫 👌";
-    if(temp >= 18) return "舒服的溫度，長袖或薄外套剛好 😌";
-    if(temp >= 14) return "變涼了，夾克或大衣請準備好 🧥";
-    return "寒流等級？穿暖一點，圍巾戴上！ 🧣";
+    if(temp <= 0) return "極凍警報！零下低溫，請穿著最保暖裝備 (羽絨+發熱衣) 🥶";
+    if(temp < 10) return "寒流等級！非常冷，請務必圍巾手套戴好 🧣";
+    if(temp < 15) return "變涼了，夾克或大衣請準備好 🧥";
+    if(temp < 20) return "舒服的溫度，長袖或薄外套剛好 😌";
+    if(temp < 25) return "短袖即可，隨身帶件薄襯衫 👌";
+    return "悶熱！穿透氣點，別中暑了 🥵";
 }
 
-function getWindAdvice(speed) {
+function getWindAdvice(speed, temp) {
+    // [修正] 風寒效應：低溫時微風也很刺骨
+    if (temp < 10 && speed > 5) return "寒風刺骨！體感溫度極低，請保護好頭部與雙手 🌬️";
     if (speed > 15) return "風大，騎車小心側風 ⚠️";
     return "微風，不影響通勤 🍃";
 }
@@ -561,6 +609,7 @@ function getWeatherIcon(code) {
     if (code === 0) return { icon: "☀️", text: "晴朗" };
     if ([1,2,3].includes(code)) return { icon: "⛅", text: "多雲" };
     if ([45,48].includes(code)) return { icon: "🌫️", text: "有霧" };
+    if ([71,73,75,77,85,86].includes(code)) return { icon: "🌨️", text: "下雪" };
     if (code >= 51 && code <= 67) return { icon: "🌧️", text: "雨天" };
     if (code >= 80 && code <= 99) return { icon: "⛈️", text: "雷雨/陣雨" };
     return { icon: "🌥️", text: "陰天" };
@@ -568,7 +617,7 @@ function getWeatherIcon(code) {
 
 /**
  * =====================================================================
- * MODULE 4: UI RENDERER (渲染層)
+ * MODULE 4: UI RENDERER
  * =====================================================================
  */
 const ui = {
@@ -609,18 +658,23 @@ const ui = {
             <div class="info-row"><div class="info-icon">🌧</div><div class="info-text">降雨機率：${rainProb}%</div></div>
             <div class="info-row"><div class="info-icon">👕</div><div class="info-text">${getClothesAdvice(c.temperature_2m)}</div></div>
             <div class="info-row"><div class="info-icon">☔</div><div class="info-text">${copy.umbrella}</div></div>
-            <div class="info-row"><div class="info-icon">💨</div><div class="info-text">${getWindAdvice(c.wind_speed_10m)}</div></div>
+            <div class="info-row"><div class="info-icon">💨</div><div class="info-text">${getWindAdvice(c.wind_speed_10m, c.temperature_2m)}</div></div>
         `;
 
         this.resultCard.style.display = "block";
         this.commuteSection.style.display = "block"; 
         this.resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-        // [LOGIC FIX]: 修正狀態判斷邏輯
-        // 優先保留 'rain' 狀態，只有在沒下雨且風大時，才設為 'wind'
         window.currentWeatherType = copy.type; 
-        if (window.currentWeatherType !== 'rain' && c.wind_speed_10m > 15) {
-            window.currentWeatherType = "wind"; 
+        window.currentTemp = c.temperature_2m; 
+        
+        // 狀態判定優先級
+        if (window.currentWeatherType !== 'rain' && 
+            window.currentWeatherType !== 'snow' && 
+            window.currentWeatherType !== 'freezing') {
+             if (c.wind_speed_10m > 15) {
+                window.currentWeatherType = "wind";
+             }
         }
     },
 
@@ -633,29 +687,86 @@ const ui = {
 };
 
 // =====================================================================
-//  APP CONTROLLER (主流程)
+//  APP CONTROLLER
 // =====================================================================
+
+function debounce(func, timeout = 500){
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+  };
+}
+
+let currentLocalResults = [];
+
+const handleGlobalSearch = debounce(async (v) => {
+    if(v.length < 2) return; 
+    
+    renderSuggestions(currentLocalResults, true); 
+    
+    const globalResults = await fetchGlobalLocations(v);
+    
+    renderSuggestions(currentLocalResults, false, globalResults);
+}, 600); 
+
+function renderSuggestions(localList, isLoadingGlobal = false, globalList = []) {
+    let html = "";
+
+    if(localList.length > 0) {
+        html += `<div class="s-header">📍 台灣地區</div>`;
+        html += localList.map(a => `<div class="s-item" data-src="local">${a.name}</div>`).join("");
+    }
+
+    if(isLoadingGlobal) {
+        html += `<div class="s-header s-global">🌏 正在搜尋全球城市...</div>`;
+    }
+
+    if(globalList.length > 0) {
+        html += `<div class="s-header s-global">🌏 全球結果</div>`;
+        html += globalList.map(a => `<div class="s-item" data-src="global" data-lat="${a.lat}" data-lon="${a.lon}">${a.name}</div>`).join("");
+    }
+    
+    if(!html) {
+        ui.suggestions.style.display="none"; 
+        return;
+    }
+
+    ui.suggestions.innerHTML = html;
+    ui.suggestions.style.display = "block";
+
+    document.querySelectorAll(".s-item").forEach(item => {
+        item.onclick = () => {
+            const src = item.dataset.src;
+            const name = item.textContent;
+            ui.search.value = name;
+            ui.suggestions.style.display = "none";
+            
+            if(src === "local") {
+                const area = districts.find(a => a.name === name);
+                if(area) executeQuery(area);
+            } else {
+                const tempArea = {
+                    name: name,
+                    lat: parseFloat(item.dataset.lat),
+                    lon: parseFloat(item.dataset.lon),
+                    geoRisk: false
+                };
+                executeQuery(tempArea);
+            }
+        };
+    });
+}
 
 ui.search.addEventListener("input", () => {
     const v = ui.search.value.trim();
     if(!v) { ui.suggestions.style.display="none"; return; }
     
-    const list = districts.filter(a => a.name.includes(v));
-    if(!list.length) { ui.suggestions.style.display="none"; return; }
-    
-    ui.suggestions.innerHTML = list.map(a => `<div class="s-item">${a.name}</div>`).join("");
-    ui.suggestions.style.display = "block";
-
-    document.querySelectorAll(".s-item").forEach(item => {
-        item.onclick = () => {
-            const name = item.textContent;
-            ui.search.value = name;
-            ui.suggestions.style.display = "none";
-            const area = districts.find(a => a.name === name);
-            if(area) executeQuery(area);
-        };
-    });
+    currentLocalResults = districts.filter(a => a.name.includes(v));
+    renderSuggestions(currentLocalResults);
+    handleGlobalSearch(v);
 });
+
 document.addEventListener("click", (e) => {
     if(!e.target.closest(".search-wrapper")) ui.suggestions.style.display="none";
 });
@@ -668,7 +779,7 @@ document.getElementById("geoBtn").addEventListener("click", () => {
     navigator.geolocation.getCurrentPosition(
         (pos) => {
             const nearest = findNearestDistrict(pos.coords.latitude, pos.coords.longitude);
-            console.log("定位:", nearest.name, "地形風險:", nearest.geoRisk);
+            console.log("定位:", nearest.name);
             executeQuery(nearest);
         },
         (err) => {
@@ -682,9 +793,13 @@ document.getElementById("geoBtn").addEventListener("click", () => {
 document.getElementById("getWeatherBtn").addEventListener("click", () => {
     const text = ui.search.value.trim();
     if(!text) return alert("請輸入地區");
+    
     const area = districts.find(a => a.name === text || a.name.includes(text));
-    if(!area) return alert("查無此地區");
-    executeQuery(area);
+    if(area) {
+        executeQuery(area);
+    } else {
+        alert("請從選單中點選搜尋結果");
+    }
 });
 
 async function executeQuery(district) {
@@ -712,7 +827,7 @@ async function executeQuery(district) {
 document.querySelectorAll(".cm-btn").forEach(btn => {
     btn.addEventListener("click", () => {
         const type = btn.dataset.type;
-        const msg = getCommuteMsg(type, window.currentWeatherType || 'ok');
+        const msg = getCommuteMsg(type, window.currentWeatherType || 'ok', window.currentTemp);
         
         if(typeof gtag === 'function') gtag('event', 'select_commute', { 'mode': type });
 
@@ -725,32 +840,57 @@ document.querySelectorAll(".cm-btn").forEach(btn => {
     });
 });
 
-// [LOGIC FIX]: 修正建議邏輯
-function getCommuteMsg(mode, weather){
+// [重點修正] 通勤建議邏輯 (Logic Fix: 溫度優先於天氣)
+function getCommuteMsg(mode, weather, temp){
+    const isFreezing = (temp < 10); // 10度以下
+    const isExtremeCold = (temp <= 0); // 0度以下 (北海道/極地)
+
     if(mode === "scooter"){
+        // 優先順序 1: 極端溫度
+        if(isExtremeCold) return "路面可能有黑冰打滑，騎車極度危險，請改道！";
+        if(weather === "snow") return "下雪騎車極度危險！請改搭大眾運輸。";
+        
+        // 優先順序 2: 天氣狀況
         if(weather === "rain") return "路滑慢行，注意標線打滑，雨衣穿好。";
         if(weather === "wind") return "風大抓穩龍頭，避開空曠路段。";
+        
+        // 優先順序 3: 一般寒冷
+        if(isFreezing) return "寒風刺骨，騎車請務必戴防風手套與口罩！";
+        
         return "天氣不錯，騎車兜風去上班吧。";
     }
     if(mode === "car"){
+        if(isExtremeCold) return "路面可能有隱形結冰(黑冰)，請避免急煞，放慢車速！";
+        if(weather === "snow") return "雪地駕駛需裝雪鏈，注意打滑，拉長車距。";
         if(weather === "rain") return "雨天視線差且易塞車，提早出門，保持車距。";
         return "車上聽個 Podcast，享受通勤時光。";
     }
     if(mode === "mrt"){
+        if(isExtremeCold || weather === "snow") return "外面天寒地凍，捷運有暖氣最舒服。";
         if(weather === "rain") return "下雨天搭捷運最乾爽，還能補眠。";
         return "捷運準時又方便，是通勤首選。";
     }
     if(mode === "bus"){
+        if(isExtremeCold) return "外面太冷了，躲進公車取暖最實在。";
         if(weather === "rain") return "等車找遮蔽處，車上冷氣強記得穿外套。";
         return "上車選個窗邊位，欣賞街景。";
     }
     if(mode === "walk"){
+        // 優先順序 1: 溫度絕對優先
+        if(isExtremeCold) return "太冷了！戶外行走容易失溫，請搭車代步。";
+        
+        // 優先順序 2: 惡劣天氣
+        if(weather === "snow") return "雪地行走困難且易滑倒，建議改搭車。";
         if(weather === "rain") return "走路鞋子會濕，建議換搭車或穿防水鞋。";
-        // 新增風大邏輯，避免誤判為好天氣
         if(weather === "wind") return "風大行走困難且易凌亂，建議改搭車。";
+        
+        // 優先順序 3: 輕微寒冷
+        if(isFreezing) return "氣溫偏低，走路請戴口罩圍巾，避免吸入冷風。";
+        
         return "今天適合走路，提早一站下車運動一下！";
     }
     if(mode === "cafe"){
+        if(isExtremeCold || weather === "snow") return "外面天寒地凍，躲進咖啡廳喝熱飲最幸福。";
         if(weather === "rain") return "雨大先躲咖啡廳工作，等雨停再走。";
         return "點杯熱拿鐵，開啟高效工作模式。";
     }
