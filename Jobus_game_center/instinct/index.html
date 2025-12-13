@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>你比市場準嗎？ - 職場感知力測驗 v1.9</title>
+    <title>你比市場準嗎？ - 職場感知力測驗 v2.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
@@ -27,7 +27,7 @@
             50% { opacity: 0.7; transform: scale(0.98); } 
         }
 
-        /* 關鍵修正：防止滑動時頁面捲動 */
+        /* 關鍵修正：防止滑動時頁面捲動 (保留 v1.9 優化) */
         input[type=range] {
             touch-action: none; 
             -webkit-appearance: none;
@@ -65,57 +65,67 @@
 <script>
 /**
  * ------------------------------------------------------------------
- * 1. Data Layer (資料層)
+ * 1. Data Layer (資料層) - v2.0 升級：擴充題庫與模擬邏輯
  * ------------------------------------------------------------------
  */
 const WorkerMock = {
+    // 模擬後端邏輯：從大題庫中隨機撈 5 題，並根據類型給予對應的市場機率
     async fetchQuestions() {
-        await new Promise(r => setTimeout(r, 600));
+        // 模擬網路延遲
+        await new Promise(r => setTimeout(r, 800));
 
-        const templates = [
-            {
-                id: "q1_project",
-                category: "職場直覺",
-                displayTitle: "這個專案真的會準時上線嗎？",
-                introText: "老闆說 Q3 一定要發布，依你的經驗，這件事成真的機率是？",
-                marketId: "poly_001", 
-                mockMarketProb: Math.floor(Math.random() * (85 - 45 + 1) + 45) 
-            },
-            {
-                id: "q2_policy",
-                category: "公司決策",
-                displayTitle: "公司宣佈的「新福利政策」明年還會在嗎？",
-                introText: "你覺得這是一個長期承諾，還是雷聲大雨點小？",
-                marketId: "poly_002",
-                mockMarketProb: Math.floor(Math.random() * (60 - 20 + 1) + 20)
-            },
-            {
-                id: "q3_tech",
-                category: "科技趨勢",
-                displayTitle: "這個新 AI 工具，真的會被導入我們部門嗎？",
-                introText: "撇開炒作，實務上你覺得大家採用的可能性？",
-                marketId: "poly_003",
-                mockMarketProb: Math.floor(Math.random() * (90 - 50 + 1) + 50)
-            },
-            {
-                id: "q4_sales",
-                category: "業績目標",
-                displayTitle: "今年業務部的「倍數成長」目標能達成嗎？",
-                introText: "看著現在的數字，你內心的真實評估是？",
-                marketId: "poly_004",
-                mockMarketProb: Math.floor(Math.random() * (50 - 10 + 1) + 10)
-            },
-            {
-                id: "q5_trend",
-                category: "市場大局",
-                displayTitle: "大家都在談的「經濟衰退」今年真的會來嗎？",
-                introText: "還是這只是媒體在販賣焦慮？你的直覺？",
-                marketId: "poly_005",
-                mockMarketProb: Math.floor(Math.random() * (70 - 30 + 1) + 30)
-            }
+        // 1. 完整題庫池 (15 題，含不同類型)
+        const fullPool = [
+            // --- 📅 EVENT 事件型 (專案/死線) ---
+            { id: "q_proj_01", category: "專案時程", displayTitle: "這個專案真的會準時上線嗎？", introText: "老闆說 Q3 一定要發布，依你的經驗，這件事成真的機率是？", marketType: "EVENT" },
+            { id: "q_proj_02", category: "產品發布", displayTitle: "原本承諾的新功能，年底前真的做得完嗎？", introText: "看著現在的進度條，你覺得工程團隊能準時交付嗎？", marketType: "EVENT" },
+            { id: "q_proj_03", category: "專案重啟", displayTitle: "那個延期兩次的專案，下個月真的會啟動嗎？", introText: "還是這只是另一次的「狼來了」？", marketType: "EVENT" },
+            { id: "q_proj_04", category: "合作案", displayTitle: "跨部門合作案，真的能在本季簽約嗎？", introText: "法務還在審合約，業務說沒問題，你的直覺呢？", marketType: "EVENT" },
+            
+            // --- 🛡️ STABLE 穩定型 (政策/人事 - 變化較慢) ---
+            { id: "q_pol_01", category: "公司決策", displayTitle: "公司宣佈的「新福利政策」明年還會在嗎？", introText: "你覺得這是一個長期承諾，還是雷聲大雨點小？", marketType: "STABLE" },
+            { id: "q_pol_02", category: "人事凍結", displayTitle: "傳聞中的「人事凍結」會持續到明年嗎？", introText: "根據你的觀察，公司目前的人力策略傾向是？", marketType: "STABLE" },
+            { id: "q_pol_03", category: "辦公模式", displayTitle: "公司會全面取消 WFH (遠端工作) 嗎？", introText: "老闆最近的發言似乎意有所指，你的直覺是？", marketType: "STABLE" },
+            { id: "q_pol_04", category: "組織改組", displayTitle: "傳聞中的「組織大改組」今年會發生嗎？", introText: "大家都在私下討論，你覺得成真的機率有多高？", marketType: "STABLE" },
+            { id: "q_pol_05", category: "年終獎金", displayTitle: "今年的年終獎金，會比去年好嗎？", introText: "看著財報和老闆的臉色，你心裡的預期是？", marketType: "STABLE" },
+
+            // --- 🌊 VOLATILE 波動型 (趨勢/市場 - 易極端) ---
+            { id: "q_tech_01", category: "科技趨勢", displayTitle: "這個新 AI 工具，真的會被導入我們部門嗎？", introText: "撇開炒作，實務上你覺得大家採用的可能性？", marketType: "VOLATILE" },
+            { id: "q_tech_02", category: "市場大局", displayTitle: "大家都在談的「經濟衰退」今年真的會來嗎？", introText: "還是這只是媒體在販賣焦慮？你的直覺？", marketType: "VOLATILE" },
+            { id: "q_sale_01", category: "業績目標", displayTitle: "今年業務部的「倍數成長」目標能達成嗎？", introText: "看著現在的數字，你內心的真實評估是？", marketType: "VOLATILE" },
+            { id: "q_mkt_01", category: "市場競爭", displayTitle: "競爭對手的新產品會對我們造成重擊嗎？", introText: "他們來勢洶洶，你覺得我們會受到多大影響？", marketType: "VOLATILE" },
+            { id: "q_crypto_01", category: "幣圈話題", displayTitle: "辦公室討論的「比特幣破新高」近期會發生嗎？", introText: "這波熱潮是玩真的，還是又要割韭菜了？", marketType: "VOLATILE" },
+            { id: "q_stock_01", category: "股價預測", displayTitle: "公司的股價今年底前會創新高嗎？", introText: "如果你有一筆閒錢，你會敢現在進場嗎？", marketType: "VOLATILE" }
         ];
 
-        return templates;
+        // 2. 隨機洗牌並取出 5 題 (Fisher-Yates Shuffle)
+        const shuffled = [...fullPool].sort(() => 0.5 - Math.random());
+        const selectedQuestions = shuffled.slice(0, 5);
+
+        // 3. 為這 5 題生成「模擬市場機率」
+        // 這裡模擬後端去 Polymarket 抓取不同類型市場的數據邏輯
+        const finalQuestions = selectedQuestions.map(q => {
+            let prob = 50;
+            
+            // 根據類型給予不同的機率分佈，讓數據看起來更真實
+            if (q.marketType === "STABLE") {
+                // 穩定型：機率通常落在 30% ~ 70% 之間，不會太極端
+                prob = Math.floor(Math.random() * (70 - 30 + 1) + 30);
+            } else if (q.marketType === "VOLATILE") {
+                // 波動型：機率可能很極端 (10% ~ 90%)
+                prob = Math.floor(Math.random() * (90 - 10 + 1) + 10);
+            } else {
+                // 事件型：隨機分佈 (15% ~ 85%)
+                prob = Math.floor(Math.random() * (85 - 15 + 1) + 15);
+            }
+
+            return {
+                ...q,
+                mockMarketProb: prob
+            };
+        });
+
+        return finalQuestions;
     }
 };
 
@@ -141,7 +151,7 @@ class GameStore {
         this.listeners.push(listener);
     }
 
-    // 修改：增加 silent 參數，允許更新數據但不觸發畫面重繪
+    // 增加 silent 參數，允許更新數據但不觸發畫面重繪
     setState(newState, silent = false) {
         this.state = { ...this.state, ...newState };
         if (!silent) {
@@ -156,6 +166,7 @@ class GameStore {
     async initGame() {
         this.setState({ view: 'loading' });
         try {
+            // 每次 initGame 都會重新去 WorkerMock 抓新的 5 題 (v2.0 特性)
             const data = await WorkerMock.fetchQuestions();
             this.setState({ 
                 questions: data, 
@@ -173,7 +184,7 @@ class GameStore {
         this.setState({ view: 'game', userGuess: 50 });
     }
 
-    // 修改：僅更新數據，不重繪（交給 UI 事件處理）
+    // 僅更新數據，不重繪（交給 UI 事件處理）
     updateGuess(val, silent = false) {
         this.setState({ userGuess: parseInt(val) }, silent);
     }
@@ -234,17 +245,14 @@ function bindEvents(state) {
     const startBtn = document.getElementById('btn-start');
     if (startBtn) startBtn.onclick = () => store.startGame();
 
-    // 關鍵修正：滑桿事件優化
+    // v1.9 的滑桿事件優化 (保留)
     const slider = document.getElementById('guess-slider');
     if (slider) {
-        // 使用 oninput 進行即時更新，但透過 DOM 操作而非重繪
         slider.oninput = (e) => {
             const val = e.target.value;
-            
-            // 1. 更新 Store 數據，但設定 silent=true 以防止重繪導致滑動中斷
-            store.updateGuess(val, true);
+            store.updateGuess(val, true); // silent update
 
-            // 2. 直接操作 DOM 更新視覺，保持效能與流暢度
+            // DOM Manipulation
             const display = document.getElementById('val-display');
             const track = document.getElementById('track-fill');
             const thumb = document.getElementById('thumb-visual');
@@ -290,7 +298,7 @@ function ViewIntro() {
             <div class="relative z-10 flex flex-col h-full justify-between fade-in">
                 <div class="mt-8">
                     <span class="inline-block px-3 py-1 bg-gray-900 text-white text-[10px] font-bold tracking-widest rounded-full mb-6">
-                        BETA v1.9
+                        BETA v2.0
                     </span>
                     <h1 class="text-5xl font-black text-gray-900 mb-2 leading-none tracking-tight">
                         你比市場<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">更準嗎？</span>
