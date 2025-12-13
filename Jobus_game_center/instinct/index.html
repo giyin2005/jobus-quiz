@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>你比市場準嗎？ - 職場感知力測驗 v1.3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        /* 動畫類 */
+        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .slide-in-right { animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideInRight { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* 自訂滑桿軌道邏輯 */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 32px;
+            width: 32px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            border: 4px solid #4F46E5;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4);
+            margin-top: -14px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 h-screen flex justify-center items-center overflow-hidden">
+
+    <div id="app" class="w-full max-w-md h-full bg-white relative shadow-2xl flex flex-col overflow-hidden sm:rounded-[2.5rem] sm:h-[95vh] sm:border-8 sm:border-gray-900">
+        </div>
+
+<script>
+/**
+ * ------------------------------------------------------------------
+ * 1. Data Layer (資料層)
+ * ------------------------------------------------------------------
+ */
+const WorkerMock = {
+    async fetchQuestions() {
+        await new Promise(r => setTimeout(r, 600));
+
+        const templates = [
+            {
+                id: "q1_project",
+                category: "職場直覺",
+                displayTitle: "這個專案真的會準時上線嗎？",
+                introText: "老闆說 Q3 一定要發布，依你的經驗，這件事成真的機率是？",
+                marketId: "poly_001", 
+                mockMarketProb: Math.floor(Math.random() * (85 - 45 + 1) + 45) 
+            },
+            {
+                id: "q2_policy",
+                category: "公司決策",
+                displayTitle: "公司宣佈的「新福利政策」明年還會在嗎？",
+                introText: "你覺得這是一個長期承諾，還是雷聲大雨點小？",
+                marketId: "poly_002",
+                mockMarketProb: Math.floor(Math.random() * (60 - 20 + 1) + 20)
+            },
+            {
+                id: "q3_tech",
+                category: "科技趨勢",
+                displayTitle: "這個新 AI 工具，真的會被導入我們部門嗎？",
+                introText: "撇開炒作，實務上你覺得大家採用的可能性？",
+                marketId: "poly_003",
+                mockMarketProb: Math.floor(Math.random() * (90 - 50 + 1) + 50)
+            },
+            {
+                id: "q4_sales",
+                category: "業績目標",
+                displayTitle: "今年業務部的「倍數成長」目標能達成嗎？",
+                introText: "看著現在的數字，你內心的真實評估是？",
+                marketId: "poly_004",
+                mockMarketProb: Math.floor(Math.random() * (50 - 10 + 1) + 10)
+            },
+            {
+                id: "q5_trend",
+                category: "市場大局",
+                displayTitle: "大家都在談的「經濟衰退」今年真的會來嗎？",
+                introText: "還是這只是媒體在販賣焦慮？你的直覺？",
+                marketId: "poly_005",
+                mockMarketProb: Math.floor(Math.random() * (70 - 30 + 1) + 30)
+            }
+        ];
+
+        return templates;
+    }
+};
+
+/**
+ * ------------------------------------------------------------------
+ * 2. State Management (狀態管理)
+ * ------------------------------------------------------------------
+ */
+class GameStore {
+    constructor() {
+        this.state = {
+            view: 'loading', 
+            questions: [],
+            currentQIndex: 0,
+            userGuess: 50, 
+            history: [], 
+            loadingText: '正在同步市場數據...',
+        };
+        this.listeners = [];
+    }
+
+    subscribe(listener) {
+        this.listeners.push(listener);
+    }
+
+    setState(newState) {
+        this.state = { ...this.state, ...newState };
+        this.notify();
+    }
+
+    notify() {
+        this.listeners.forEach(fn => fn(this.state));
+    }
+
+    async initGame() {
+        this.setState({ view: 'loading' });
+        try {
+            const data = await WorkerMock.fetchQuestions();
+            this.setState({ 
+                questions: data, 
+                view: 'intro',
+                currentQIndex: 0,
+                history: []
+            });
+        } catch (e) {
+            console.error(e);
+            alert("載入失敗，請重試");
+        }
+    }
+
+    startGame() {
+        this.setState({ view: 'game', userGuess: 50 });
+    }
+
+    updateGuess(val) {
+        this.setState({ userGuess: parseInt(val) });
+    }
+
+    submitGuess() {
+        const { questions, currentQIndex, userGuess, history } = this.state;
+        const currentQ = questions[currentQIndex];
+        
+        const record = {
+            question: currentQ,
+            user: userGuess,
+            market: currentQ.mockMarketProb,
+            diff: userGuess - currentQ.mockMarketProb 
+        };
+
+        this.setState({
+            history: [...history, record],
+            view: 'reveal'
+        });
+    }
+
+    nextQuestion() {
+        const { currentQIndex, questions } = this.state;
+        if (currentQIndex + 1 < questions.length) {
+            this.setState({
+                currentQIndex: currentQIndex + 1,
+                view: 'game',
+                userGuess: 50
+            });
+        } else {
+            this.setState({ view: 'result' });
+        }
+    }
+}
+
+const store = new GameStore();
+
+/**
+ * ------------------------------------------------------------------
+ * 3. UI Layer (渲染層)
+ * ------------------------------------------------------------------
+ */
+const App = document.getElementById('app');
+
+function render(state) {
+    App.innerHTML = ''; 
+    switch(state.view) {
+        case 'loading': App.innerHTML = ViewLoading(state); break;
+        case 'intro':   App.innerHTML = ViewIntro(); break;
+        case 'game':    App.innerHTML = ViewGame(state); break;
+        case 'reveal':  App.innerHTML = ViewReveal(state); break;
+        case 'result':  App.innerHTML = ViewResult(state); break; // 邏輯已更新
+    }
+    bindEvents(state);
+}
+
+function bindEvents(state) {
+    const startBtn = document.getElementById('btn-start');
+    if (startBtn) startBtn.onclick = () => store.startGame();
+
+    const slider = document.getElementById('guess-slider');
+    if (slider) {
+        slider.oninput = (e) => store.updateGuess(e.target.value);
+    }
+
+    const confirmBtn = document.getElementById('btn-confirm');
+    if (confirmBtn) confirmBtn.onclick = () => store.submitGuess();
+
+    const nextBtn = document.getElementById('btn-next');
+    if (nextBtn) nextBtn.onclick = () => store.nextQuestion();
+    
+    const restartBtn = document.getElementById('btn-restart');
+    if (restartBtn) restartBtn.onclick = () => store.initGame();
+}
+
+/**
+ * Views (視圖組件)
+ */
+
+function ViewLoading(state) {
+    return `
+        <div class="flex flex-col items-center justify-center h-full space-y-4 bg-gray-50">
+            <div class="relative">
+                <div class="w-16 h-16 border-4 border-gray-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                <div class="absolute top-0 left-0 w-16 h-16 border-4 border-transparent border-b-indigo-300 rounded-full animate-spin" style="animation-duration: 1.5s"></div>
+            </div>
+            <p class="text-gray-500 text-sm animate-pulse tracking-wide font-medium">${state.loadingText}</p>
+        </div>
+    `;
+}
+
+function ViewIntro() {
+    return `
+        <div class="flex flex-col h-full p-8 relative overflow-hidden bg-white">
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div>
+            <div class="absolute bottom-0 right-0 w-64 h-64 bg-purple-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+            
+            <div class="relative z-10 flex flex-col h-full justify-between fade-in">
+                <div class="mt-8">
+                    <span class="inline-block px-3 py-1 bg-gray-900 text-white text-[10px] font-bold tracking-widest rounded-full mb-6">
+                        BETA v1.3
+                    </span>
+                    <h1 class="text-5xl font-black text-gray-900 mb-2 leading-none tracking-tight">
+                        你比市場<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">更準嗎？</span>
+                    </h1>
+                    <p class="text-gray-500 text-lg font-medium mt-4">
+                        職場感知力測驗
+                    </p>
+                </div>
+
+                <div class="flex-grow flex items-center justify-center">
+                    <div class="text-center space-y-6">
+                        <div class="text-8xl animate-bounce drop-shadow-2xl filter grayscale-[0.2]">🔮</div>
+                        <div class="space-y-2">
+                            <p class="text-indigo-900 font-bold text-xl">你的直覺 vs 大眾共識</p>
+                            <p class="text-gray-400 text-sm max-w-xs mx-auto leading-relaxed">
+                                這不是考試，而是看你在充滿雜訊的職場中，是否擁有看透局勢的「絕對音感」。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <button id="btn-start" class="w-full bg-gray-900 text-white text-xl font-bold py-5 rounded-2xl shadow-xl transform transition active:scale-[0.98] hover:bg-gray-800 border border-gray-800 flex items-center justify-center gap-2">
+                        開始測驗 <span class="text-gray-400 text-lg">→</span>
+                    </button>
+                    <p class="text-center text-[10px] text-gray-400 mt-4 opacity-60">
+                        *測驗結果僅供參考，無任何投資建議
+                    </p>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function ViewGame(state) {
+    const q = state.questions[state.currentQIndex];
+    const progress = ((state.currentQIndex + 1) / state.questions.length) * 100;
+
+    return `
+        <div class="flex flex-col h-full bg-gray-50 fade-in">
+            <div class="w-full h-1.5 bg-gray-200">
+                <div class="h-full bg-indigo-600 transition-all duration-300 ease-out" style="width: ${progress}%"></div>
+            </div>
+
+            <div class="px-6 pt-6 flex justify-between items-center">
+                <span class="text-gray-400 text-xs font-bold tracking-widest uppercase">
+                    Q ${state.currentQIndex + 1} / ${state.questions.length}
+                </span>
+                <span class="text-indigo-600 text-xs font-bold bg-indigo-100 px-3 py-1 rounded-full border border-indigo-200">
+                    ${q.category}
+                </span>
+            </div>
+
+            <div class="flex-grow flex flex-col px-6 py-4">
+                <div class="bg-white rounded-[1.5rem] p-6 shadow-sm border border-gray-100 mb-6 slide-in-right">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-3 leading-snug">
+                        ${q.displayTitle}
+                    </h2>
+                    <p class="text-gray-500 text-base leading-relaxed">
+                        ${q.introText}
+                    </p>
+                </div>
+
+                <div class="flex-grow flex flex-col justify-center items-center relative">
+                    <div class="absolute text-[12rem] font-black text-gray-200 select-none -z-10 opacity-30 transform -rotate-12">
+                        %
+                    </div>
+
+                    <div class="text-center w-full max-w-xs">
+                        <p class="text-gray-400 text-sm font-bold tracking-wider mb-2 uppercase">你的直覺機率</p>
+                        <div class="text-8xl font-black text-indigo-600 tracking-tighter mb-8 tabular-nums">
+                            ${state.userGuess}<span class="text-4xl text-indigo-300 ml-1">%</span>
+                        </div>
+                        
+                        <div class="relative h-16 w-full flex items-center">
+                             <div class="absolute left-0 right-0 top-1/2 h-3 bg-gray-200 rounded-full overflow-hidden transform -translate-y-1/2 pointer-events-none shadow-inner">
+                                 <div class="h-full bg-indigo-500 transition-all duration-75" style="width: ${state.userGuess}%"></div>
+                             </div>
+                             
+                             <input id="guess-slider" type="range" min="0" max="100" value="${state.userGuess}" class="z-10 relative w-full h-full opacity-0 cursor-pointer">
+                             
+                             <div class="absolute top-1/2 h-8 w-8 bg-white border-4 border-indigo-600 rounded-full shadow-lg transform -translate-y-1/2 -translate-x-1/2 pointer-events-none transition-all duration-75 flex items-center justify-center" style="left: ${state.userGuess}%">
+                                <div class="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                             </div>
+                        </div>
+                        
+                        <div class="flex justify-between text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-widest px-1">
+                            <span>不可能 (0%)</span>
+                            <span>絕對會 (100%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 bg-gray-50 border-t border-gray-100">
+                <button id="btn-confirm" class="w-full bg-gray-900 text-white text-lg font-bold py-4 rounded-2xl shadow-lg transform transition active:scale-[0.98] hover:bg-gray-800 flex justify-center items-center gap-2">
+                    確認鎖定 <span class="text-sm opacity-50">🔒</span>
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function ViewReveal(state) {
+    const lastRecord = state.history[state.history.length - 1];
+    const q = lastRecord.question;
+    const userVal = lastRecord.user;
+    const marketVal = lastRecord.market;
+    
+    let diffText = "";
+    const diff = userVal - marketVal;
+    
+    if (Math.abs(diff) < 10) diffText = "英雄所見略同";
+    else if (diff > 0) diffText = "你比市場更樂觀";
+    else diffText = "你比市場更保守";
+
+    const diffColorClass = diff > 0 ? "text-orange-300" : "text-blue-300";
+
+    return `
+        <div class="flex flex-col h-full bg-gray-900 text-white slide-up relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-16 -mt-16 animate-pulse"></div>
+            
+            <div class="p-8 flex-grow flex flex-col justify-center relative z-10">
+                <h3 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">
+                    ${q.category}
+                </h3>
+                <h2 class="text-xl font-bold mb-10 leading-snug text-white/90">
+                    ${q.displayTitle}
+                </h2>
+
+                <div class="space-y-10">
+                    <div>
+                        <div class="flex justify-between items-end mb-3">
+                            <span class="text-sm text-indigo-300 font-medium">你的直覺</span>
+                            <span class="text-4xl font-bold text-white leading-none">${userVal}%</span>
+                        </div>
+                        <div class="h-3 bg-gray-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-indigo-500 rounded-full transition-all duration-1000 ease-out" style="width: ${userVal}%"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-end mb-3">
+                            <div class="flex flex-col">
+                                <span class="text-sm text-emerald-300 font-medium mb-1">目前多數人的判斷</span>
+                                <span class="inline-block self-start text-[10px] bg-gray-800 border border-gray-700 px-2 py-0.5 rounded text-gray-400 tracking-wider">
+                                    即時市場數據
+                                </span>
+                            </div>
+                            <span class="text-4xl font-bold text-emerald-400 leading-none">${marketVal}%</span>
+                        </div>
+                        <div class="h-3 bg-gray-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-emerald-500 rounded-full transition-all duration-1000 ease-out" style="width: ${marketVal}%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-16 text-center">
+                    <div class="inline-block px-6 py-4 bg-gray-800/80 backdrop-blur-sm border border-gray-700 rounded-2xl">
+                        <span class="text-lg font-medium text-gray-200 block mb-1">${diffText}</span>
+                        <span class="text-sm ${diffColorClass} font-bold tracking-wider">
+                            (差異 ${diff > 0 ? '+' : ''}${diff}%)
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-gray-800 z-10 bg-gray-900">
+                <button id="btn-next" class="w-full bg-white text-gray-900 text-lg font-bold py-4 rounded-2xl shadow-lg transform transition active:scale-[0.98] hover:bg-gray-100">
+                    下一題 →
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// 修正版 ViewResult：修復「忽冷忽熱」導致的邏輯誤判
+function ViewResult(state) {
+    // 1. 計算帶正負號的平均 (判斷整體方向)
+    const totalDiff = state.history.reduce((acc, curr) => acc + curr.diff, 0);
+    const avgDiff = totalDiff / state.history.length;
+
+    // 2. 計算「絕對值」的平均 (判斷波動程度)
+    // 解決問題關鍵：如果 avgAbsDiff 很大，代表玩家猜測與市場差距大，不是「同步」
+    const totalAbsDiff = state.history.reduce((acc, curr) => acc + Math.abs(curr.diff), 0);
+    const avgAbsDiff = totalAbsDiff / state.history.length;
+    
+    let persona = {};
+    
+    // 邏輯優化：優先檢查絕對誤差
+    if (avgAbsDiff < 15) { 
+        // 絕對誤差很小 -> 真的準 -> 現實錨點
+        persona = { 
+            emoji: "⚓️",
+            title: "現實錨點", 
+            titleEn: "The Reality Anchor",
+            color: "text-indigo-600",
+            tag: "精準同步",
+            desc: "你不是普通，你是「精準」。這代表你對局勢的判斷與集體智慧 (Wisdom of Crowd) 高度重疊。在混亂的專案裡，你就是那個最清醒、最能客觀評估風險的人。", 
+            advice: "💡 <b>你的優勢：</b>你是團隊的「定海神針」。<br>當大家意見分歧時，你的直覺通常就是最接近事實的答案。請更有自信地站出來統合意見。"
+        };
+    } else if (avgDiff >= 15) { 
+        // 絕對誤差大，且方向明顯偏正 -> 樂觀
+        persona = { 
+            emoji: "🚀",
+            title: "機遇獵人", 
+            titleEn: "The Opportunity Hunter",
+            color: "text-orange-500",
+            tag: "開創型",
+            desc: "你看到的未來，比大部分人更光明。你對於「可能性」非常敏感，這讓你成為極佳的業務或產品開創者，因為你總能看見別人看不見的機會。", 
+            advice: "💡 <b>你的優勢：</b>你敢做夢，也敢衝。<br>你需要配一個「現實錨點」型的副手。當你說「下週可以上線」時，讓他幫你檢查是不是漏了什麼細節。"
+        };
+    } else if (avgDiff <= -15) { 
+        // 絕對誤差大，且方向明顯偏負 -> 保守
+        persona = { 
+            emoji: "🛡️",
+            title: "風險守門員", 
+            titleEn: "The Risk Guardian",
+            color: "text-teal-600",
+            tag: "防禦型",
+            desc: "你比市場更謹慎，這不是壞事。你擁有極強的「危機嗅覺」，往往在專案還沒開始前，你就已經聞到了燒焦味。你是防止公司翻車的關鍵煞車皮。", 
+            advice: "💡 <b>你的優勢：</b>你不會讓團隊陷入絕境。<br>小心別變成「氣氛殺手」。試著把「我覺得不行」改成「如果我們要成功，必須先解決這三個隱憂...」。"
+        };
+    } else {
+        // [新增情況] 絕對誤差大 (>15)，但平均誤差小 (例如 -15~15 之間)
+        // 代表：有時候超樂觀，有時候超保守，正負抵銷了，導致 avgDiff 接近 0。
+        // 這不是「同步」，這是「獨行俠」。
+        persona = {
+            emoji: "🦄",
+            title: "直覺獨行俠",
+            titleEn: "The Intuitive Maverick",
+            color: "text-purple-600",
+            tag: "獨立思考",
+            desc: "你的判斷完全不隨波逐流。有時你比市場極度樂觀，有時又極度保守。這代表你擁有非常獨特的視角，不受群體共識影響，是標準的「反向操作」潛力股。",
+            advice: "💡 <b>你的優勢：</b>你看見了別人沒看見的盲點。<br>你的觀點通常很有衝擊性，建議在發表意見時多準備一些數據佐證，因為你的直覺對大多數人來說可能太過前衛。"
+        };
+    }
+
+    return `
+        <div class="flex flex-col h-full bg-white p-6 overflow-y-auto fade-in">
+            <div class="mt-4 text-center">
+                <p class="text-gray-400 text-[10px] font-bold tracking-[0.2em] uppercase mb-4">— 你的職場感知力分析 —</p>
+                
+                <div class="bg-gray-50 rounded-[2rem] p-8 mb-6 border border-gray-100 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-gray-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 -mr-10 -mt-10"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="text-6xl mb-4 filter drop-shadow-md animate-bounce" style="animation-duration: 2s">${persona.emoji}</div>
+                        
+                        <span class="inline-block px-3 py-1 bg-white border border-gray-200 text-gray-500 text-[10px] font-bold tracking-wider rounded-full mb-3 shadow-sm uppercase">
+                            ${persona.tag}
+                        </span>
+                        
+                        <h2 class="text-3xl font-black mb-1 ${persona.color} leading-tight">
+                            ${persona.title}
+                        </h2>
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-4 opacity-70">${persona.titleEn}</p>
+
+                        <div class="w-12 h-1 bg-gray-200 mx-auto rounded-full mb-4"></div>
+
+                        <p class="text-gray-600 text-sm leading-relaxed text-justify mb-0">
+                            ${persona.desc}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-indigo-50 p-5 rounded-2xl border-l-4 border-indigo-500 text-left mb-8 shadow-sm">
+                    <p class="text-indigo-900 text-sm font-medium leading-relaxed">
+                        ${persona.advice}
+                    </p>
+                </div>
+            </div>
+
+            <div class="space-y-4 mb-8 px-4">
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">數據體檢</h3>
+                
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600 text-sm font-medium">整體傾向 (Bias)</span>
+                    <span class="font-black text-gray-900 text-xl font-mono tracking-tight">${avgDiff > 0 ? '+' : ''}${Math.round(avgDiff)}%</span>
+                </div>
+                
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600 text-sm font-medium">離群程度 (Volatility)</span>
+                    <span class="font-bold text-gray-500 text-sm bg-gray-100 px-2 py-1 rounded">
+                        ${Math.round(avgAbsDiff)}%
+                    </span>
+                </div>
+
+                <div class="flex justify-between items-center mt-2">
+                    <span class="text-gray-600 text-sm font-medium">最終判定</span>
+                    <span class="font-bold text-white text-xs ${persona.color.replace('text-', 'bg-')} px-3 py-1 rounded-full shadow-sm">
+                        ${persona.title}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="mt-auto pb-4">
+                <button id="btn-restart" class="w-full bg-gray-900 text-white text-lg font-bold py-4 rounded-2xl shadow-lg transform transition active:scale-[0.98] mb-4 hover:bg-gray-800">
+                    再測一次
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// 啟動應用
+store.subscribe(render);
+store.initGame();
+
+</script>
+</body>
+</html>
