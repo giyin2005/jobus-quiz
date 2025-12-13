@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>你比市場準嗎？ - 職場感知力測驗 v1.6</title>
+    <title>你比市場準嗎？ - 職場感知力測驗 v1.8</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
@@ -15,6 +15,10 @@
         .slide-in-right { animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .pulse-text { animation: pulseText 2s infinite; }
         
+        /* 隱藏 Scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes slideInRight { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -23,17 +27,26 @@
             50% { opacity: 0.7; transform: scale(0.98); } 
         }
 
+        /* 關鍵修正：解決滑動卡頓問題 */
+        input[type=range] {
+            /* 告訴瀏覽器：在這個元件上，手指移動不要觸發「頁面捲動」，完全交給滑桿處理 */
+            touch-action: none; 
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
         /* 自訂滑桿軌道邏輯 */
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 36px; 
-            width: 36px;
+            height: 40px; /* 加大 Thumb 觸控區 */
+            width: 40px;
             border-radius: 50%;
             background: #ffffff;
             cursor: pointer;
             border: 4px solid #4F46E5;
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.5); 
-            margin-top: -16px; 
+            margin-top: -18px; /* 垂直置中修正 */
             position: relative;
             z-index: 20;
         }
@@ -258,7 +271,7 @@ function ViewIntro() {
             <div class="relative z-10 flex flex-col h-full justify-between fade-in">
                 <div class="mt-8">
                     <span class="inline-block px-3 py-1 bg-gray-900 text-white text-[10px] font-bold tracking-widest rounded-full mb-6">
-                        BETA v1.6
+                        BETA v1.8
                     </span>
                     <h1 class="text-5xl font-black text-gray-900 mb-2 leading-none tracking-tight">
                         你比市場<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">更準嗎？</span>
@@ -447,9 +460,9 @@ function ViewResult(state) {
     
     let persona = {};
     
+    // 判斷邏輯
     if (avgAbsDiff < 15) { 
         persona = { 
-            // 修正：使用 DiceBear Notion 風格的頭像作為「屬性圖片」，取代原本的 Emoji
             img: "https://api.dicebear.com/9.x/notionists/svg?seed=Anchor&backgroundColor=e0e7ff",
             title: "現實錨點", 
             titleEn: "The Reality Anchor",
@@ -493,11 +506,11 @@ function ViewResult(state) {
     return `
         <div class="flex flex-col h-full bg-white relative fade-in overflow-hidden">
             
-            <div class="flex-grow overflow-y-auto px-6 pt-6 pb-24 scroll-smooth">
+            <div class="flex-grow overflow-y-auto px-6 pt-4 pb-32 scroll-smooth no-scrollbar">
                 <div class="text-center mt-2">
-                    <p class="text-gray-400 text-xs font-bold tracking-[0.2em] uppercase mb-6">— 你的職場感知力分析 —</p>
+                    <p class="text-gray-400 text-xs font-bold tracking-[0.2em] uppercase mb-4">— 你的職場感知力分析 —</p>
                     
-                    <div class="bg-gray-50 rounded-[2.5rem] p-8 mb-8 border border-gray-100 shadow-sm relative overflow-hidden">
+                    <div class="bg-gray-50 rounded-[2.5rem] p-8 mb-6 border border-gray-100 shadow-sm relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-40 h-40 bg-gray-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 -mr-10 -mt-10"></div>
                         
                         <div class="relative z-10">
@@ -543,15 +556,24 @@ function ViewResult(state) {
                                 ${Math.round(avgAbsDiff)}%
                             </span>
                         </div>
-                        
-                        </div>
+                    </div>
                 </div>
             </div>
             
-            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent pt-12 z-20">
-                <button id="btn-restart" class="w-full bg-gray-900 text-white text-xl font-bold py-5 rounded-2xl shadow-xl transform transition active:scale-[0.98] hover:bg-gray-800">
-                    再測一次
-                </button>
+            <div class="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
+                <div class="h-48 bg-gradient-to-t from-white via-white/90 to-transparent flex flex-col justify-end items-center p-6 pb-8">
+                    
+                    <div class="flex flex-col items-center mb-3 animate-bounce opacity-60">
+                        <span class="text-xs font-bold text-gray-400 tracking-widest uppercase mb-1">下滑查看完整分析</span>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                        </svg>
+                    </div>
+
+                    <button id="btn-restart" class="w-full bg-gray-900 text-white text-xl font-bold py-5 rounded-2xl shadow-xl transform transition active:scale-[0.98] hover:bg-gray-800 pointer-events-auto">
+                        再測一次
+                    </button>
+                </div>
             </div>
         </div>
     `;
