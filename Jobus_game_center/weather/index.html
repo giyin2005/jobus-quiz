@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>通勤天氣小幫手 🌤 (Full 368 Districts)</title>
+<title>通勤天氣小幫手 🌤 (Logic Fixed)</title>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-P7PY1RNXJQ"></script>
 <script>
@@ -208,7 +208,7 @@ const districts = [
   {name: "基隆市 安樂區", lat: 25.138, lon: 121.718, geoRisk: true}, {name: "基隆市 暖暖區", lat: 25.097, lon: 121.739, geoRisk: true},
   {name: "基隆市 七堵區", lat: 25.094, lon: 121.706, geoRisk: true},
 
-  // --- 台北市 (12) [北投/士林/南港/內湖/文山 標記風險] ---
+  // --- 台北市 (12) ---
   {name: "台北市 中正區", lat: 25.032, lon: 121.519}, {name: "台北市 大同區", lat: 25.063, lon: 121.513},
   {name: "台北市 中山區", lat: 25.064, lon: 121.533}, {name: "台北市 松山區", lat: 25.058, lon: 121.558},
   {name: "台北市 大安區", lat: 25.026, lon: 121.543}, {name: "台北市 萬華區", lat: 25.030, lon: 121.498},
@@ -216,7 +216,7 @@ const districts = [
   {name: "台北市 北投區", lat: 25.132, lon: 121.500, geoRisk: true}, {name: "台北市 內湖區", lat: 25.083, lon: 121.594, geoRisk: true},
   {name: "台北市 南港區", lat: 25.055, lon: 121.617, geoRisk: true}, {name: "台北市 文山區", lat: 24.998, lon: 121.574, geoRisk: true},
 
-  // --- 新北市 (29) [汐止/淡水/瑞芳/萬里/金山/深坑/石碇/坪林/平溪/雙溪/貢寮/烏來 標記風險] ---
+  // --- 新北市 (29) ---
   {name: "新北市 板橋區", lat: 25.014, lon: 121.464}, {name: "新北市 三重區", lat: 25.061, lon: 121.488},
   {name: "新北市 中和區", lat: 24.993, lon: 121.500}, {name: "新北市 永和區", lat: 25.009, lon: 121.516},
   {name: "新北市 新莊區", lat: 25.036, lon: 121.450}, {name: "新北市 新店區", lat: 24.957, lon: 121.538},
@@ -491,7 +491,7 @@ function getRainRiskLevel(weatherData, district) {
         return RISK_LEVELS.MEDIUM;
     }
 
-    // --- Layer 3: 地形保險層 (Only if GeoRisk is true for this district) ---
+    // --- Layer 3: 地形保險層 ---
     if (district.geoRisk === true) {
         return RISK_LEVELS.LOW_GEO;
     }
@@ -520,19 +520,19 @@ function getCopyByRiskLevel(level, rainProb) {
             return {
                 umbrella: "一定會濕！大傘準備好 ☔",
                 note: "通勤時段降雨機率偏高，建議攜帶雨具，避免被雨耽誤行程。",
-                type: "rain" // 用於通勤按鈕邏輯
+                type: "rain"
             };
         case RISK_LEVELS.MEDIUM:
             return {
                 umbrella: "雲層厚或有飄雨，建議帶傘求心安 🌦️",
                 note: "雲層偏厚，可能有局部短暫降雨，通勤時建議以防萬一帶把傘。",
-                type: "rain" // 保守建議
+                type: "rain"
             };
         case RISK_LEVELS.LOW_GEO:
             return {
                 umbrella: "地形性風險區，建議帶著折疊傘 🌂",
                 note: "此區域靠近山區或迎風面，即使整體天氣穩定，仍可能有局部飄雨。",
-                type: "rain" // 地形風險提醒
+                type: "rain"
             };
         case RISK_LEVELS.LOW:
         default:
@@ -576,10 +576,9 @@ const ui = {
     suggestions: document.getElementById("suggestions"),
     skeleton: document.getElementById("weatherSkeleton"),
     resultCard: document.getElementById("weatherSummaryCard"),
-    commuteSection: document.getElementById("commuteSection"), // 父容器
-    commuteBtns: document.getElementById("commuteBtns"),       // 子容器
+    commuteSection: document.getElementById("commuteSection"), 
+    commuteBtns: document.getElementById("commuteBtns"),       
     
-    // 切換 Loading 狀態
     toggleLoading(isLoading) {
         if (isLoading) {
             this.skeleton.style.display = "block";
@@ -590,7 +589,6 @@ const ui = {
         }
     },
 
-    // 渲染天氣結果
     render(label, weatherData, district, riskLevel, copy) {
         const c = weatherData.current;
         const d = weatherData.daily;
@@ -601,7 +599,6 @@ const ui = {
         const weatherInfo = getWeatherIcon(c.weather_code);
         const rainProb = getHourlyProb(h);
         
-        // 填入文字
         document.getElementById("summaryCity").textContent = label;
         document.getElementById("summaryTime").textContent = this.getTimeStr();
         document.getElementById("weatherBottomNote").textContent = copy.note;
@@ -615,18 +612,16 @@ const ui = {
             <div class="info-row"><div class="info-icon">💨</div><div class="info-text">${getWindAdvice(c.wind_speed_10m)}</div></div>
         `;
 
-        // 顯示結果區域
         this.resultCard.style.display = "block";
-        
-        // 防呆機制：確保通勤區塊顯示
         this.commuteSection.style.display = "block"; 
-        
-        // 滾動到結果
         this.resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-        // 更新全域狀態供按鈕使用
+        // [LOGIC FIX]: 修正狀態判斷邏輯
+        // 優先保留 'rain' 狀態，只有在沒下雨且風大時，才設為 'wind'
         window.currentWeatherType = copy.type; 
-        if (c.wind_speed_10m > 15) window.currentWeatherType = "wind"; // 風大覆蓋
+        if (window.currentWeatherType !== 'rain' && c.wind_speed_10m > 15) {
+            window.currentWeatherType = "wind"; 
+        }
     },
 
     getTimeStr() {
@@ -641,12 +636,10 @@ const ui = {
 //  APP CONTROLLER (主流程)
 // =====================================================================
 
-// 搜尋建議互動
 ui.search.addEventListener("input", () => {
     const v = ui.search.value.trim();
     if(!v) { ui.suggestions.style.display="none"; return; }
     
-    // 支援模糊搜尋
     const list = districts.filter(a => a.name.includes(v));
     if(!list.length) { ui.suggestions.style.display="none"; return; }
     
@@ -667,7 +660,6 @@ document.addEventListener("click", (e) => {
     if(!e.target.closest(".search-wrapper")) ui.suggestions.style.display="none";
 });
 
-// 定位按鈕
 document.getElementById("geoBtn").addEventListener("click", () => {
     if(typeof gtag === 'function') gtag('event', 'use_geolocation');
     if(!navigator.geolocation) { alert("不支援定位"); return; }
@@ -687,7 +679,6 @@ document.getElementById("geoBtn").addEventListener("click", () => {
     );
 });
 
-// 查詢按鈕
 document.getElementById("getWeatherBtn").addEventListener("click", () => {
     const text = ui.search.value.trim();
     if(!text) return alert("請輸入地區");
@@ -696,23 +687,16 @@ document.getElementById("getWeatherBtn").addEventListener("click", () => {
     executeQuery(area);
 });
 
-// 執行核心查詢流程
 async function executeQuery(district) {
     try {
         ui.toggleLoading(true);
         if(typeof gtag === 'function') gtag('event', 'search_weather', { 'event_label': district.name });
         ui.search.value = district.name;
 
-        // 1. Data Layer
         const weatherData = await fetchWeatherData(district.lat, district.lon);
-        
-        // 2. Rule Engine
         const riskLevel = getRainRiskLevel(weatherData, district);
-        
-        // 3. Copy Resolver
         const copy = getCopyByRiskLevel(riskLevel);
 
-        // 4. UI Renderer
         setTimeout(() => { 
             ui.toggleLoading(false);
             ui.render(district.name, weatherData, district, riskLevel, copy);
@@ -725,7 +709,6 @@ async function executeQuery(district) {
     }
 }
 
-// 通勤按鈕邏輯
 document.querySelectorAll(".cm-btn").forEach(btn => {
     btn.addEventListener("click", () => {
         const type = btn.dataset.type;
@@ -742,6 +725,7 @@ document.querySelectorAll(".cm-btn").forEach(btn => {
     });
 });
 
+// [LOGIC FIX]: 修正建議邏輯
 function getCommuteMsg(mode, weather){
     if(mode === "scooter"){
         if(weather === "rain") return "路滑慢行，注意標線打滑，雨衣穿好。";
@@ -762,6 +746,8 @@ function getCommuteMsg(mode, weather){
     }
     if(mode === "walk"){
         if(weather === "rain") return "走路鞋子會濕，建議換搭車或穿防水鞋。";
+        // 新增風大邏輯，避免誤判為好天氣
+        if(weather === "wind") return "風大行走困難且易凌亂，建議改搭車。";
         return "今天適合走路，提早一站下車運動一下！";
     }
     if(mode === "cafe"){
