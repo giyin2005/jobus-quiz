@@ -497,7 +497,7 @@ const RISK_LEVELS = {
     SNOW: 'SNOW',
     EXTREME_COLD: 'EXTREME_COLD', 
     HIGH: 'HIGH',
-    MEDIUM: 'MEDIUM',
+    MEDIUM: 'MEDIUM', // Drizzle only
     LOW_GEO: 'LOW_GEO',
     LOW: 'LOW'
 };
@@ -518,12 +518,14 @@ function getRainRiskLevel(weatherData, district) {
     }
     // 3. 大雨
     if (rainProb >= 30) return RISK_LEVELS.HIGH;
-    // 4. 飄雨/厚雲
+    
+    // 4. 飄雨 (修正：移除雲量判斷，只有真的有雨才算 MEDIUM)
     const drizzleCodes = [51, 53, 55, 61, 63, 65, 80, 81, 82];
-    if (drizzleCodes.includes(c.weather_code) || c.cloud_cover >= 75) {
+    if (drizzleCodes.includes(c.weather_code)) {
         return RISK_LEVELS.MEDIUM;
     }
-    // 5. 地形風險 (修正：即使是GeoRisk，如果沒雨，就只給提醒，不改變主要狀態)
+    
+    // 5. 地形風險 (文字提醒，但狀態為 OK)
     if (district.geoRisk === true) return RISK_LEVELS.LOW_GEO;
 
     return RISK_LEVELS.LOW;
@@ -540,7 +542,7 @@ function getHourlyProb(hourlyData) {
 
 /**
  * =====================================================================
- * MODULE 3: COPY RESOLVER (邏輯修正：LOW_GEO 不再視為雨天)
+ * MODULE 3: COPY RESOLVER
  * =====================================================================
  */
 function getCopyByRiskLevel(level) {
@@ -565,8 +567,8 @@ function getCopyByRiskLevel(level) {
             };
         case RISK_LEVELS.MEDIUM:
             return {
-                umbrella: "雲層厚或有飄雨，建議帶傘求心安 🌦️",
-                note: "雲層偏厚，可能有局部短暫降雨，通勤時建議以防萬一帶把傘。",
+                umbrella: "外面有飄雨，建議帶傘 🌦️", // 微調文案
+                note: "戶外有短暫雨或毛毛雨，建議攜帶雨具。",
                 type: "rain"
             };
         case RISK_LEVELS.LOW_GEO:
