@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>直覺實驗室 - v4.6</title>
+    <title>直覺實驗室 - v4.7</title>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-LH8TP88B66"></script>
     <script>
@@ -13,6 +13,8 @@
       gtag('config', 'G-LH8TP88B66');
     </script>
 
+    <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAMAAAAKE/YAAAAAbFBMVEUAAAD///+ZmZlmZmZ/f3+BgYF2dnZ+fn6EhISJiYmDg4N6enqHh4eFhYV5eXmCgoJ8fHyGhoaIiIiKioqMjIyNjY2SkpKUlJSZmZmcnJygIKEhISEoKCgtLS0yMjI4ODg+Pj5AQEBERERISEhMU238AAAAI3RSTlMAAQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyAhIiMkKikAAAMnSURBVHic7drbctowEAZQoCS0hJa0pQ3//88tG1wM2JjY1kmZ5z45M54R2yuRLEu0AAAAAAAAAAAAAAAAAAAAAADwP70+f+x2u91x3z/s/j+9vT9+P9/eP3b//d7eX5/v2+18f979t3p9f72db7fL/bL7T/X6+nS53C/n23b3H+r19elyuZzO291/ps/X58v5fDrdtv/4K/14fT6fT6fLdvff6Mfr8/l4Ok/b/Rf6fH0+H4+n03b3H+jH6/PxeDxtd/+8Pl+fj8fD/r+P1+fj4bT9x+fz8XA4bneX6/VwOOz/+3g9HA6H/X9fD/v9dne5Xvf7/X53uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/Xb3/wUAAAAAAPw3fwE+37g/7t+e7gAAAABJRU5ErkJggg==">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
@@ -214,7 +216,7 @@ function ViewHome() {
     return `
         <div class="flex flex-col h-full p-8 bg-white relative overflow-hidden fade-in">
             <div class="mt-8 mb-6 flex-shrink-0">
-                <span class="inline-block px-3 py-1 bg-gray-900 text-white text-xs font-bold tracking-widest rounded-full mb-4">v4.6 穩定版</span>
+                <span class="inline-block px-3 py-1 bg-gray-900 text-white text-xs font-bold tracking-widest rounded-full mb-4">v4.7 穩定版</span>
                 <h1 class="text-5xl font-black text-gray-900 mb-2 leading-none">直覺<br><span class="text-indigo-600">實驗室</span></h1>
                 <p class="text-gray-500 text-xl font-medium mt-2">請選擇你想測試的能力</p>
             </div>
@@ -249,7 +251,6 @@ function ViewLoading(state) {
     return `<div class="flex flex-col items-center justify-center h-full space-y-6 bg-gray-50 px-8 rounded-[2.5rem]"><div class="relative"><div class="w-20 h-20 border-[6px] border-gray-200 border-t-indigo-600 rounded-full animate-spin"></div></div><p class="text-gray-600 text-xl animate-pulse tracking-wide font-bold text-center">${state.loadingText}</p></div>`;
 }
 
-// v4.6 終極修正：縮小數字字體、增加強制間距、釋放空間
 function ViewGame(state) {
     const q = state.questions[state.currentQIndex];
     const progress = ((state.currentQIndex + 1) / state.questions.length) * 100;
@@ -387,7 +388,7 @@ function ViewResult(state) {
                                 <img src="${persona.img}" alt="${persona.title}" class="relative z-10 w-full h-full rounded-full shadow-2xl border-[6px] border-white object-cover">
                             </div>
                             <span class="inline-block px-6 py-2.5 bg-white border-2 border-gray-200 text-gray-700 text-base font-bold tracking-wider rounded-full mb-6 shadow-md uppercase">${persona.tag}</span>
-                            <h2 class="text-6xl font-black mb-3 ${persona.color} leading-tight tracking-tight">${persona.title}</h2>
+                            <h2 class="text-5xl font-black mb-3 ${persona.color} leading-tight tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">${persona.title}</h2>
                             <p class="text-gray-400 text-xl font-bold uppercase tracking-widest mb-10 opacity-80">${persona.titleEn}</p>
                             <div class="w-24 h-2 bg-gray-200 mx-auto rounded-full mb-10"></div>
                             <p class="text-gray-700 text-[1.35rem] leading-relaxed text-justify mb-6 tracking-wide font-medium">${persona.desc}</p>
