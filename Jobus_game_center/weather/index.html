@@ -523,7 +523,7 @@ function getRainRiskLevel(weatherData, district) {
     if (drizzleCodes.includes(c.weather_code) || c.cloud_cover >= 75) {
         return RISK_LEVELS.MEDIUM;
     }
-    // 5. 地形風險
+    // 5. 地形風險 (修正：即使是GeoRisk，如果沒雨，就只給提醒，不改變主要狀態)
     if (district.geoRisk === true) return RISK_LEVELS.LOW_GEO;
 
     return RISK_LEVELS.LOW;
@@ -540,7 +540,7 @@ function getHourlyProb(hourlyData) {
 
 /**
  * =====================================================================
- * MODULE 3: COPY RESOLVER (溫度與風速邏輯修復版)
+ * MODULE 3: COPY RESOLVER (邏輯修正：LOW_GEO 不再視為雨天)
  * =====================================================================
  */
 function getCopyByRiskLevel(level) {
@@ -570,10 +570,11 @@ function getCopyByRiskLevel(level) {
                 type: "rain"
             };
         case RISK_LEVELS.LOW_GEO:
+            // [修正] 地形風險區：文字提醒帶傘，但狀態設為 ok (好天氣)
             return {
                 umbrella: "地形性風險區，建議帶著折疊傘 🌂",
                 note: "此區域靠近山區或迎風面，即使整體天氣穩定，仍可能有局部飄雨。",
-                type: "rain"
+                type: "ok" // <--- 關鍵修正：不再讓按鈕以為下雨
             };
         case RISK_LEVELS.LOW:
         default:
@@ -594,9 +595,7 @@ function getClothesAdvice(temp) {
     return "悶熱！穿透氣點，別中暑了 🥵";
 }
 
-// [重點修正] 風速建議 - 溫度優先原則
 function getWindAdvice(speed, temp) {
-    // 1. 計算風級 (Beaufort Scale)
     let level = 0;
     if (speed < 1) level = 0;
     else if (speed <= 5) level = 1;
@@ -610,27 +609,23 @@ function getWindAdvice(speed, temp) {
 
     const levelStr = `${level}級風`;
 
-    // 2. [邏輯修正] 溫度判定優先 (解決 -7.1度 還是舒適的問題)
-    // 狀況 A: 極冷/寒冷 (< 12°C)
+    // 溫度判定優先
     if (temp < 12) {
         if (level >= 3) return `${levelStr}，寒風刺骨！體感極低，保暖要包緊 🧥`;
-        return `${levelStr}，氣溫低，空氣冰冷請保暖 ❄️`; // (解決北海道問題)
+        return `${levelStr}，氣溫低，空氣冰冷請保暖 ❄️`; 
     }
 
-    // 狀況 B: 炎熱 (> 30°C)
     if (temp > 30) {
          if (level <= 2) return `${levelStr}，悶熱無風，注意中暑 🥵`;
          return `${levelStr}，熱風吹拂，記得多喝水 💧`;
     }
 
-    // 狀況 C: 標準舒適區間 (12°C ~ 30°C) - 使用通勤體感描述
     if (level >= 8) return `${levelStr}，颱風等級！極度危險，請躲室內 🏠`;
     if (level >= 6) return `${levelStr}，危險！騎車不穩，走路困難 🚫`;
     if (level === 5) return `${levelStr}，強風！雨傘容易開花，騎車小心側風 ⚠️`;
     if (level === 4) return `${levelStr}，風大！騎車明顯有阻力 🛵`;
     if (level === 3) return `${levelStr}，起風！樹葉搖晃，有涼意 🍃`;
     
-    // 0-2級 (舒適溫度下)
     return `${levelStr}，微風！空氣流通，舒適宜人 👌`;
 }
 
@@ -697,10 +692,8 @@ const ui = {
         window.currentWeatherType = copy.type; 
         window.currentTemp = c.temperature_2m; 
         
-        if (window.currentWeatherType !== 'rain' && 
-            window.currentWeatherType !== 'snow' && 
-            window.currentWeatherType !== 'freezing') {
-             // 5級風以上才判定為「強風」(按鈕變色)
+        // 狀態判斷：只有在「非雨、非雪、非極凍」且「非地形風險(ok)」時，才判斷風大
+        if (window.currentWeatherType === 'ok') {
              if (c.wind_speed_10m > 28) { 
                 window.currentWeatherType = "wind";
              }
