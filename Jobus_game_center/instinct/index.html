@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>直覺實驗室 - v4.7</title>
+    <title>直覺實驗室 - v5.0</title>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-LH8TP88B66"></script>
     <script>
@@ -13,8 +13,6 @@
       gtag('config', 'G-LH8TP88B66');
     </script>
 
-    <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAMAAAAKE/YAAAAAbFBMVEUAAAD///+ZmZlmZmZ/f3+BgYF2dnZ+fn6EhISJiYmDg4N6enqHh4eFhYV5eXmCgoJ8fHyGhoaIiIiKioqMjIyNjY2SkpKUlJSZmZmcnJygIKEhISEoKCgtLS0yMjI4ODg+Pj5AQEBERERISEhMU238AAAAI3RSTlMAAQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyAhIiMkKikAAAMnSURBVHic7drbctowEAZQoCS0hJa0pQ3//88tG1wM2JjY1kmZ5z45M54R2yuRLEu0AAAAAAAAAAAAAAAAAAAAAADwP70+f+x2u91x3z/s/j+9vT9+P9/eP3b//d7eX5/v2+18f979t3p9f72db7fL/bL7T/X6+nS53C/n23b3H+r19elyuZzO291/ps/X58v5fDrdtv/4K/14fT6fT6fLdvff6Mfr8/l4Ok/b/Rf6fH0+H4+n03b3H+jH6/PxeDxtd/+8Pl+fj8fD/r+P1+fj4bT9x+fz8XA4bneX6/VwOOz/+3g9HA6H/X9fD/v9dne5Xvf7/X53uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/XZ3uV73+/12d7le9/v9dne5Xvf7/Xb3/wUAAAAAAPw3fwE+37g/7t+e7gAAAABJRU5ErkJggg==">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
@@ -63,21 +61,52 @@ const DataService = {
             { id: "wp_02", displayTitle: "公司宣佈的「新福利政策」明年還會在嗎？", introText: "你覺得這是一個長期承諾，還是雷聲大雨點小？", marketType: "STABLE" },
             { id: "wp_03", displayTitle: "原本承諾的新功能，年底前真的做得完嗎？", introText: "看著現在的進度條，你覺得工程團隊能準時交付嗎？", marketType: "EVENT" },
             { id: "wp_04", displayTitle: "辦公室關於「人事凍結」的傳聞是真的嗎？", introText: "根據你的觀察，公司目前的人力策略傾向是？", marketType: "STABLE" },
-            { id: "wp_05", displayTitle: "今年的年終獎金，會比去年好嗎？", introText: "看著財報和老闆的臉色，你心裡的預期是？", marketType: "STABLE" }
+            { id: "wp_05", displayTitle: "今年的年終獎金，會比去年好嗎？", introText: "看著財報和老闆的臉色，你心裡的預期是？", marketType: "STABLE" },
+            { id: "wp_06", displayTitle: "這次的冗長會議會準時結束嗎？", introText: "議程看起來很滿，主講人又很愛離題，你的膀胱告訴你...", marketType: "EVENT" },
+            { id: "wp_07", displayTitle: "我的提案會被老闆採納嗎？", introText: "你準備了很久，但看老闆今天的臉色，勝算有多少？", marketType: "VOLATILE" },
+            { id: "wp_08", displayTitle: "隔壁部門的那個同事會離職嗎？", introText: "聽說他最近一直在刷 LinkedIn，你覺得他真的會走嗎？", marketType: "EVENT" },
+            { id: "wp_09", displayTitle: "公司未來會全面取消遠端工作嗎？", introText: "科技巨頭都叫人回辦公室了，我們公司會跟風嗎？", marketType: "STABLE" },
+            { id: "wp_10", displayTitle: "這個季度的 KPI 目標設得合理嗎？", introText: "看著那些數字，你覺得是挑戰還是天方夜譚？", marketType: "STABLE" },
+            { id: "wp_11", displayTitle: "AI 會在三年內取代我的職位嗎？", introText: "看著 AI 工具越來越強，你內心的危機感指數是？", marketType: "STABLE" },
+            { id: "wp_12", displayTitle: "這次的部門聚餐氣氛會很僵嗎？", introText: "又要跟不熟的同事尬聊，你覺得會有多尷尬？", marketType: "VOLATILE" },
+            { id: "wp_13", displayTitle: "老闆口頭承諾的「補休」真的休得到嗎？", introText: "還是等到過期了都還在忙專案？", marketType: "EVENT" },
+            { id: "wp_14", displayTitle: "競爭對手的新產品會重擊我們嗎？", introText: "市場傳聞他們來勢洶洶，你對自家產品防禦力有信心嗎？", marketType: "VOLATILE" },
+            { id: "wp_15", displayTitle: "我今年有機會升職加薪嗎？", introText: "是論資排輩還是實力至上？你覺得你的機會大嗎？", marketType: "STABLE" }
         ],
+        // v5.0 INVEST 修正：全數去時效化、通用化
         INVEST: [
-            { id: "inv_01", displayTitle: "比特幣今年底會突破 10 萬美金嗎？", introText: "市場情緒極度貪婪，你的理性告訴你會發生嗎？", marketType: "VOLATILE" },
+            { id: "inv_01", displayTitle: "比特幣短期內會再創歷史新高嗎？", introText: "市場情緒極度貪婪，你的理性告訴你會發生嗎？", marketType: "VOLATILE" },
             { id: "inv_02", displayTitle: "這家公司的股價，下個月會創新高嗎？", introText: "技術線圖看起來很強，但你的直覺敢追高嗎？", marketType: "VOLATILE" },
-            { id: "inv_03", displayTitle: "現在是買進黃金的好時機嗎？", introText: "全球局勢動盪，你覺得避險資產還會漲嗎？", marketType: "STABLE" },
+            { id: "inv_03", displayTitle: "現在是買進黃金/避險資產的好時機嗎？", introText: "全球局勢動盪，你覺得避險資產還會繼續漲嗎？", marketType: "STABLE" },
             { id: "inv_04", displayTitle: "這個熱門的迷因幣 (Meme Coin) 會歸零嗎？", introText: "雖然現在炒很兇，但你覺得它能活過三個月嗎？", marketType: "VOLATILE" },
-            { id: "inv_05", displayTitle: "聯準會下季會降息救市嗎？", introText: "總體經濟數據混亂，你賭央行會怎麼做？", marketType: "STABLE" }
+            { id: "inv_05", displayTitle: "央行的下一步利率決策會如市場預期嗎？", introText: "通膨數據好壞參半，你賭央行會怎麼做？", marketType: "STABLE" },
+            { id: "inv_06", displayTitle: "現在進場買房是當接盤俠嗎？", introText: "房價居高不下，現在買是剛需還是韭菜？", marketType: "STABLE" },
+            { id: "inv_07", displayTitle: "AI 概念股的泡沫近期會破嗎？", introText: "這波漲勢太瘋狂，是技術革命還是網路泡沫 2.0？", marketType: "VOLATILE" },
+            { id: "inv_08", displayTitle: "現在是換外幣/日幣的好時機嗎？", introText: "匯率起起伏伏，你覺得現在是相對低點嗎？", marketType: "STABLE" },
+            { id: "inv_09", displayTitle: "股市大盤短期內會再創里程碑嗎？", introText: "經濟成長 vs 地緣政治，你對未來多樂觀？", marketType: "STABLE" },
+            { id: "inv_10", displayTitle: "這檔新上市的 ETF 會破發嗎？", introText: "廣告打很大，但成分股看起來有點虛？", marketType: "EVENT" },
+            { id: "inv_11", displayTitle: "國際油價下個月會大漲嗎？", introText: "產油國局勢緊張，你的錢包準備好了嗎？", marketType: "EVENT" },
+            { id: "inv_12", displayTitle: "市場名人的社群發言會再次造成震盪嗎？", introText: "他們的一句話總是能讓幣圈上下跳動，你覺得呢？", marketType: "VOLATILE" },
+            { id: "inv_13", displayTitle: "現在把定存解約去買股票明智嗎？", introText: "保守與貪婪的拔河，你的直覺選哪邊？", marketType: "VOLATILE" },
+            { id: "inv_14", displayTitle: "全球經濟會實現「軟著陸」嗎？", introText: "通膨似乎受控了，但衰退的陰影真的消失了嗎？", marketType: "STABLE" },
+            { id: "inv_15", displayTitle: "朋友推薦的「內線明牌」能信嗎？", introText: "他說穩賺不賠，但你的理智告訴你...", marketType: "VOLATILE" }
         ],
         LIFE: [
-            { id: "life_01", displayTitle: "這對明星情侶今年會分手嗎？", introText: "八卦雜誌都在傳，看他們最近的互動，你覺得呢？", marketType: "EVENT" },
+            { id: "life_01", displayTitle: "這對明星情侶近期會分手嗎？", introText: "八卦雜誌都在傳，看他們最近的互動，你覺得呢？", marketType: "EVENT" },
             { id: "life_02", displayTitle: "明天的天氣真的會如預報一樣下雨嗎？", introText: "看著現在的天空，你覺得氣象局準嗎？", marketType: "EVENT" },
             { id: "life_03", displayTitle: "這部期待已久的電影會是爛片嗎？", introText: "預告片剪得很好，但通常這就是雷片的徵兆？", marketType: "VOLATILE" },
             { id: "life_04", displayTitle: "你支持的球隊下一場會贏嗎？", introText: "對手很強，但你的信仰有多堅定？", marketType: "EVENT" },
-            { id: "life_05", displayTitle: "下週油價會上漲嗎？", introText: "國際局勢不穩，你覺得該先去加油嗎？", marketType: "STABLE" }
+            { id: "life_05", displayTitle: "下週油價會上漲嗎？", introText: "國際局勢不穩，你覺得該先去加油嗎？", marketType: "STABLE" },
+            { id: "life_06", displayTitle: "這場秒殺級的演唱會，我能搶到票嗎？", introText: "幾十萬人在線排隊，你覺得你是天選之人嗎？", marketType: "VOLATILE" },
+            { id: "life_07", displayTitle: "這個月立下的減肥 Flag 會成功嗎？", introText: "看著手上的珍奶，你覺得這次能瘦幾公斤？", marketType: "EVENT" },
+            { id: "life_08", displayTitle: "下一次颱風來襲，會放颱風假嗎？", introText: "路徑圖看起來很像，你敢不敢現在就訂 KTV？", marketType: "EVENT" },
+            { id: "life_09", displayTitle: "曖昧對象稍後會回我訊息嗎？", introText: "已經已讀一小時了，他在忙還是沒興趣？", marketType: "VOLATILE" },
+            { id: "life_10", displayTitle: "下一期的統一發票會中獎嗎？", introText: "累積了一堆紙本，這次財神爺會眷顧嗎？", marketType: "VOLATILE" },
+            { id: "life_11", displayTitle: "這家網紅餐廳真的如傳聞中好吃嗎？", introText: "排隊兩小時，你覺得會是雷店嗎？", marketType: "EVENT" },
+            { id: "life_12", displayTitle: "新款 iPhone 會有令人驚艷的改變嗎？", introText: "還是又只是換個顏色、改個按鈕？", marketType: "STABLE" },
+            { id: "life_13", displayTitle: "今天上班通勤會塞車遲到嗎？", introText: "看著窗外的路況，你的不祥預感有多強？", marketType: "EVENT" },
+            { id: "life_14", displayTitle: "那位網紅的道歉影片是真心的嗎？", introText: "穿著素T素顏，你覺得他在演戲還是真悔過？", marketType: "VOLATILE" },
+            { id: "life_15", displayTitle: "我也能像網路上那樣靠副業月入十萬嗎？", introText: "看別人做都很簡單，實際跳下去做呢？", marketType: "STABLE" }
         ]
     },
 
@@ -100,10 +129,12 @@ const DataService = {
         let marketPools = null;
         if (WORKER_URL) {
             try {
+                // 強制延遲 1.5 秒，確保使用者看到 Loading 畫面
                 const [res] = await Promise.all([
                     fetch(WORKER_URL),
                     new Promise(r => setTimeout(r, 1500)) 
                 ]);
+                
                 if (res.ok) marketPools = await res.json();
             } catch (e) { console.warn("API Error", e); }
         }
@@ -216,7 +247,7 @@ function ViewHome() {
     return `
         <div class="flex flex-col h-full p-8 bg-white relative overflow-hidden fade-in">
             <div class="mt-8 mb-6 flex-shrink-0">
-                <span class="inline-block px-3 py-1 bg-gray-900 text-white text-xs font-bold tracking-widest rounded-full mb-4">v4.7 穩定版</span>
+                <span class="inline-block px-3 py-1 bg-gray-900 text-white text-xs font-bold tracking-widest rounded-full mb-4">v5.0 穩定版</span>
                 <h1 class="text-5xl font-black text-gray-900 mb-2 leading-none">直覺<br><span class="text-indigo-600">實驗室</span></h1>
                 <p class="text-gray-500 text-xl font-medium mt-2">請選擇你想測試的能力</p>
             </div>
@@ -264,7 +295,7 @@ function ViewGame(state) {
             </div>
             
             <div class="px-6 py-4 flex-shrink-0">
-                <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 slide-in-right">
+                <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 slide-in-right mb-6">
                     <h2 class="text-2xl font-black text-gray-900 mb-3 leading-tight">${q.displayTitle}</h2>
                     <p class="text-gray-600 text-lg leading-relaxed font-medium">${q.introText}</p>
                 </div>
@@ -299,7 +330,7 @@ function ViewGame(state) {
                 </div>
             </div>
             
-            <div class="p-6 pt-4 bg-gray-50 border-t border-gray-200 flex-shrink-0 z-20">
+            <div class="p-4 pt-4 bg-gray-50 border-t border-gray-200 flex-shrink-0 z-20">
                 <button id="btn-confirm" class="w-full bg-gray-900 text-white text-2xl font-bold py-5 rounded-[2rem] shadow-xl transform transition active:scale-[0.98] hover:bg-gray-800 flex justify-center items-center gap-3 active:shadow-md">
                     確認鎖定 <span class="text-xl opacity-60">🔒</span>
                 </button>
@@ -321,7 +352,7 @@ function ViewReveal(state) {
         <div class="flex flex-col h-full bg-gray-900 text-white slide-up relative overflow-hidden">
             <div class="absolute top-0 right-0 w-80 h-80 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-25 -mr-20 -mt-20 animate-pulse"></div>
             
-            <div class="flex-grow overflow-y-auto px-8 pt-10 pb-10 scroll-smooth no-scrollbar relative z-10">
+            <div class="flex-grow overflow-y-auto px-8 pt-10 pb-36 scroll-smooth no-scrollbar relative z-10">
                 <h3 class="text-indigo-400 text-sm font-bold uppercase tracking-widest mb-3">${q.categoryLabel}</h3>
                 <h2 class="text-2xl font-black mb-12 leading-tight text-white/95">${q.displayTitle}</h2>
                 <div class="space-y-12">
@@ -345,8 +376,8 @@ function ViewReveal(state) {
                 </div>
             </div>
             
-            <div class="p-6 pt-6 bg-gray-900 border-t border-gray-800 flex-shrink-0 z-20">
-                <button id="btn-next" class="w-full bg-white text-gray-900 text-2xl font-bold py-6 rounded-[2rem] shadow-xl transform transition active:scale-[0.98] hover:bg-gray-200 active:shadow-md">下一題 →</button>
+            <div class="p-4 pt-4 bg-gray-900 border-t border-gray-800 flex-shrink-0 z-20">
+                <button id="btn-next" class="w-full bg-white text-gray-900 text-2xl font-bold py-5 rounded-[2rem] shadow-xl transform transition active:scale-[0.98] hover:bg-gray-200 active:shadow-md">下一題 →</button>
             </div>
         </div>
     `;
@@ -377,7 +408,7 @@ function ViewResult(state) {
 
     return `
         <div class="flex flex-col h-full bg-white relative fade-in overflow-hidden">
-            <div class="flex-grow overflow-y-auto px-6 pt-6 pb-48 scroll-smooth no-scrollbar relative z-10">
+            <div class="flex-grow overflow-y-auto px-6 pt-6 pb-72 scroll-smooth no-scrollbar relative z-10">
                 <div class="text-center">
                     <p class="text-gray-400 text-sm font-bold tracking-[0.3em] uppercase mb-8">— 你的直覺分析報告 —</p>
                     <div class="bg-gray-50 rounded-[3rem] p-8 mb-10 border-2 border-gray-100 shadow-xl relative overflow-hidden">
