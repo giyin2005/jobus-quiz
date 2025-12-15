@@ -202,7 +202,7 @@
 
 <script>
 /**
- * =====================================================================
+  * =====================================================================
  * MODULE 1: DATA LAYER (全台368行政區 + 全球搜尋)
  * =====================================================================
  */
@@ -416,11 +416,12 @@ const districts = [
   {name: "連江縣 莒光鄉", lat: 25.973, lon: 119.940}, {name: "連江縣 東引鄉", lat: 26.368, lon: 120.493}
 ];
 
+
 // 請務必貼回完整的 districts 陣列
 
 async function fetchWeatherData(lat, lon) {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-                `&current=temperature_2m,precipitation,wind_speed_10m,weather_code,cloud_cover,snowfall` +
+                `&current=temperature_2m,apparent_temperature,precipitation,wind_speed_10m,weather_code,cloud_cover,snowfall` +
                 `&daily=temperature_2m_max,temperature_2m_min&hourly=precipitation_probability` +
                 `&forecast_days=1&timezone=auto`;
     try {
@@ -512,14 +513,15 @@ function getRainRiskLevel(weatherData, district) {
     if (snowCodes.includes(c.weather_code) || (c.snowfall && c.snowfall > 0)) {
         return RISK_LEVELS.SNOW;
     }
-    // 2. 極凍 (< 0度)
-    if (c.temperature_2m <= 0) {
+    // 2. 極凍 (改用體感溫度判斷更準)
+    const feel = c.apparent_temperature;
+    if (feel <= 0) {
         return RISK_LEVELS.EXTREME_COLD;
     }
     // 3. 大雨
     if (rainProb >= 30) return RISK_LEVELS.HIGH;
     
-    // 4. 飄雨 (修正：移除雲量判斷，只有真的有雨才算 MEDIUM)
+    // 4. 飄雨
     const drizzleCodes = [51, 53, 55, 61, 63, 65, 80, 81, 82];
     if (drizzleCodes.includes(c.weather_code)) {
         return RISK_LEVELS.MEDIUM;
@@ -567,16 +569,15 @@ function getCopyByRiskLevel(level) {
             };
         case RISK_LEVELS.MEDIUM:
             return {
-                umbrella: "外面有飄雨，建議帶傘 🌦️", // 微調文案
+                umbrella: "外面有飄雨，建議帶傘 🌦️",
                 note: "戶外有短暫雨或毛毛雨，建議攜帶雨具。",
                 type: "rain"
             };
         case RISK_LEVELS.LOW_GEO:
-            // [修正] 地形風險區：文字提醒帶傘，但狀態設為 ok (好天氣)
             return {
                 umbrella: "地形性風險區，建議帶著折疊傘 🌂",
                 note: "此區域靠近山區或迎風面，即使整體天氣穩定，仍可能有局部飄雨。",
-                type: "ok" // <--- 關鍵修正：不再讓按鈕以為下雨
+                type: "ok"
             };
         case RISK_LEVELS.LOW:
         default:
@@ -588,16 +589,17 @@ function getCopyByRiskLevel(level) {
     }
 }
 
-function getClothesAdvice(temp) {
-    if(temp <= 0) return "極凍警報！零下低溫，請穿著最保暖裝備 (羽絨+發熱衣) 🥶";
-    if(temp < 10) return "寒流等級！非常冷，請務必圍巾手套戴好 🧣";
-    if(temp < 15) return "變涼了，夾克或大衣請準備好 🧥";
-    if(temp < 20) return "舒服的溫度，長袖或薄外套剛好 😌";
-    if(temp < 25) return "短袖即可，隨身帶件薄襯衫 👌";
+// 改用體感溫度判斷穿著
+function getClothesAdvice(feel) {
+    if(feel <= 0) return "極凍警報！體感零下，請穿著最保暖裝備 (羽絨+發熱衣) 🥶";
+    if(feel < 10) return "寒流等級！體感很冷，圍巾手套請準備 🧣";
+    if(feel < 15) return "變涼了，夾克或大衣請準備好 🧥";
+    if(feel < 20) return "舒適偏涼，長袖或薄外套剛好 😌";
+    if(feel < 26) return "短袖即可，怕冷帶件薄襯衫 👌";
     return "悶熱！穿透氣點，別中暑了 🥵";
 }
 
-function getWindAdvice(speed, temp) {
+function getWindAdvice(speed, temp, feel) {
     let level = 0;
     if (speed < 1) level = 0;
     else if (speed <= 5) level = 1;
@@ -611,15 +613,14 @@ function getWindAdvice(speed, temp) {
 
     const levelStr = `${level}級風`;
 
-    // 溫度判定優先
-    if (temp < 12) {
+    // 優先：體感溫度極低
+    if (feel < 12) {
         if (level >= 3) return `${levelStr}，寒風刺骨！體感極低，保暖要包緊 🧥`;
         return `${levelStr}，氣溫低，空氣冰冷請保暖 ❄️`; 
     }
 
-    if (temp > 30) {
-         if (level <= 2) return `${levelStr}，悶熱無風，注意中暑 🥵`;
-         return `${levelStr}，熱風吹拂，記得多喝水 💧`;
+    if (feel > 32) {
+         return `${levelStr}，熱浪來襲，注意中暑多喝水 🥵`;
     }
 
     if (level >= 8) return `${levelStr}，颱風等級！極度危險，請躲室內 🏠`;
@@ -671,6 +672,7 @@ const ui = {
         
         const tMax = d.temperature_2m_max[0];
         const tMin = d.temperature_2m_min[0];
+        const feel = c.apparent_temperature; // 體感溫度
         const weatherInfo = getWeatherIcon(c.weather_code);
         const rainProb = getHourlyProb(h);
         
@@ -679,12 +681,12 @@ const ui = {
         document.getElementById("weatherBottomNote").textContent = copy.note;
 
         document.getElementById("infoList").innerHTML = `
-            <div class="info-row"><div class="info-icon">🌡</div><div class="info-text">氣溫：${c.temperature_2m}℃ (高:${tMax.toFixed(0)} / 低:${tMin.toFixed(0)})</div></div>
+            <div class="info-row"><div class="info-icon">🌡</div><div class="info-text">氣溫：${c.temperature_2m}℃ (高:${tMax.toFixed(0)} / 低:${tMin.toFixed(0)}) <br><span style="font-size:0.95em;color:#666;font-weight:600">體感：${feel}℃</span></div></div>
             <div class="info-row"><div class="info-icon">${weatherInfo.icon}</div><div class="info-text">狀況：${weatherInfo.text}</div></div>
             <div class="info-row"><div class="info-icon">🌧</div><div class="info-text">降雨機率：${rainProb}%</div></div>
-            <div class="info-row"><div class="info-icon">👕</div><div class="info-text">${getClothesAdvice(c.temperature_2m)}</div></div>
+            <div class="info-row"><div class="info-icon">👕</div><div class="info-text">${getClothesAdvice(feel)}</div></div>
             <div class="info-row"><div class="info-icon">☔</div><div class="info-text">${copy.umbrella}</div></div>
-            <div class="info-row"><div class="info-icon">💨</div><div class="info-text">${getWindAdvice(c.wind_speed_10m, c.temperature_2m)}</div></div>
+            <div class="info-row"><div class="info-icon">💨</div><div class="info-text">${getWindAdvice(c.wind_speed_10m, c.temperature_2m, feel)}</div></div>
         `;
 
         this.resultCard.style.display = "block";
@@ -692,9 +694,8 @@ const ui = {
         this.resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         window.currentWeatherType = copy.type; 
-        window.currentTemp = c.temperature_2m; 
+        window.currentTemp = feel; // 改用體感溫度做全域判斷
         
-        // 狀態判斷：只有在「非雨、非雪、非極凍」且「非地形風險(ok)」時，才判斷風大
         if (window.currentWeatherType === 'ok') {
              if (c.wind_speed_10m > 28) { 
                 window.currentWeatherType = "wind";
@@ -882,9 +883,9 @@ document.querySelectorAll(".cm-btn").forEach(btn => {
     });
 });
 
-function getCommuteMsg(mode, weather, temp){
-    const isFreezing = (temp < 10); 
-    const isExtremeCold = (temp <= 0); 
+function getCommuteMsg(mode, weather, feel){
+    const isFreezing = (feel < 10); // 改用體感
+    const isExtremeCold = (feel <= 0); // 改用體感
 
     if(mode === "scooter"){
         if(isExtremeCold) return "路面可能有黑冰打滑，騎車極度危險，請改道！";
