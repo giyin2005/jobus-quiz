@@ -29,6 +29,7 @@
         min-height:100vh;
         overflow-x:hidden;
         color: #333;
+        /* iOS Safe Area */
         padding-top: env(safe-area-inset-top);
         padding-bottom: env(safe-area-inset-bottom);
     }
@@ -46,30 +47,30 @@
 
     /* ========== 主要容器 ========== */
     .container{ position:relative; z-index:10; max-width:520px; margin:0 auto; padding:20px 16px 40px; }
-    h1{ text-align:center; font-size:24px; margin:12px 0 6px; color: #111; font-weight: 800; letter-spacing: 1px; }
-    .subtitle-emoji{ text-align:center; font-size:28px; margin-bottom:12px; }
+    h1{ text-align:center; font-size:26px; margin:12px 0 8px; color: #111; font-weight: 800; letter-spacing: 1px; }
+    .subtitle-emoji{ text-align:center; font-size:32px; margin-bottom:16px; }
 
     /* ========== 卡片共用樣式 ========== */
-    .card{ background:#ffffff; border-radius:24px; padding:20px; box-shadow:0 10px 25px rgba(58,141,255,0.15); margin-bottom:18px; transition: transform 0.2s; }
-    .card-title{ font-weight:700; margin-bottom:10px; font-size:18px; color: #444; }
+    .card{ background:#ffffff; border-radius:24px; padding:24px 22px; box-shadow:0 10px 25px rgba(58,141,255,0.15); margin-bottom:20px; transition: transform 0.2s; }
+    .card-title{ font-weight:700; margin-bottom:12px; font-size:20px; color: #444; }
 
-    /* ========== 搜尋區塊 ========== */
+    /* ========== 搜尋區塊 (加大) ========== */
     .search-wrapper{ position:relative; margin-top:8px; }
-    #searchInput{ width:100%; padding:14px 16px; font-size:18px; border-radius:14px; border:2px solid #e0e8ff; outline:none; background:#f9fbff; color: #333; transition: all 0.2s; }
+    #searchInput{ width:100%; padding:15px 16px; font-size:20px; border-radius:14px; border:2px solid #e0e8ff; outline:none; background:#f9fbff; color: #333; transition: all 0.2s; }
     #searchInput:focus { border-color: #3A8DFF; box-shadow: 0 0 0 3px rgba(58,141,255,0.15); background:#fff; }
     
     #suggestions{ position:absolute; left:0; right:0; top:105%; background:#fff; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.15); max-height:280px; overflow-y:auto; display:none; z-index:100; border: 1px solid #eee; }
     
-    .s-item{ padding:12px 16px; cursor:pointer; font-size:16px; border-bottom: 1px solid #f5f5f5; color: #333; }
+    .s-item{ padding:14px 16px; cursor:pointer; font-size:18px; border-bottom: 1px solid #f5f5f5; color: #333; }
     .s-item:last-child{ border-bottom: none; }
     .s-item:hover{ background:#f0f7ff; color: #3A8DFF; font-weight: 600; }
     
-    .s-header { padding: 8px 16px; font-size: 13px; color: #888; background: #fafafa; font-weight: 700; border-bottom: 1px solid #eee; }
+    .s-header { padding: 10px 16px; font-size: 15px; color: #888; background: #fafafa; font-weight: 700; border-bottom: 1px solid #eee; }
     .s-global { color: #555; }
 
-    /* ========== 按鈕組 ========== */
-    .btn-row{ display:flex; gap:12px; margin-top:16px; }
-    .main-btn, .ghost-btn{ flex:1; padding:12px 16px; font-size:16px; font-weight: 600; border-radius:14px; cursor:pointer; transition: transform 0.1s, background 0.2s; border:none; display: flex; align-items: center; justify-content: center; gap: 6px;}
+    /* ========== 按鈕組 (加大) ========== */
+    .btn-row{ display:flex; gap:12px; margin-top:18px; }
+    .main-btn, .ghost-btn{ flex:1; padding:14px 16px; font-size:18px; font-weight: 600; border-radius:16px; cursor:pointer; transition: transform 0.1s, background 0.2s; border:none; display: flex; align-items: center; justify-content: center; gap: 6px;}
     .main-btn:active, .ghost-btn:active { transform: scale(0.98); }
     
     .main-btn{ background:linear-gradient(135deg, #3A8DFF, #2a75d9); color:#fff; box-shadow: 0 4px 10px rgba(58,141,255,0.3); }
@@ -89,33 +90,33 @@
     }
     @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
-    .sk-header { display:flex; flex-direction:column; gap:8px; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px; }
-    .sk-title { width: 60%; height: 32px; }
-    .sk-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .sk-icon { width: 32px; height: 32px; border-radius: 50%; }
-    .sk-text { flex: 1; height: 24px; }
-    .sk-note { width: 100%; height: 60px; margin-top: 15px; border-radius: 12px; }
+    .sk-header { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px; }
+    .sk-title { width: 60%; height: 36px; }
+    .sk-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .sk-icon { width: 36px; height: 36px; border-radius: 50%; }
+    .sk-text { flex: 1; height: 28px; }
+    .sk-note { width: 100%; height: 70px; margin-top: 15px; border-radius: 12px; }
 
-    /* ========== 真實天氣資料區 (Compact List) ========== */
-    #weatherSummaryCard{ display:none; line-height:1.7; font-size:16px; color: #111; animation: fadeIn 0.4s ease-out; }
+    /* ========== 真實天氣資料區 (樂齡版 Compact List) ========== */
+    #weatherSummaryCard{ display:none; line-height:1.6; color: #111; animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:translateY(0);} }
 
-    .summary-header { margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
-    #summaryCity { font-size: 22px; font-weight: 800; color: #222; }
-    #summaryTime { font-size: 14px; color: #666; margin-top: 4px; }
+    .summary-header { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+    #summaryCity { font-size: 26px; font-weight: 800; color: #222; }
+    #summaryTime { font-size: 16px; color: #666; margin-top: 6px; }
 
-    /* 列表項目樣式 */
+    /* 列表項目樣式 (放大) */
     .info-row { 
-        margin-bottom: 10px; 
+        margin-bottom: 14px; 
         display: flex; 
         align-items: flex-start; 
         padding: 4px 0;
     }
     .info-icon { 
-        min-width: 36px; 
+        min-width: 40px; 
         text-align: center; 
-        margin-right: 10px; 
-        font-size: 20px; 
+        margin-right: 12px; 
+        font-size: 26px; /* 圖示放大 */
         display: flex; 
         align-items: center; 
         justify-content: center;
@@ -123,45 +124,49 @@
     .info-text { 
         flex: 1; 
         word-break: break-word; 
-        font-size: 17px; 
-        color: #333;
+        font-size: 21px; /* 主文放大 */
+        line-height: 1.5;
+        color: #222;
+        font-weight: 500;
     }
     
-    /* 數據標籤樣式 */
+    /* 數據標籤樣式 (放大) */
     .highlight-data {
-        font-size: 0.9em;
-        color: #555;
-        background: #f4f6f8;
-        padding: 4px 8px;
-        border-radius: 6px;
+        font-size: 18px; /* 副文放大 */
+        color: #444;
+        background: #f0f4f8;
+        padding: 6px 10px;
+        border-radius: 8px;
         display: inline-block;
-        margin-top: 4px;
-        margin-right: 4px;
+        margin-top: 6px;
+        margin-right: 6px;
         font-weight: 500;
     }
 
     /* 預報分隔線 */
     .forecast-row {
-        margin-top: 12px;
-        padding-top: 12px;
-        border-top: 2px dashed #edf2f7;
-        color: #555;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 2px dashed #e0e0e0;
+        color: #444;
     }
 
-    #weatherBottomNote { margin-top: 16px; font-weight: 600; color: #2c5282; background: #eef6fc; padding: 14px; border-radius: 12px; font-size: 16px; line-height: 1.6; }
+    #weatherBottomNote { margin-top: 20px; font-weight: 600; color: #2c5282; background: #eef6fc; padding: 16px; border-radius: 14px; font-size: 19px; line-height: 1.6; }
 
-    /* ========== 通勤按鈕樣式 ========== */
-    #commuteBtns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 8px; }
-    .cm-btn{ flex:1 1 45%; min-width:130px; padding:16px 12px; border-radius:18px; border:1px solid #e0e8ff; background:#fff; color:#3A8DFF; font-size:17px; font-weight: 600; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.03); transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    /* ========== 通勤按鈕樣式 (加大) ========== */
+    #commuteBtns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 10px; }
+    .cm-btn{ flex:1 1 45%; min-width:140px; padding:18px 14px; border-radius:20px; border:1px solid #e0e8ff; background:#fff; color:#3A8DFF; font-size:19px; font-weight: 600; cursor:pointer; box-shadow:0 3px 6px rgba(0,0,0,0.03); transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
     .cm-btn:hover{ background: #3A8DFF; color: #fff; transform: translateY(-2px); box-shadow: 0 5px 12px rgba(58,141,255,0.25); border-color: #3A8DFF; }
-    .cm-btn span { font-size: 24px; } 
+    .cm-btn span { font-size: 28px; } 
     
-    #commuteResult{ margin-top:20px; font-size:18px; font-weight:500; line-height: 1.6; color: #333; padding: 15px; background: #fff; border-radius: 12px; border-left: 4px solid #3A8DFF; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    #commuteResult{ margin-top:24px; font-size:21px; font-weight:500; line-height: 1.6; color: #333; padding: 18px; background: #fff; border-radius: 16px; border-left: 5px solid #3A8DFF; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 
-    .footer-copyright { text-align: center; padding: 30px 0 40px; font-size: 13px; color: #999; }
+    .footer-copyright { text-align: center; padding: 40px 0 50px; font-size: 14px; color: #999; }
     
     @media (max-width:360px){
-        .cm-btn { min-width: 120px; }
+        .cm-btn { min-width: 130px; font-size: 17px; }
+        .info-text { font-size: 19px; }
+        .highlight-data { font-size: 16px; }
     }
 </style>
 </head>
@@ -447,7 +452,6 @@ const districts = [
 // 請務必貼回完整的 districts 陣列
 
 async function fetchWeatherData(lat, lon) {
-    // 新增 apparent_temperature 等參數
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
                 `&current=temperature_2m,apparent_temperature,precipitation,wind_speed_10m,wind_direction_10m,weather_code,cloud_cover,snowfall,relative_humidity_2m,surface_pressure,visibility` +
                 `&daily=temperature_2m_max,temperature_2m_min,weather_code&hourly=precipitation_probability` +
@@ -519,7 +523,7 @@ function findNearestDistrict(lat, lon) {
 
 /**
  * =====================================================================
- * MODULE 2: RULE ENGINE & HELPERS
+ * MODULE 2: RULE ENGINE
  * =====================================================================
  */
 const RISK_LEVELS = {
@@ -549,13 +553,13 @@ function getRainRiskLevel(weatherData, district) {
     // 3. 大雨
     if (rainProb >= 30) return RISK_LEVELS.HIGH;
     
-    // 4. 飄雨 (修正：嚴格判定，移除雲量)
+    // 4. 飄雨
     const drizzleCodes = [51, 53, 55, 61, 63, 65, 80, 81, 82];
     if (drizzleCodes.includes(c.weather_code)) {
         return RISK_LEVELS.MEDIUM;
     }
     
-    // 5. 地形風險 (狀態為 OK)
+    // 5. 地形風險 (文字提醒，但狀態為 OK)
     if (district.geoRisk === true) return RISK_LEVELS.LOW_GEO;
 
     return RISK_LEVELS.LOW;
@@ -578,7 +582,7 @@ function getWindDirText(degree) {
 
 /**
  * =====================================================================
- * MODULE 3: COPY RESOLVER (包含 Bug 修復)
+ * MODULE 3: COPY RESOLVER
  * =====================================================================
  */
 function getCopyByRiskLevel(level) {
@@ -608,7 +612,7 @@ function getCopyByRiskLevel(level) {
                 type: "rain"
             };
         case RISK_LEVELS.LOW_GEO:
-            // [修正] 狀態設為 ok，避免誤判下雨
+            // 地形風險區：文字提醒，狀態 OK
             return {
                 umbrella: "地形性風險區，建議帶著折疊傘 🌂",
                 note: "此區域靠近山區或迎風面，即使整體天氣穩定，仍可能有局部飄雨。",
@@ -636,7 +640,7 @@ function getClothesAdvice(feel) {
     return "熱浪來襲！輕薄透氣衣物為主，注意防曬與補充水分 ☀️";
 }
 
-// 風速建議 (含通勤體感修正 + 悶熱修正)
+// 風速建議 (含通勤體感 + 悶熱修正)
 function getWindAdvice(speed, temp, feel) {
     let level = 0;
     if (speed < 1) level = 0;
@@ -687,7 +691,7 @@ function getWeatherIcon(code) {
 
 /**
  * =====================================================================
- * MODULE 4: UI RENDERER (Compact List)
+ * MODULE 4: UI RENDERER (Compact List + 樂齡大字版)
  * =====================================================================
  */
 const ui = {
@@ -731,13 +735,13 @@ const ui = {
         document.getElementById("summaryTime").textContent = this.getTimeStr();
         document.getElementById("weatherBottomNote").textContent = copy.note;
 
-        // 微整合列表 (Compact List) - 順序調整過
+        // 微整合列表 (Compact List) - 字體加大版
         document.getElementById("infoList").innerHTML = `
             <div class="info-row">
                 <div class="info-icon">🌡</div>
                 <div class="info-text">
                     氣溫：${Math.round(c.temperature_2m)}℃ (高:${tMax} / 低:${tMin}) 
-                    <br><span style="font-size:0.9em;color:#666">體感 ${feel}℃</span>
+                    <br><span style="font-size:18px;color:#666">體感 ${feel}℃</span>
                 </div>
             </div>
             <div class="info-row">
@@ -746,7 +750,7 @@ const ui = {
             </div>
             <div class="info-row">
                 <div class="info-icon">🌬</div>
-                <div class="info-text">${getWindAdvice(c.wind_speed_10m, c.temperature_2m, feel)} <span style="font-size:0.9em;color:#666">(${windDir})</span></div>
+                <div class="info-text">${getWindAdvice(c.wind_speed_10m, c.temperature_2m, feel)} <span style="font-size:18px;color:#666">(${windDir})</span></div>
             </div>
             <div class="info-row">
                 <div class="info-icon">📊</div>
