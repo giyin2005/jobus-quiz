@@ -484,7 +484,6 @@ const districts = [
   {name: "連江縣 南竿鄉", lat: 26.155, lon: 119.927}, {name: "連江縣 北竿鄉", lat: 26.223, lon: 119.989},
   {name: "連江縣 莒光鄉", lat: 25.973, lon: 119.940}, {name: "連江縣 東引鄉", lat: 26.368, lon: 120.493}
 ];
-
 // 同時呼叫天氣與空氣 API
 async function fetchAllData(lat, lon) {
     const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
@@ -648,7 +647,7 @@ function getModeInfo(mode, district) {
                 badge: "🥶 極凍生存模式",
                 color: "#2a4365",
                 bg: "#bee3f8",
-                desc: "戶外極度寒冷，有失溫與黑冰風險。通勤請務必選擇「保命」方式，避免長時間暴露。"
+                desc: "戶外極度寒冷，有失溫與路面結冰風險。通勤請務必選擇「保命」方式，避免長時間暴露。"
             };
         case MODES.RAIN:
             return {
@@ -1108,7 +1107,7 @@ async function executeQuery(district) {
 
         // 2. 檢查快取
         const CACHE_DURATION = 15 * 60 * 1000; 
-        const cacheKey = `weather_v26_${district.lat.toFixed(2)}_${district.lon.toFixed(2)}`;
+        const cacheKey = `weather_v27_${district.lat.toFixed(2)}_${district.lon.toFixed(2)}`;
         const cached = localStorage.getItem(cacheKey);
         
         let allData;
@@ -1152,11 +1151,12 @@ function showManifesto() {
     alert("《通勤天氣小幫手》\n\n這是一個把天氣數據轉為「通勤決策」的 Web App。\n\n它不只告訴你幾度、會不會下雨，而是幫你回答更重要的問題：「我今天這樣出門，安全嗎？」\n\n我們不是中立的資料工具，而是站在「避免風險」這一邊。");
 }
 
-// 專家矩陣建議邏輯 (查表法)
+// 專家矩陣建議邏輯 (Level 27 最終微調)
 function getCommuteMsg(mode, transport){
     // 1. 極凍生存
     if (mode === MODES.COLD_SURVIVAL) {
         if(transport === 'scooter') return "❌ 生命危險！路面結冰極易打滑，且易嚴重失溫，嚴格禁止騎車。";
+        if(transport === 'car') return "⚠️ 路面恐結冰打滑，請避免急煞，放慢車速！"; // (修正移回)
         if(transport === 'walk') return "❌ 極度危險！戶外暴露有失溫風險，請務必改搭大眾運輸。";
         if(transport === 'bus') return "⚠️ 勉強可選！但等車時請注意保暖，避免吹風。";
         return "✅ 唯一選擇！請選擇有暖氣的密閉交通工具。";
@@ -1215,7 +1215,7 @@ function getCommuteMsg(mode, transport){
     // 7. 能見度差
     if (mode === MODES.LOW_VIS) {
         if(transport === 'mrt') return "✅ 首選！軌道交通不受路面能見度影響。";
-        if(transport === 'car') return "⚠️ 路面恐結冰打滑，請避免急煞，放慢車速！";
+        if(transport === 'car') return "⚠️ 警戒！請開霧燈，拉長車距，慢速行駛。"; // (還原正確建議)
         if(transport === 'bus') return "⚠️ 普通！公車視線死角多，上下車請小心。";
         if(transport === 'scooter') return "❌ 危險！汽車可能看不到你，極度危險。";
         if(transport === 'walk') return "⚠️ 危險！請穿亮色衣物，走在人行道內側。";
