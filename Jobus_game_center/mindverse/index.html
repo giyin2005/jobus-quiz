@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>心理宇宙：Mindverse (Final Release)</title>
+    <title>心理宇宙：Mindverse (Ultimate Release)</title>
     
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-3V80KBCWC1"></script>
     <script>
@@ -46,8 +46,8 @@
 
     <script>
         /**
-         * 心理宇宙 Mindverse - v1.0 Final Release
-         * Features: Journey Mode, Scrollable Summary, RWD Optimization
+         * 心理宇宙 Mindverse - Ultimate Release
+         * Features: Desktop Scroll, Smart Pointer, Layout Fixes, Robust Copy
          */
 
         // --- 核心系統與變數 ---
@@ -70,7 +70,7 @@
         let camera = { zoom: 1, x: 0, y: 0, targetZoom: 1, targetX: 0, targetY: 0 };
         let hitZones = []; 
         
-        // 滾動系統變數 (New for Summary Scroll)
+        // 滾動系統變數
         let summaryScrollY = 0;
         let summaryContentHeight = 0;
         let touchStartY = 0;
@@ -249,7 +249,6 @@
             let found = false;
             // Summary 頁面的按鈕 (不受 Clipping 影響)
             if (currentScene === 'SUMMARY' && hitZones.length > 0) {
-                 // 這裡只檢查按鈕區 (通常在畫面下方)
                  for (let z of hitZones) {
                     let hit = (worldX >= z.x && worldX <= z.x+z.w && worldY >= z.y && worldY <= z.y+z.h);
                     if (hit) {
@@ -273,7 +272,7 @@
             if(!found) document.body.style.cursor = 'default';
         };
 
-        // Scroll Event Listeners
+        // Scroll Event Listeners (Touch)
         canvas.addEventListener('touchstart', e => { 
             e.preventDefault(); 
             const p = getPos(e.touches[0]); 
@@ -290,9 +289,6 @@
                 const dy = p.y - touchStartY;
                 touchStartY = p.y;
                 summaryScrollY -= dy;
-                // Clamp scroll
-                // 可視高度約 = height - (Title Area) - (Footer Area)
-                // 這裡簡單估算，允許滾動直到內容底部接近 Footer
                 const viewH = height - SAFE_TOP - SAFE_BOTTOM - 150; 
                 const maxScroll = Math.max(0, summaryContentHeight - viewH + 50);
                 if(summaryScrollY < 0) summaryScrollY = 0;
@@ -303,9 +299,80 @@
         }, {passive:false});
 
         canvas.addEventListener('touchend', () => { isDragging = false; mouse.down = false; });
-        canvas.addEventListener('mousemove', e => { const p=getPos(e); handleInput(p.x, p.y, false); });
-        canvas.addEventListener('mousedown', e => { const p=getPos(e); handleInput(p.x, p.y, true); });
-        canvas.addEventListener('mouseup', () => mouse.down=false);
+
+        // ✅ 新增：Desktop 滾動與滑鼠拖曳支援 (Mouse & Wheel)
+        canvas.addEventListener('mousedown', e => { 
+            const p = getPos(e); 
+            if (currentScene === 'SUMMARY') {
+                isDragging = true;
+                touchStartY = p.y; // 借用變數紀錄滑鼠位置
+            }
+            handleInput(p.x, p.y, true); 
+        });
+
+        canvas.addEventListener('mousemove', e => { 
+            const p = getPos(e); 
+            
+            if (currentScene === 'SUMMARY' && isDragging) {
+                const dy = p.y - touchStartY;
+                touchStartY = p.y;
+                summaryScrollY -= dy;
+                const viewH = height - SAFE_TOP - SAFE_BOTTOM - 150; 
+                const maxScroll = Math.max(0, summaryContentHeight - viewH + 50);
+                if(summaryScrollY < 0) summaryScrollY = 0;
+                if(summaryScrollY > maxScroll) summaryScrollY = maxScroll;
+            }
+            
+            handleInput(p.x, p.y, false); 
+        });
+
+        canvas.addEventListener('mouseup', () => { isDragging = false; mouse.down = false; });
+
+        canvas.addEventListener('wheel', e => {
+            if (currentScene === 'SUMMARY') {
+                e.preventDefault();
+                summaryScrollY += e.deltaY;
+                const viewH = height - SAFE_TOP - SAFE_BOTTOM - 150; 
+                const maxScroll = Math.max(0, summaryContentHeight - viewH + 50);
+                if(summaryScrollY < 0) summaryScrollY = 0;
+                if(summaryScrollY > maxScroll) summaryScrollY = maxScroll;
+            }
+        }, {passive:false});
+
+
+        // --- 強力複製工具 (Robust Copy Tool) ---
+        function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text)
+                    .then(() => alert("✅ 已複製！請開啟 Instagram 私訊 @jobus 官方帳號"))
+                    .catch(err => {
+                        console.error('API Copy failed, trying fallback', err);
+                        fallbackCopy(text);
+                    });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed"; 
+            textArea.style.opacity = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if(successful) alert("✅ 已複製！請開啟 Instagram 私訊 @jobus 官方帳號");
+                else alert("⚠️ 複製失敗，請手動截圖");
+            } catch (err) {
+                alert("⚠️ 複製失敗，請手動截圖");
+            }
+            
+            document.body.removeChild(textArea);
+        }
 
         // --- 遊戲循環 ---
         function loop() {
@@ -349,7 +416,7 @@
         }
 
         function drawSectionTitle(title, x, y, color='#fff') {
-            ctx.fillStyle = color; ctx.font = 'bold 18px "Noto Sans TC"'; ctx.textAlign = 'left'; ctx.fillText(title, x, y); return y + 30;
+            ctx.fillStyle = color; ctx.font = (isMobile ? 'bold 20px' : 'bold 22px') + ' "Noto Sans TC"'; ctx.textAlign = 'left'; ctx.fillText(title, x, y); return y + 35;
         }
 
         function drawBulletList(list, x, y, maxW, lh=24) {
@@ -390,23 +457,22 @@
             ctx.textAlign='right'; ctx.fillStyle='#00f3ff'; ctx.font='16px Orbitron'; ctx.fillText(`${curr}/${total}`, width-20, SAFE_TOP + 20);
         }
 
-        // --- LOBBY 繪製邏輯 (Visual Optimized) ---
+        // --- LOBBY 繪製邏輯 (Visual Optimized + Smart Pointer) ---
         let lobbyRot = 0;
         function drawLobby() {
             lobbyRot += 0.0005; const cx=width/2, cy=height/2;
+            // 🔧 平衡方案：中心微縮，讓出空間 (55 vs 80)
             const r = Math.min(width, height) * (isMobile ? 0.35 : 0.32);
             
-            drawCentralStar(cx, cy); // 瘦身後的核心
+            drawCentralStar(cx, cy); 
             
             ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1; ctx.stroke();
             
             lobbyNodes.forEach((node, i) => {
-                // 計算位置
                 const ang=(i/6)*Math.PI*2+lobbyRot; const nx=cx+Math.cos(ang)*r; const ny=cy+Math.sin(ang)*r;
                 const wx=(mouse.x-width/2)/camera.zoom+width/2+camera.x; const wy=(mouse.y-height/2)/camera.zoom+height/2+camera.y;
-                const hover=Math.hypot(wx-nx, wy-ny)<50; 
+                const hover=Math.hypot(wx-nx, wy-ny)<60; 
 
-                // 判斷狀態
                 const myOrder = journey.order.indexOf(node.id);
                 let state = 'LOCKED';
                 if (myOrder < journey.idx) state = 'DONE';
@@ -415,18 +481,38 @@
                 drawPlanetIcon(node, nx, ny, hover, state);
 
                 if(state === 'ACTIVE' && camera.zoom<2) {
-                    hitZones.push({t:'circle', x:nx, y:ny, r:50, action:()=>enterGame(node.id, nx, ny)});
+                    hitZones.push({t:'circle', x:nx, y:ny, r:60, action:()=>enterGame(node.id, nx, ny)});
                     
-                    // UI優化：使用跳動箭頭 ▼ 取代長文字
-                    const pR = isMobile ? 36 : 50; 
-                    const bounce = Math.sin(Date.now() * 0.005) * 5;
+                    // ✅ 智慧衛星導航 (Smart Orbit Pointer)
+                    const dist = isMobile ? 44 + 30 : 50 + 35; // 距離星球中心的距離
+                    let arrowAng = Math.atan2(ny - cy, nx - cx); // 計算星球相對於核心的角度
+
+                    // 判斷是否在下方 (Math.sin(arrowAng) > 0.5)
+                    const isBottom = Math.sin(arrowAng) > 0.5;
+                    let ax, ay, rot;
+                    
+                    if (isBottom) {
+                        // 下方擁擠：放在內側 (從中心往外指)
+                        ax = nx - Math.cos(arrowAng) * dist;
+                        ay = ny - Math.sin(arrowAng) * dist;
+                        rot = arrowAng + Math.PI/2; 
+                    } else {
+                        // 其他方位：放在外側 (從外往內指)
+                        ax = nx + Math.cos(arrowAng) * dist;
+                        ay = ny + Math.sin(arrowAng) * dist;
+                        rot = arrowAng - Math.PI/2; 
+                    }
+
+                    const bounce = Math.sin(Date.now() * 0.01) * 5;
                     ctx.save();
-                    ctx.translate(nx, ny - (pR + 20) + bounce);
+                    ctx.translate(ax + Math.cos(arrowAng)*bounce, ay + Math.sin(arrowAng)*bounce);
+                    ctx.rotate(rot); 
+                    ctx.beginPath();
+                    ctx.moveTo(0, 5); // 箭頭尖端
+                    ctx.lineTo(-6, -8);
+                    ctx.lineTo(6, -8);
                     ctx.fillStyle = '#ff0055';
-                    ctx.textAlign = 'center';
-                    ctx.font = 'bold 24px Arial'; 
-                    ctx.shadowColor = '#ff0055'; ctx.shadowBlur = 10;
-                    ctx.fillText("▼", 0, 0);
+                    ctx.fill();
                     ctx.restore();
                 }
             });
@@ -434,8 +520,8 @@
 
         function drawCentralStar(cx, cy) {
             const p = Math.sin(Date.now()*0.003)*10;
-            // 視覺瘦身：RWD 半徑調整
-            const baseR = isMobile ? 60 : 80; // 大幅縮小
+            // 🔧 平衡方案：中心微縮
+            const baseR = isMobile ? 55 : 80; 
             
             const g = ctx.createRadialGradient(cx, cy, 20, cx, cy, baseR+p); 
             g.addColorStop(0,'rgba(255,255,255,0.8)'); 
@@ -454,8 +540,8 @@
         
         function drawPlanetIcon(n, x, y, hover, state) {
             const scale = hover ? 1.1 : 1.0;
-            // 視覺瘦身：RWD 行星大小
-            const radius = isMobile ? 36 : 50; 
+            // 🔧 平衡方案：圖標顯著放大
+            const radius = isMobile ? 44 : 50; 
 
             ctx.save(); ctx.translate(x, y); ctx.scale(scale, scale);
             
@@ -468,7 +554,7 @@
             ctx.fillStyle='rgba(10,10,20,0.8)'; ctx.beginPath(); ctx.arc(0,0,radius,0,Math.PI*2); ctx.fill();
             ctx.shadowBlur=0; ctx.lineWidth=2; ctx.strokeStyle= state==='LOCKED' ? '#555' : n.color;
 
-            // Shape Logic (Scaled by radius)
+            // Shape Logic
             const rRatio = radius / 50; 
 
             if(n.type==='pentagon'){ 
@@ -525,11 +611,11 @@
 
             ctx.restore();
             
-            // UI優化：文字緊貼星球
             ctx.fillStyle = hover ? '#fff' : 'rgba(255,255,255,0.7)';
             if(state==='LOCKED') ctx.fillStyle = '#555';
             
-            const fontSize = isMobile ? '13px' : '16px';
+            // 🔧 平衡方案：文字放大
+            const fontSize = isMobile ? '15px' : '16px';
             const textOffset = radius + 15; 
             
             ctx.font = (hover ? 'bold ' : '') + fontSize + ' "Noto Sans TC"'; 
@@ -579,18 +665,15 @@
 
         // --- v1.0 REPORT GENERATOR ---
         function generateReport() {
-            // Helper: Find max key in scores
             const getMax = (scores) => {
                 let maxK=null, maxV=-999;
                 for(let k in scores) if(scores[k]>maxV){maxV=scores[k]; maxK=k;}
                 return maxK;
             };
 
-            // 1. Core (MBTI > Enn)
             const mbtiType = (gameSt.mbti.scores.ei<0?'E':'I')+(gameSt.mbti.scores.sn<0?'S':'N')+(gameSt.mbti.scores.tf<0?'T':'F')+(gameSt.mbti.scores.jp<0?'J':'P');
             const mbtiRes = mbtiData.results[mbtiType] || mbtiData.results['ISTJ'];
             
-            // 2. Projection (Animal > Color)
             const x=gameSt.animal.pos.x, y=gameSt.animal.pos.y;
             let aniRes=animalData.results['D']; 
             if(x>0 && y<=0) aniRes=animalData.results['I']; else if(x>0 && y>0) aniRes=animalData.results['S']; else if(x<=0 && y>0) aniRes=animalData.results['C'];
@@ -598,15 +681,11 @@
             const cId = gameSt.color.sel[0] ? gameSt.color.sel[0].id : 1;
             const colorRes = colorMeanings[cId];
 
-            // 3. Data Mapping
-            // Work: MBTI careerHint (or teamRole)
             const workText = mbtiRes.careerHint.join('、');
-            // Drain: Enneagram stress (or Big5 workRisk)
             let ennMax=-1, ennType=1; for(let i=1;i<=9;i++) if(gameSt.enn.scores[i]>ennMax){ennMax=gameSt.enn.scores[i];ennType=i;}
             const ennRes = ennData.results[ennType];
-            const drainText = ennRes.stress; // Short stress desc
+            const drainText = ennRes.stress; 
             
-            // Career: RIASEC + MBTI teamRole
             const riasecSorted = Object.entries(gameSt.riasec.scores).sort((a,b)=>b[1]-a[1]);
             const riasecCode = riasecSorted.slice(0,2).map(x=>x[0]).join('');
             const careerText = `適合結合「${riasecCode}」特質，在${mbtiRes.teamRole}的角色中發揮。`;
@@ -630,13 +709,10 @@
 
             ctx.fillStyle = 'rgba(0,0,0,0.95)'; ctx.fillRect(0,0,width,height);
             
-            // --- 1. 固定頂部 (Header) ---
             const headerH = 80;
             drawTitle("心理宇宙輪廓", cx, SAFE_TOP + 40, '#fff'); 
             
-            // --- 2. 滾動區域 (Scroll View) ---
-            // 計算可視區域：頂部標題下 ~ 底部按鈕上
-            const footerH = 140; // 按鈕區高度
+            const footerH = 140; 
             const scrollViewTop = SAFE_TOP + headerH;
             const scrollViewBottom = height - SAFE_BOTTOM - footerH;
             const scrollViewHeight = scrollViewBottom - scrollViewTop;
@@ -644,15 +720,13 @@
             ctx.save();
             ctx.beginPath();
             ctx.rect(0, scrollViewTop, width, scrollViewHeight);
-            ctx.clip(); // 裁切：只顯示在此區域
+            ctx.clip(); 
 
-            // 開始繪製內容 (套用滾動位移)
             let y = scrollViewTop + 20 - summaryScrollY;
-            const startY = y; // 紀錄起始點計算總高度
+            const startY = y; 
             const maxW = Math.min(width - 40, 500);
             const startX = cx - maxW/2;
 
-            // [Content A] 視覺結構 (Core vs Projection)
             const mbtiNode = lobbyNodes.find(n=>n.id==='MBTI');
             drawPlanetIcon(mbtiNode, cx, y+60, false, 'ACTIVE'); 
             
@@ -665,17 +739,23 @@
             ctx.save(); ctx.translate(cx+80, y+40); ctx.scale(0.7,0.7);
             drawPlanetIcon(colNode, 0, 0, false, 'ACTIVE'); ctx.restore();
             
+            // ✅ FIX: 文字下移與間距拉大
             ctx.fillStyle='#aaa'; ctx.font='12px "Noto Sans TC"'; ctx.textAlign='center';
-            ctx.fillText("核心", cx, y+130); ctx.fillText("投射", cx-80, y+100); ctx.fillText("投射", cx+80, y+100);
+            ctx.fillText("核心", cx, y+170); // 155 -> 170
+            ctx.fillText("投射", cx-80, y+140); // 125 -> 140
+            ctx.fillText("投射", cx+80, y+140); // 125 -> 140
             
-            y += 160;
+            y += 200; // 185 -> 200 (增加區塊高度)
 
-            // [Content B] 文字區塊
             const drawSection = (title, text, color) => {
-                ctx.fillStyle = color; ctx.font = 'bold 16px "Noto Sans TC"'; ctx.textAlign = 'left';
-                ctx.fillText(title, startX, y); y += 25;
-                ctx.fillStyle = '#ddd'; ctx.font = '14px "Noto Sans TC"'; 
-                y = wrapText(text, startX, y, maxW, 22) + 20;
+                ctx.fillStyle = color; 
+                ctx.font = (isMobile ? 'bold 20px' : 'bold 22px') + ' "Noto Sans TC"'; 
+                ctx.textAlign = 'left';
+                ctx.fillText(title, startX, y); y += 30; 
+                
+                ctx.fillStyle = '#ddd'; 
+                ctx.font = (isMobile ? '16px' : '18px') + ' "Noto Sans TC"';
+                y = wrapText(text, startX, y, maxW, 28) + 25; 
             };
 
             drawSection("✨ 一句話總結", report.oneLine, '#fff');
@@ -684,23 +764,29 @@
             drawSection("⚠️ 消耗你的情境", report.drain, '#ff6666');
             drawSection("🚀 職涯發展", report.career, '#ffff99');
             
-            y += 20; // Padding bottom
-            
-            // 計算內容總高度 (用於限制滾動)
+            y += 20; 
             summaryContentHeight = y - (scrollViewTop + 20 - summaryScrollY);
 
-            ctx.restore(); // 解除裁切
+            ctx.restore(); 
 
-            // --- 3. 固定底部 (Footer) ---
-            // 漸層底色防護罩
+            // Footer Background
             const g = ctx.createLinearGradient(0, height - footerH - 40, 0, height);
             g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(0.4, 'rgba(0,0,0,0.9)'); g.addColorStop(1, '#000');
             ctx.fillStyle = g; ctx.fillRect(0, height - footerH - 40, width, footerH + 40);
 
+            // Scroll Hint (Yellow)
+            if (summaryScrollY < 10 && summaryContentHeight > scrollViewHeight) {
+                const bounce = Math.sin(Date.now() * 0.005) * 5;
+                ctx.fillStyle = '#ffff99'; 
+                ctx.textAlign = 'center';
+                ctx.font = 'bold 14px "Noto Sans TC"';
+                ctx.fillText("▼ 直覺實驗室 解析 ▼", cx, height - footerH - 20 + bounce);
+            }
+
             const btnY = height - SAFE_BOTTOM - 60;
             drawBtn(cx, btnY - 70, "複製完整報告", '#00f3ff', () => {
                 const shareText = `【我的心理宇宙報告】\n${report.oneLine}\n\n🧠 結構：${report.raw.mbti.t} x ${report.raw.enn.t}\n🛠️ 工作：${report.work}\n⚠️ 消耗：${report.drain}\n\n#心理宇宙 #Jobus`;
-                navigator.clipboard.writeText(shareText).then(() => alert("報告已複製！請貼給朋友或小編。"));
+                copyToClipboard(shareText);
             }, 240);
             
             drawBtn(cx, btnY, "重新探索宇宙", '#555', () => {
