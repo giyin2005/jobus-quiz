@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>心理宇宙：Mindverse (Ultimate Release)</title>
+    <title>心理宇宙：Mindverse (Narrative Edition)</title>
     
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-3V80KBCWC1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-3V80KBCWC1');
     </script>
 
@@ -29,13 +28,11 @@
             -webkit-font-smoothing: antialiased;
             position: fixed;
         }
-
         canvas {
             display: block;
             outline: none;
             -webkit-tap-highlight-color: transparent;
         }
-        
         .font-preload { position: absolute; opacity: 0; pointer-events: none; }
     </style>
 </head>
@@ -46,8 +43,8 @@
 
     <script>
         /**
-         * 心理宇宙 Mindverse - Ultimate Release
-         * Features: Desktop Scroll, Smart Pointer, Layout Fixes, Robust Copy
+         * 心理宇宙 Mindverse - v1.0 Narrative Edition
+         * Features: Narrative FSM, Vector Pointers, Context-Aware Hints, Safe-Zone Typography
          */
 
         // --- 核心系統與變數 ---
@@ -79,6 +76,29 @@
         const SAFE_TOP = 50;
         const SAFE_BOTTOM = 40;
 
+        // --- Mindverse Narrative System (v1.0 Final) ---
+        
+        // 文案庫：開場 (Opening) - 隨機三選一
+        const openingTexts = [
+            "歡迎來到心理宇宙。\n每一次選擇，\n都在描繪你的性格軌道。",
+            "這裡沒有標準答案。\n只有你如何做出選擇。",
+            "旅程即將展開。\n從那顆正在呼吸的星球開始。"
+        ];
+
+        // 文案庫：狀態提示 (Hints) - 定型文
+        const WORLD_HINT = {
+            LOCKED: "這顆星球，\n還沒到你抵達的時間。",
+            DONE:   "你的旅程，\n會在正確的節奏中展開。"
+        };
+
+        // 世界訊息狀態機
+        let worldMsg = { 
+            state: 'IDLE', // IDLE | OPENING | HINT | FADE_OUT
+            text: '', 
+            alpha: 0, 
+            timer: 0 
+        };
+
         // --- 視覺風格 ---
         const styles = {
             bg: '#020205',
@@ -92,7 +112,7 @@
             }
         };
 
-        // --- 資料庫 (完整內容) ---
+        // --- 資料庫 (完整內容 - 保持不變) ---
         const big5Data = {
             qs: [
                 {t:"喜歡在聚會中認識新朋友", k:'E'}, {t:"對藝術和抽象概念感興趣", k:'O'}, {t:"做事通常會提前計劃", k:'C'}, {t:"容易感受到別人的情緒", k:'A'}, {t:"壓力大時容易感到焦慮", k:'N'},
@@ -183,13 +203,11 @@
                 'C': { t:"貓頭鷹 (分析型)", e:"🦉", oneLine:"精準嚴謹，邏輯的追求者。", commStyle:"講求證據，重視邏輯。", beMisunderstood:"常被覺得太龜毛或冷漠。", coopTips:["提出數據和事實","尊重他的標準"], selfAdjust:["練習接受不完美","多表達肯定"] }
             }
         };
-
         // --- 遊戲狀態管理 ---
         const journey = {
             order: ['BIG5', 'MBTI', 'ENNEAGRAM', 'RIASEC', 'ANIMAL', 'COLOR'],
             idx: 0
         };
-
         const lobbyNodes = [ { id: 'BIG5' }, { id: 'MBTI' }, { id: 'ENNEAGRAM' }, { id: 'RIASEC' }, { id: 'ANIMAL' }, { id: 'COLOR' } ];
         lobbyNodes.forEach(n => Object.assign(n, styles.nodes[n.id]));
 
@@ -201,7 +219,6 @@
             color: {phase:0, sel:[], auraT:0, done:false, sent:false}, 
             animal: {idx:0, pos:{x:0, y:0}, done:false, sent:false} 
         };
-
         function getGameStKey(id) {
             if (id === 'ENNEAGRAM') return 'enn';
             return id.toLowerCase();
@@ -221,6 +238,14 @@
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             isMobile = width < 768;
             initStars();
+
+            // v1.0 Narrative Opening Check
+            const hasVisited = localStorage.getItem('mindverse_visited');
+            if (!hasVisited) {
+                const rIdx = Math.floor(Math.random() * openingTexts.length);
+                triggerWorldMsg('OPENING', openingTexts[rIdx]);
+                localStorage.setItem('mindverse_visited', 'true');
+            }
         }
 
         const stars = []; const shootingStars = [];
@@ -235,7 +260,7 @@
 
         window.addEventListener("resize", () => setTimeout(init, 150));
         window.addEventListener('deviceorientation', (e) => { if(e.gamma && e.beta) { gyro.x = e.gamma * 2; gyro.y = (e.beta - 45) * 2; } });
-
+        
         // --- 輸入處理 & 滾動邏輯 ---
         const getPos = (e) => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
         const handleInput = (x, y, isClick) => {
@@ -272,7 +297,7 @@
             if(!found) document.body.style.cursor = 'default';
         };
 
-        // Scroll Event Listeners (Touch)
+        // Scroll Event Listeners
         canvas.addEventListener('touchstart', e => { 
             e.preventDefault(); 
             const p = getPos(e.touches[0]); 
@@ -280,7 +305,6 @@
             isDragging = true;
             handleInput(p.x, p.y, true); 
         }, {passive:false});
-
         canvas.addEventListener('touchmove', e => { 
             e.preventDefault(); 
             const p = getPos(e.touches[0]);
@@ -297,48 +321,10 @@
             
             handleInput(p.x, p.y, false); 
         }, {passive:false});
-
         canvas.addEventListener('touchend', () => { isDragging = false; mouse.down = false; });
-
-        // ✅ 新增：Desktop 滾動與滑鼠拖曳支援 (Mouse & Wheel)
-        canvas.addEventListener('mousedown', e => { 
-            const p = getPos(e); 
-            if (currentScene === 'SUMMARY') {
-                isDragging = true;
-                touchStartY = p.y; // 借用變數紀錄滑鼠位置
-            }
-            handleInput(p.x, p.y, true); 
-        });
-
-        canvas.addEventListener('mousemove', e => { 
-            const p = getPos(e); 
-            
-            if (currentScene === 'SUMMARY' && isDragging) {
-                const dy = p.y - touchStartY;
-                touchStartY = p.y;
-                summaryScrollY -= dy;
-                const viewH = height - SAFE_TOP - SAFE_BOTTOM - 150; 
-                const maxScroll = Math.max(0, summaryContentHeight - viewH + 50);
-                if(summaryScrollY < 0) summaryScrollY = 0;
-                if(summaryScrollY > maxScroll) summaryScrollY = maxScroll;
-            }
-            
-            handleInput(p.x, p.y, false); 
-        });
-
-        canvas.addEventListener('mouseup', () => { isDragging = false; mouse.down = false; });
-
-        canvas.addEventListener('wheel', e => {
-            if (currentScene === 'SUMMARY') {
-                e.preventDefault();
-                summaryScrollY += e.deltaY;
-                const viewH = height - SAFE_TOP - SAFE_BOTTOM - 150; 
-                const maxScroll = Math.max(0, summaryContentHeight - viewH + 50);
-                if(summaryScrollY < 0) summaryScrollY = 0;
-                if(summaryScrollY > maxScroll) summaryScrollY = maxScroll;
-            }
-        }, {passive:false});
-
+        canvas.addEventListener('mousemove', e => { const p=getPos(e); handleInput(p.x, p.y, false); });
+        canvas.addEventListener('mousedown', e => { const p=getPos(e); handleInput(p.x, p.y, true); });
+        canvas.addEventListener('mouseup', () => mouse.down=false);
 
         // --- 強力複製工具 (Robust Copy Tool) ---
         function copyToClipboard(text) {
@@ -362,7 +348,6 @@
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
-            
             try {
                 const successful = document.execCommand('copy');
                 if(successful) alert("✅ 已複製！請開啟 Instagram 私訊 @jobus 官方帳號");
@@ -370,8 +355,22 @@
             } catch (err) {
                 alert("⚠️ 複製失敗，請手動截圖");
             }
-            
             document.body.removeChild(textArea);
+        }
+
+        // --- Trigger World Message (FSM) ---
+        function triggerWorldMsg(newState, customText) {
+            // [Guard] 如果正處於開場序列，禁止任何打斷 (防呆)
+            if (worldMsg.state === 'OPENING') return;
+            
+            // 避免在淡出或已顯示時重複觸發
+            if(worldMsg.state !== 'IDLE' && worldMsg.state !== 'FADE_OUT') return;
+            
+            worldMsg.state = newState;
+            worldMsg.text = customText;
+            worldMsg.alpha = 0;
+            // Timer: FadeIn ~0.3s (20 frames) + Hold ~2s (120 frames)
+            worldMsg.timer = 140; 
         }
 
         // --- 遊戲循環 ---
@@ -380,16 +379,42 @@
             camera.x += (camera.targetX - camera.x)*0.05; camera.y += (camera.targetY - camera.y)*0.05;
             ctx.clearRect(0,0,width,height); hitZones=[];
             
+            // World Msg Update Logic (FSM)
+            if(currentScene === 'LOBBY') {
+                if(worldMsg.state === 'OPENING' || worldMsg.state === 'HINT') {
+                    // Fade In Phase
+                    if (worldMsg.alpha < 1 && worldMsg.timer > 120) {
+                        worldMsg.alpha += 0.05;
+                        if(worldMsg.alpha > 1) worldMsg.alpha = 1;
+                    }
+                    // Hold Phase
+                    worldMsg.timer--;
+                    if(worldMsg.timer <= 20) {
+                        worldMsg.state = 'FADE_OUT';
+                    }
+                } else if(worldMsg.state === 'FADE_OUT') {
+                    worldMsg.alpha -= 0.05;
+                    if(worldMsg.alpha <= 0) {
+                        worldMsg.alpha = 0;
+                        worldMsg.state = 'IDLE';
+                    }
+                }
+            }
+
             drawStars();
+            
             if(currentScene==='LOBBY'||currentScene==='TRANSITION') {
                 ctx.save(); ctx.translate(width/2, height/2);
                 ctx.scale(camera.zoom, camera.zoom); ctx.translate(-width/2-camera.x, -height/2-camera.y);
-                drawLobby(); ctx.restore();
-                if(camera.zoom < 1.5) {
-                    ctx.fillStyle='#ffffff';
-                    ctx.font='12px Orbitron'; ctx.textAlign='center';
-                    ctx.fillText("Copyright © JOBUS ASIA 2025-26", width/2, height-SAFE_BOTTOM/2);
-                }
+                
+                // Layer 3: Planets (受 Camera 影響)
+                drawLobbyPlanets(); 
+                
+                ctx.restore();
+                
+                // Layer 1 & 2: UI & World Msg (不受 Camera 影響)
+                if(currentScene === 'LOBBY') drawLobbyUI();
+
             } else if (currentScene === 'SUMMARY') {
                 drawSummary();
             } else {
@@ -409,24 +434,29 @@
             const chars = txt.split(''); let line = ''; let cy = y;
             for(let n=0; n<chars.length; n++) {
                 const test = line + chars[n];
-                if(ctx.measureText(test).width > maxW && n > 0) { ctx.fillText(line, x, cy); line = chars[n]; cy += lh; } else { line = test; }
+                if(ctx.measureText(test).width > maxW && n > 0) { ctx.fillText(line, x, cy); line = chars[n]; cy += lh;
+                } else { line = test; }
             }
             ctx.fillText(line, x, cy);
             return cy + lh; 
         }
 
         function drawSectionTitle(title, x, y, color='#fff') {
-            ctx.fillStyle = color; ctx.font = (isMobile ? 'bold 20px' : 'bold 22px') + ' "Noto Sans TC"'; ctx.textAlign = 'left'; ctx.fillText(title, x, y); return y + 35;
+            ctx.fillStyle = color;
+            ctx.font = (isMobile ? 'bold 20px' : 'bold 22px') + ' "Noto Sans TC"'; ctx.textAlign = 'left'; ctx.fillText(title, x, y);
+            return y + 35;
         }
 
         function drawBulletList(list, x, y, maxW, lh=24) {
-            ctx.textAlign = 'left'; ctx.font = '16px "Noto Sans TC"'; ctx.fillStyle = '#ddd'; let cy = y;
+            ctx.textAlign = 'left';
+            ctx.font = '16px "Noto Sans TC"'; ctx.fillStyle = '#ddd'; let cy = y;
             if(!list || list.length===0) return cy;
             list.forEach(item => {
                 const bullet = "• "; const chars = item.split(''); let line = bullet;
                 for(let n=0; n<chars.length; n++) {
                     const test = line + chars[n];
-                    if(ctx.measureText(test).width > maxW && n>0) { ctx.fillText(line, x, cy); line = "  " + chars[n]; cy += lh; } else { line = test; }
+                    if(ctx.measureText(test).width > maxW && n>0) 
+                    { ctx.fillText(line, x, cy); line = "  " + chars[n]; cy += lh; } else { line = test; }
                 }
                 ctx.fillText(line, x, cy); cy += lh * 1.2;
             });
@@ -438,127 +468,204 @@
             ctx.strokeStyle=hover?c:'#555'; ctx.lineWidth=2; ctx.fillStyle=hover?'rgba(255,255,255,0.12)':'rgba(30,30,30,0.85)';
             ctx.beginPath(); ctx.roundRect(x-w/2, y, w, h, 15); ctx.fill(); ctx.stroke();
             ctx.fillStyle=c; ctx.font='30px Orbitron'; ctx.textAlign='center'; ctx.fillText(t, x, y+45);
-            ctx.fillStyle='#fff'; ctx.font='20px "Noto Sans TC"'; wrapText(txt, x, y+85, w-40, 26);
+            ctx.fillStyle='#fff';
+            ctx.font='20px "Noto Sans TC"'; wrapText(txt, x, y+85, w-40, 26);
             hitZones.push({t:'rect', x:x-w/2, y:y, w:w, h:h, action:act});
         }
 
         function drawBtn(x, y, txt, color, act, w=200) {
-            const h=50; const hover = Math.abs(mouse.x - x) < w/2 && Math.abs(mouse.y - (y+h/2)) < h/2;
-            ctx.fillStyle=hover?'#fff':color; ctx.beginPath(); ctx.roundRect(x-w/2, y, w, h, 25); ctx.fill();
+            const h=50;
+            const hover = Math.abs(mouse.x - x) < w/2 && Math.abs(mouse.y - (y+h/2)) < h/2;
+            ctx.fillStyle=hover?'#fff':color; ctx.beginPath();
+            ctx.roundRect(x-w/2, y, w, h, 25); ctx.fill();
             ctx.fillStyle=hover?'#000':'#fff'; ctx.textAlign='center'; ctx.font='bold 18px "Noto Sans TC"'; ctx.fillText(txt, x, y+32);
             hitZones.push({t:'rect', x:x-w/2, y:y, w:w, h:h, action:act});
         }
 
         function drawTitle(txt, x, y, color) { 
-            ctx.textAlign='center'; ctx.fillStyle=color; ctx.font='bold 32px "Noto Sans TC"'; ctx.shadowColor=color; ctx.shadowBlur=20; ctx.fillText(txt, x, y); ctx.shadowBlur=0;
+            ctx.textAlign='center';
+            ctx.fillStyle=color; ctx.font='bold 32px "Noto Sans TC"'; ctx.shadowColor=color; ctx.shadowBlur=20; ctx.fillText(txt, x, y); ctx.shadowBlur=0;
         }
 
         function drawProgress(curr, total) { 
-            ctx.textAlign='right'; ctx.fillStyle='#00f3ff'; ctx.font='16px Orbitron'; ctx.fillText(`${curr}/${total}`, width-20, SAFE_TOP + 20);
+            ctx.textAlign='right';
+            ctx.fillStyle='#00f3ff'; ctx.font='16px Orbitron'; ctx.fillText(`${curr}/${total}`, width-20, SAFE_TOP + 20);
         }
 
-        // --- LOBBY 繪製邏輯 (Visual Optimized + Smart Pointer) ---
+        // --- LOBBY 繪製邏輯 (v1.0 Narrative Edition) ---
         let lobbyRot = 0;
-        function drawLobby() {
+        const WORLD_MSG_RADIUS = Math.min(window.visualViewport ? window.visualViewport.width : window.innerWidth, window.visualViewport ? window.visualViewport.height : window.innerHeight) * 0.18;
+        
+        function drawLobbyUI() {
+            // 1. Layer 1: Header (固定頂部)
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'alphabetic'; 
+            ctx.fillStyle = 'rgba(255,255,255,0.95)';
+            ctx.font = 'bold 24px "Noto Sans TC"'; 
+            ctx.fillText("心理宇宙 Mindverse", width/2, SAFE_TOP + 30);
+            
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.font = '14px "Noto Sans TC"';
+            ctx.fillText("探索你的性格軌道，而不是一張分數表", width/2, SAFE_TOP + 55);
+
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.font = '12px "Noto Sans TC"';
+            ctx.fillText("回答一系列簡短的直覺選擇", width/2, SAFE_TOP + 80);
+            ctx.fillText("看看你平常是用哪一套性格導航系統在做決定", width/2, SAFE_TOP + 98);
+
+            // 2. Layer 2: Central World Message (正中央 - Safe Zone)
+            if(worldMsg.alpha > 0) {
+                ctx.save();
+                
+                // 設定樣式：純白、無陰影、高可讀性
+                ctx.globalAlpha = worldMsg.alpha * 0.9; // Max alpha 0.9
+                ctx.fillStyle = '#FFFFFF';
+                // 字體大小控制
+                const msgFontSize = isMobile ? 15 : 16;
+                ctx.font = `400 ${msgFontSize}px "Noto Sans TC"`; 
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle'; 
+                ctx.shadowBlur = 0; 
+
+                // 多行處理邏輯
+                const lines = worldMsg.text.split('\n');
+                const lineHeight = 28; // 行距
+
+                lines.forEach((line, i) => {
+                    const yOffset = (i - (lines.length - 1) / 2) * lineHeight;
+                    ctx.fillText(line, width/2, height/2 + yOffset);
+                });
+
+                ctx.restore();
+            }
+
+            // 3. Footer (底部版權)
+            if(camera.zoom < 1.5) {
+                ctx.textBaseline = 'alphabetic';
+                ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                ctx.font = '12px Orbitron'; ctx.textAlign = 'center';
+                ctx.fillText("Copyright © JOBUS ASIA 2025-26", width/2, height - SAFE_BOTTOM/2);
+            }
+        }
+
+        function drawLobbyPlanets() {
             lobbyRot += 0.0005; const cx=width/2, cy=height/2;
-            // 🔧 平衡方案：中心微縮，讓出空間 (55 vs 80)
             const r = Math.min(width, height) * (isMobile ? 0.35 : 0.32);
             
-            drawCentralStar(cx, cy); 
+            // 軌道線
+            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.strokeStyle='rgba(255,255,255,0.05)';
+            ctx.lineWidth=1; ctx.stroke();
             
-            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1; ctx.stroke();
-            
+            // 心跳節奏 (僅用於 Active)
+            const pulse = (Math.sin(Date.now() * 0.003) + 1) / 2; // 0 ~ 1
+            const activeScale = 1.0 + pulse * 0.06; // 1.0 ~ 1.06
+            const activeGlow = 0.6 + pulse * 0.4; // 0.6 ~ 1.0
+
             lobbyNodes.forEach((node, i) => {
                 const ang=(i/6)*Math.PI*2+lobbyRot; const nx=cx+Math.cos(ang)*r; const ny=cy+Math.sin(ang)*r;
                 const wx=(mouse.x-width/2)/camera.zoom+width/2+camera.x; const wy=(mouse.y-height/2)/camera.zoom+height/2+camera.y;
-                const hover=Math.hypot(wx-nx, wy-ny)<60; 
+                const hover=Math.hypot(wx-nx, wy-ny)<60;
 
                 const myOrder = journey.order.indexOf(node.id);
+                
                 let state = 'LOCKED';
                 if (myOrder < journey.idx) state = 'DONE';
                 else if (myOrder === journey.idx) state = 'ACTIVE';
 
-                drawPlanetIcon(node, nx, ny, hover, state);
+                // 只有 Active 才有動畫參數
+                let currentScale = 1.0;
+                let currentGlow = 0;
+                
+                if (state === 'ACTIVE') {
+                    currentScale = activeScale;
+                    currentGlow = activeGlow;
+                }
 
-                if(state === 'ACTIVE' && camera.zoom<2) {
-                    hitZones.push({t:'circle', x:nx, y:ny, r:60, action:()=>enterGame(node.id, nx, ny)});
-                    
-                    // ✅ 智慧衛星導航 (Smart Orbit Pointer)
-                    const dist = isMobile ? 44 + 30 : 50 + 35; // 距離星球中心的距離
-                    let arrowAng = Math.atan2(ny - cy, nx - cx); // 計算星球相對於核心的角度
+                drawPlanetIcon(node, nx, ny, hover, state, currentScale, currentGlow);
 
-                    // 判斷是否在下方 (Math.sin(arrowAng) > 0.5)
-                    const isBottom = Math.sin(arrowAng) > 0.5;
-                    let ax, ay, rot;
-                    
-                    if (isBottom) {
-                        // 下方擁擠：放在內側 (從中心往外指)
-                        ax = nx - Math.cos(arrowAng) * dist;
-                        ay = ny - Math.sin(arrowAng) * dist;
-                        rot = arrowAng + Math.PI/2; 
-                    } else {
-                        // 其他方位：放在外側 (從外往內指)
-                        ax = nx + Math.cos(arrowAng) * dist;
-                        ay = ny + Math.sin(arrowAng) * dist;
-                        rot = arrowAng - Math.PI/2; 
+                // Interaction Logic
+                const touchR = 60;
+                if(state === 'ACTIVE') {
+                    if (camera.zoom < 2) {
+                        hitZones.push({t:'circle', x:nx, y:ny, r:touchR, action:()=>enterGame(node.id, nx, ny)});
+                        
+                        // --- Vector Pointer Logic ---
+                        // 1. 計算從星球指向中心的單位向量
+                        const dx = cx - nx;
+                        const dy = cy - ny;
+                        const dist = Math.hypot(dx, dy);
+                        const ux = dx / dist; // Unit X
+                        const uy = dy / dist; // Unit Y
+
+                        // 2. 位置：從星球中心往畫面中心延伸 (半徑 + 間距)
+                        const pOffset = (isMobile ? 44 : 50) + 12;
+                        const px = nx + ux * pOffset;
+                        const py = ny + uy * pOffset;
+
+                        // 3. 旋轉：三角形尖端指向中心
+                        // Math.atan2(dy, dx) 是指向中心的角度
+                        // 我們要畫 "▼"，它的尖端是朝下 (PI/2)
+                        // 所以需要旋轉 angle - PI/2
+                        const angle = Math.atan2(dy, dx);
+                        
+                        // 4. 呼吸動畫 (Scale only)
+                        const ptrScale = 1.0 + Math.sin(Date.now() * 0.003) * 0.08;
+
+                        ctx.save();
+                        ctx.translate(px, py);
+                        ctx.rotate(angle - Math.PI/2); // Align "down" triangle to vector
+                        ctx.scale(ptrScale, ptrScale);
+                        
+                        ctx.fillStyle = '#ff0055';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.font = 'bold 24px Arial';
+                        ctx.shadowColor = '#ff0055'; ctx.shadowBlur = 10;
+                        ctx.fillText("▼", 0, 0); // Triangle symbol
+                        ctx.restore();
                     }
-
-                    const bounce = Math.sin(Date.now() * 0.01) * 5;
-                    ctx.save();
-                    ctx.translate(ax + Math.cos(arrowAng)*bounce, ay + Math.sin(arrowAng)*bounce);
-                    ctx.rotate(rot); 
-                    ctx.beginPath();
-                    ctx.moveTo(0, 5); // 箭頭尖端
-                    ctx.lineTo(-6, -8);
-                    ctx.lineTo(6, -8);
-                    ctx.fillStyle = '#ff0055';
-                    ctx.fill();
-                    ctx.restore();
+                } else {
+                    // 非 Active 星球：觸發對應的世界提示
+                    hitZones.push({
+                        t:'circle', x:nx, y:ny, r:touchR, 
+                        action:() => {
+                            if (state === 'LOCKED') {
+                                triggerWorldMsg('HINT', WORLD_HINT.LOCKED);
+                            } else if (state === 'DONE') {
+                                triggerWorldMsg('HINT', WORLD_HINT.DONE);
+                            }
+                        }
+                    });
                 }
             });
         }
-
-        function drawCentralStar(cx, cy) {
-            const p = Math.sin(Date.now()*0.003)*10;
-            // 🔧 平衡方案：中心微縮
-            const baseR = isMobile ? 55 : 80; 
-            
-            const g = ctx.createRadialGradient(cx, cy, 20, cx, cy, baseR+p); 
-            g.addColorStop(0,'rgba(255,255,255,0.8)'); 
-            g.addColorStop(0.2,'#ff0055'); 
-            g.addColorStop(1,'transparent');
-            
-            ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx, cy, baseR+p, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle='#ff0055'; ctx.beginPath(); ctx.arc(cx, cy, 35, 0, Math.PI*2); ctx.fill();
-            
-            if(camera.zoom < 1.5) {
-                ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.shadowColor='rgba(0,0,0,0.5)'; ctx.shadowBlur=4; 
-                ctx.fillStyle='#fff'; ctx.font='900 24px "Noto Sans TC"'; ctx.fillText("心理宇宙", cx, cy-10); ctx.shadowBlur=0;
-                ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='700 10px Orbitron'; ctx.fillText("M I N D V E R S E", cx, cy+15); ctx.textBaseline='alphabetic';
-            }
-        }
         
-        function drawPlanetIcon(n, x, y, hover, state) {
-            const scale = hover ? 1.1 : 1.0;
-            // 🔧 平衡方案：圖標顯著放大
+        function drawPlanetIcon(n, x, y, hover, state, scaleMod, glowAlpha) {
+            const scale = (hover ? 1.1 : 1.0) * scaleMod;
             const radius = isMobile ? 44 : 50; 
 
             ctx.save(); ctx.translate(x, y); ctx.scale(scale, scale);
             
             let alpha = 1;
             if (state === 'LOCKED') alpha = 0.3;
-            else if (state === 'DONE') alpha = 0.6;
+            else if (state === 'DONE') alpha = 0.5;
+            // ACTIVE alpha remains 1
+
             ctx.globalAlpha = alpha;
 
-            if(hover && state === 'ACTIVE'){ctx.shadowColor=n.glow; ctx.shadowBlur=20;}
+            if(state === 'ACTIVE'){
+                ctx.shadowColor = n.glow;
+                ctx.shadowBlur = 20 * glowAlpha; // 呼吸 glow
+            }
+
             ctx.fillStyle='rgba(10,10,20,0.8)'; ctx.beginPath(); ctx.arc(0,0,radius,0,Math.PI*2); ctx.fill();
-            ctx.shadowBlur=0; ctx.lineWidth=2; ctx.strokeStyle= state==='LOCKED' ? '#555' : n.color;
+            ctx.shadowBlur=0; ctx.lineWidth=2;
+            ctx.strokeStyle= state==='LOCKED' ? '#555' : n.color;
 
-            // Shape Logic
-            const rRatio = radius / 50; 
-
+            // Shape Logic (Scaled by radius)
+            const rRatio = radius / 50;
             if(n.type==='pentagon'){ 
-                ctx.beginPath(); 
+                ctx.beginPath();
                 for(let i=0;i<5;i++){const a=(i/5)*Math.PI*2-Math.PI/2;ctx.lineTo(Math.cos(a)*35*rRatio,Math.sin(a)*35*rRatio);}
                 ctx.closePath();ctx.stroke(); 
                 ctx.lineWidth=1;
@@ -567,20 +674,20 @@
                 ctx.closePath();ctx.stroke();
             }
             else if(n.type==='hexagon'){ 
-                ctx.beginPath(); 
+                ctx.beginPath();
                 for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2;ctx.lineTo(Math.cos(a)*35*rRatio,Math.sin(a)*35*rRatio);}
                 ctx.closePath();ctx.stroke(); 
                 ctx.lineWidth=2;
                 ctx.beginPath();ctx.moveTo(0,-35*rRatio);ctx.lineTo(0,35*rRatio);ctx.stroke();
             }
             else if(n.type==='nonagon'){ 
-                ctx.beginPath(); 
+                ctx.beginPath();
                 for(let i=0;i<9;i++){const a=(i/9)*Math.PI*2-Math.PI/2;ctx.lineTo(Math.cos(a)*38*rRatio,Math.sin(a)*38*rRatio);}
                 ctx.closePath();ctx.stroke();
                 ctx.lineWidth=1;
                 ctx.beginPath();
                 for(let i=0;i<3;i++){const a=(i/3)*Math.PI*2-Math.PI/2;ctx.lineTo(Math.cos(a)*38*rRatio,Math.sin(a)*38*rRatio);}
-                ctx.closePath();ctx.stroke(); 
+                ctx.closePath();ctx.stroke();
             }
             else if(n.type==='radar'){ 
                 ctx.lineWidth=2;
@@ -593,14 +700,17 @@
                 ctx.beginPath();ctx.arc(10*rRatio,-5*rRatio,4*rRatio,0,Math.PI*2);ctx.fill();
             }
             else if(n.type==='rainbow'){ 
-                const gr=ctx.createLinearGradient(-35*rRatio,-35*rRatio,35*rRatio,35*rRatio); gr.addColorStop(0,'#f00');gr.addColorStop(0.2,'#ff0');gr.addColorStop(0.4,'#0f0');gr.addColorStop(0.6,'#0ff');gr.addColorStop(0.8,'#00f');gr.addColorStop(1,'#f0f');
+                const gr=ctx.createLinearGradient(-35*rRatio,-35*rRatio,35*rRatio,35*rRatio);
+                gr.addColorStop(0,'#f00');gr.addColorStop(0.2,'#ff0');gr.addColorStop(0.4,'#0f0');gr.addColorStop(0.6,'#0ff');gr.addColorStop(0.8,'#00f');gr.addColorStop(1,'#f0f');
                 ctx.fillStyle=gr;ctx.beginPath();ctx.arc(0,0,35*rRatio,0,Math.PI*2);ctx.fill();
             }
             else if(n.type==='core'){ 
-                ctx.fillStyle='#ff3333';ctx.beginPath();ctx.arc(0,0,35*rRatio,0,Math.PI*2);ctx.fill(); ctx.fillStyle='#ff6600';ctx.beginPath();ctx.arc(0,0,18*rRatio,0,Math.PI*2);ctx.fill();
+                ctx.fillStyle='#ff3333';ctx.beginPath();ctx.arc(0,0,35*rRatio,0,Math.PI*2);ctx.fill();
+                ctx.fillStyle='#ff6600';ctx.beginPath();ctx.arc(0,0,18*rRatio,0,Math.PI*2);ctx.fill();
             }
             
-            ctx.strokeStyle=n.color; ctx.lineWidth=1; ctx.globalAlpha=alpha*0.5; ctx.beginPath(); ctx.arc(0,0,radius,0,Math.PI*2); ctx.stroke(); 
+            ctx.strokeStyle=n.color;
+            ctx.lineWidth=1; ctx.globalAlpha=alpha*0.5; ctx.beginPath(); ctx.arc(0,0,radius,0,Math.PI*2); ctx.stroke(); 
             ctx.globalAlpha=alpha;
             
             if (state === 'DONE') {
@@ -614,24 +724,25 @@
             ctx.fillStyle = hover ? '#fff' : 'rgba(255,255,255,0.7)';
             if(state==='LOCKED') ctx.fillStyle = '#555';
             
-            // 🔧 平衡方案：文字放大
             const fontSize = isMobile ? '15px' : '16px';
             const textOffset = radius + 15; 
             
-            ctx.font = (hover ? 'bold ' : '') + fontSize + ' "Noto Sans TC"'; 
+            ctx.font = (hover ? 'bold ' : '') + fontSize + ' "Noto Sans TC"';
             ctx.textAlign='center'; 
             ctx.fillText(n.label, x, y + textOffset * scale + (isMobile?5:8)); 
             ctx.shadowBlur=0;
         }
 
         function drawStars() {
-            ctx.fillStyle = styles.bg; ctx.fillRect(0,0,width,height);
+            ctx.fillStyle = styles.bg;
+            ctx.fillRect(0,0,width,height);
             if(Math.random() < 0.03) shootingStars.push(new ShootingStar());
             stars.forEach(s => {
                 const offX = (mouse.x - width/2) * 0.02 * s.z + gyro.x; const offY = (mouse.y - height/2) * 0.02 * s.z + gyro.y;
                 ctx.fillStyle = `rgba(255,255,255,${s.alpha})`; ctx.beginPath(); ctx.arc(s.x + offX, s.y + offY, s.size, 0, Math.PI*2); ctx.fill();
             });
-            for(let i=shootingStars.length-1; i>=0; i--) { const s = shootingStars[i]; s.update(); s.draw(); if(!s.active) shootingStars.splice(i, 1); }
+            for(let i=shootingStars.length-1; i>=0; i--) { const s = shootingStars[i]; s.update(); s.draw(); if(!s.active) shootingStars.splice(i, 1);
+            }
         }
 
         // --- Transitions & Logic ---
@@ -639,7 +750,8 @@
             activeGameId = id;
             currentScene = 'TRANSITION';
             sendGAEvent('level_start', { level_name: id });
-            camera.targetZoom = 5; camera.targetX = targetX - width/2; camera.targetY = targetY - height/2;
+            camera.targetZoom = 5; camera.targetX = targetX - width/2;
+            camera.targetY = targetY - height/2;
             setTimeout(() => {
                 if(id==='BIG5') startBig5(); if(id==='MBTI') startMBTI(); if(id==='ENNEAGRAM') startEnneagram();
                 if(id==='RIASEC') startRIASEC(); if(id==='COLOR') startColorTest(); if(id==='ANIMAL') startAnimalTest();
@@ -658,34 +770,40 @@
             if (journey.idx >= journey.order.length) {
                 currentScene = 'SUMMARY';
             } else {
-                currentScene = 'LOBBY'; 
+                currentScene = 'LOBBY';
                 camera.zoom = 5; camera.targetZoom = 1; camera.x = 0; camera.y = 0; camera.targetX = 0; camera.targetY = 0;
             }
         }
 
         // --- v1.0 REPORT GENERATOR ---
         function generateReport() {
+            // Helper: Find max key in scores
             const getMax = (scores) => {
                 let maxK=null, maxV=-999;
                 for(let k in scores) if(scores[k]>maxV){maxV=scores[k]; maxK=k;}
                 return maxK;
             };
 
+            // 1. Core (MBTI > Enn)
             const mbtiType = (gameSt.mbti.scores.ei<0?'E':'I')+(gameSt.mbti.scores.sn<0?'S':'N')+(gameSt.mbti.scores.tf<0?'T':'F')+(gameSt.mbti.scores.jp<0?'J':'P');
             const mbtiRes = mbtiData.results[mbtiType] || mbtiData.results['ISTJ'];
             
+            // 2. Projection (Animal > Color)
             const x=gameSt.animal.pos.x, y=gameSt.animal.pos.y;
             let aniRes=animalData.results['D']; 
             if(x>0 && y<=0) aniRes=animalData.results['I']; else if(x>0 && y>0) aniRes=animalData.results['S']; else if(x<=0 && y>0) aniRes=animalData.results['C'];
-            
             const cId = gameSt.color.sel[0] ? gameSt.color.sel[0].id : 1;
             const colorRes = colorMeanings[cId];
-
+            // 3. Data Mapping
+            // Work: MBTI careerHint (or teamRole)
             const workText = mbtiRes.careerHint.join('、');
-            let ennMax=-1, ennType=1; for(let i=1;i<=9;i++) if(gameSt.enn.scores[i]>ennMax){ennMax=gameSt.enn.scores[i];ennType=i;}
+            // Drain: Enneagram stress (or Big5 workRisk)
+            let ennMax=-1, ennType=1;
+            for(let i=1;i<=9;i++) if(gameSt.enn.scores[i]>ennMax){ennMax=gameSt.enn.scores[i];ennType=i;}
             const ennRes = ennData.results[ennType];
-            const drainText = ennRes.stress; 
+            const drainText = ennRes.stress; // Short stress desc
             
+            // Career: RIASEC + MBTI teamRole
             const riasecSorted = Object.entries(gameSt.riasec.scores).sort((a,b)=>b[1]-a[1]);
             const riasecCode = riasecSorted.slice(0,2).map(x=>x[0]).join('');
             const careerText = `適合結合「${riasecCode}」特質，在${mbtiRes.teamRole}的角色中發揮。`;
@@ -708,11 +826,14 @@
             const report = generateReport();
 
             ctx.fillStyle = 'rgba(0,0,0,0.95)'; ctx.fillRect(0,0,width,height);
-            
+            // --- 1. 固定頂部 (Header) ---
             const headerH = 80;
             drawTitle("心理宇宙輪廓", cx, SAFE_TOP + 40, '#fff'); 
             
-            const footerH = 140; 
+            // --- 2. 滾動區域 (Scroll View) ---
+            // 計算可視區域：頂部標題下 ~ 底部按鈕上
+            const footerH = 140;
+            // 按鈕區高度
             const scrollViewTop = SAFE_TOP + headerH;
             const scrollViewBottom = height - SAFE_BOTTOM - footerH;
             const scrollViewHeight = scrollViewBottom - scrollViewTop;
@@ -720,42 +841,44 @@
             ctx.save();
             ctx.beginPath();
             ctx.rect(0, scrollViewTop, width, scrollViewHeight);
-            ctx.clip(); 
+            ctx.clip(); // 裁切：只顯示在此區域
 
+            // 開始繪製內容 (套用滾動位移)
             let y = scrollViewTop + 20 - summaryScrollY;
-            const startY = y; 
+            const startY = y; // 紀錄起始點計算總高度
             const maxW = Math.min(width - 40, 500);
             const startX = cx - maxW/2;
 
+            // [Content A] 視覺結構 (Core vs Projection)
             const mbtiNode = lobbyNodes.find(n=>n.id==='MBTI');
-            drawPlanetIcon(mbtiNode, cx, y+60, false, 'ACTIVE'); 
+            drawPlanetIcon(mbtiNode, cx, y+60, false, 'ACTIVE', 1.0, 0); 
             
             const aniNode = lobbyNodes.find(n=>n.id==='ANIMAL');
             const colNode = lobbyNodes.find(n=>n.id==='COLOR');
             
-            ctx.save(); ctx.translate(cx-80, y+40); ctx.scale(0.7,0.7); 
-            drawPlanetIcon(aniNode, 0, 0, false, 'ACTIVE'); ctx.restore();
+            ctx.save(); ctx.translate(cx-80, y+40); ctx.scale(0.7,0.7);
+            drawPlanetIcon(aniNode, 0, 0, false, 'ACTIVE', 1.0, 0); ctx.restore();
 
             ctx.save(); ctx.translate(cx+80, y+40); ctx.scale(0.7,0.7);
-            drawPlanetIcon(colNode, 0, 0, false, 'ACTIVE'); ctx.restore();
+            drawPlanetIcon(colNode, 0, 0, false, 'ACTIVE', 1.0, 0); ctx.restore();
             
-            // ✅ FIX: 文字下移與間距拉大
-            ctx.fillStyle='#aaa'; ctx.font='12px "Noto Sans TC"'; ctx.textAlign='center';
-            ctx.fillText("核心", cx, y+170); // 155 -> 170
-            ctx.fillText("投射", cx-80, y+140); // 125 -> 140
-            ctx.fillText("投射", cx+80, y+140); // 125 -> 140
+            ctx.fillStyle='#aaa';
+            ctx.font='12px "Noto Sans TC"'; ctx.textAlign='center';
+            ctx.fillText("核心", cx, y+130); ctx.fillText("投射", cx-80, y+100); ctx.fillText("投射", cx+80, y+100);
             
-            y += 200; // 185 -> 200 (增加區塊高度)
-
+            y += 160;
+            // [Content B] 文字區塊 (字體放大版)
             const drawSection = (title, text, color) => {
-                ctx.fillStyle = color; 
+                ctx.fillStyle = color;
                 ctx.font = (isMobile ? 'bold 20px' : 'bold 22px') + ' "Noto Sans TC"'; 
                 ctx.textAlign = 'left';
-                ctx.fillText(title, startX, y); y += 30; 
+                ctx.fillText(title, startX, y);
+                y += 30; // 標題間距
                 
-                ctx.fillStyle = '#ddd'; 
+                ctx.fillStyle = '#ddd';
                 ctx.font = (isMobile ? '16px' : '18px') + ' "Noto Sans TC"';
-                y = wrapText(text, startX, y, maxW, 28) + 25; 
+                // Line Height 28 for better reading
+                y = wrapText(text, startX, y, maxW, 28) + 25;
             };
 
             drawSection("✨ 一句話總結", report.oneLine, '#fff');
@@ -764,20 +887,21 @@
             drawSection("⚠️ 消耗你的情境", report.drain, '#ff6666');
             drawSection("🚀 職涯發展", report.career, '#ffff99');
             
-            y += 20; 
+            y += 20; // Padding bottom
+            
+            // 計算內容總高度 (用於限制滾動)
             summaryContentHeight = y - (scrollViewTop + 20 - summaryScrollY);
+            ctx.restore(); // 解除裁切
 
-            ctx.restore(); 
-
-            // Footer Background
+            // --- 3. 固定底部 (Footer) ---
+            // 漸層底色防護罩
             const g = ctx.createLinearGradient(0, height - footerH - 40, 0, height);
             g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(0.4, 'rgba(0,0,0,0.9)'); g.addColorStop(1, '#000');
             ctx.fillStyle = g; ctx.fillRect(0, height - footerH - 40, width, footerH + 40);
-
-            // Scroll Hint (Yellow)
+            // [New] 滾動提示 (Scroll Hint)
             if (summaryScrollY < 10 && summaryContentHeight > scrollViewHeight) {
                 const bounce = Math.sin(Date.now() * 0.005) * 5;
-                ctx.fillStyle = '#ffff99'; 
+                ctx.fillStyle = '#00f3ff';
                 ctx.textAlign = 'center';
                 ctx.font = 'bold 14px "Noto Sans TC"';
                 ctx.fillText("▼ 直覺實驗室 解析 ▼", cx, height - footerH - 20 + bounce);
@@ -786,9 +910,9 @@
             const btnY = height - SAFE_BOTTOM - 60;
             drawBtn(cx, btnY - 70, "複製完整報告", '#00f3ff', () => {
                 const shareText = `【我的心理宇宙報告】\n${report.oneLine}\n\n🧠 結構：${report.raw.mbti.t} x ${report.raw.enn.t}\n🛠️ 工作：${report.work}\n⚠️ 消耗：${report.drain}\n\n#心理宇宙 #Jobus`;
+                // 使用強力複製
                 copyToClipboard(shareText);
             }, 240);
-            
             drawBtn(cx, btnY, "重新探索宇宙", '#555', () => {
                 resetGame();
                 currentScene = 'LOBBY';
@@ -810,7 +934,8 @@
         }
 
         // --- 1. BIG 5 GAME ---
-        function startBig5() { gameSt.big5 = { idx:0, ans:3, scores:{O:0,C:0,E:0,A:0,N:0}, done:false, sent:false }; }
+        function startBig5() { gameSt.big5 = { idx:0, ans:3, scores:{O:0,C:0,E:0,A:0,N:0}, done:false, sent:false };
+        }
         function drawBig5() {
             const st = gameSt.big5;
             const cx = width/2, cy = height/2;
@@ -829,26 +954,34 @@
                     t:'rect', x:cx-sw/2-20, y:sy-30, w:sw+40, h:60,
                     action: (mx, my) => { const ratio = (mx - (cx - sw/2)) / sw; st.ans = Math.max(1, Math.min(5, Math.round(ratio*4+1))); }
                 });
-                for(let i=0; i<5; i++){ let tickX = (cx - sw/2) + (sw * (i/4)); ctx.beginPath(); ctx.arc(tickX, sy+3, 3, 0, Math.PI*2); ctx.fillStyle='#666'; ctx.fill(); }
+                for(let i=0; i<5; i++){ let tickX = (cx - sw/2) + (sw * (i/4)); ctx.beginPath(); ctx.arc(tickX, sy+3, 3, 0, Math.PI*2);
+                ctx.fillStyle='#666'; ctx.fill(); }
                 const options = ["不同意", "稍不同意", "普通", "稍同意", "同意"];
                 ctx.font = '12px "Noto Sans TC"'; ctx.fillStyle = '#aaa'; ctx.textAlign = 'center';
-                for(let i=0; i<5; i++){ let tickX = (cx - sw/2) + (sw * (i/4)); ctx.fillText(options[i], tickX, sy + 40); }
-                ctx.beginPath(); ctx.arc(hx, sy+3, 12, 0, Math.PI*2); ctx.fillStyle='#00f3ff'; ctx.fill();
+                for(let i=0; i<5; i++){ let tickX = (cx - sw/2) + (sw * (i/4)); ctx.fillText(options[i], tickX, sy + 40);
+                }
+                ctx.beginPath();
+                ctx.arc(hx, sy+3, 12, 0, Math.PI*2); ctx.fillStyle='#00f3ff'; ctx.fill();
                 drawBtn(cx, height-SAFE_BOTTOM-80, "下一題", styles.nodes.BIG5.color, () => {
                     const sc = st.ans - 3; st.scores[q.k] += q.rev ? -sc : sc;
                     if(st.idx < big5Data.qs.length-1) { st.idx++; st.ans=3; } else st.done = true;
                 });
             } else {
-                let maxK='O', maxV=-99; for(let k in st.scores) if(st.scores[k]>maxV) { maxV=st.scores[k]; maxK=k; }
+                let maxK='O', maxV=-99;
+                for(let k in st.scores) if(st.scores[k]>maxV) { maxV=st.scores[k]; maxK=k; }
                 const res = big5Data.results[maxK];
-                if(!st.sent) { sendGAEvent('level_end', { level_name: 'BIG5', result_id: maxK, success: true }); st.sent = true; }
+                if(!st.sent) { sendGAEvent('level_end', { level_name: 'BIG5', result_id: maxK, success: true }); st.sent = true;
+                }
                 drawTitle("分析完成", cx, SAFE_TOP + 40, styles.nodes.BIG5.color);
                 drawRadar(cx, SAFE_TOP + 120, 70, st.scores);
                 ctx.textAlign='center'; ctx.font='bold 28px "Noto Sans TC"'; ctx.fillStyle='#fff'; ctx.fillText(res.t, cx, SAFE_TOP + 220);
                 ctx.font='18px "Noto Sans TC"'; ctx.fillStyle='#ccc'; wrapText(res.oneLine, cx, SAFE_TOP + 250, width-40, 26);
-                let textY = SAFE_TOP + 290; const maxW = Math.min(width * 0.85, 500); const startX = cx - maxW/2;
-                textY = drawSectionTitle("【生活中的你】", startX, textY, '#00f3ff'); textY = wrapText(res.life, startX, textY, maxW, 24) + 15;
-                textY = drawSectionTitle("【工作優勢】", startX, textY, '#00f3ff'); textY = drawBulletList(res.workStrength, startX, textY, maxW);
+                let textY = SAFE_TOP + 290;
+                const maxW = Math.min(width * 0.85, 500); const startX = cx - maxW/2;
+                textY = drawSectionTitle("【生活中的你】", startX, textY, '#00f3ff');
+                textY = wrapText(res.life, startX, textY, maxW, 24) + 15;
+                textY = drawSectionTitle("【工作優勢】", startX, textY, '#00f3ff');
+                textY = drawBulletList(res.workStrength, startX, textY, maxW);
                 textY = drawSectionTitle("【盲點與風險】", startX, textY, '#ff6666'); textY = drawBulletList(res.workRisk, startX, textY, maxW);
                 drawBtn(cx, height-SAFE_BOTTOM-60, "返回旅程", 'rgba(255,255,255,0.2)', returnLobby);
             }
@@ -865,7 +998,8 @@
         }
 
         // --- 2. MBTI GAME ---
-        function startMBTI() { gameSt.mbti = { idx:0, scores:{ei:0,sn:0,tf:0,jp:0}, done:false, sent:false }; }
+        function startMBTI() { gameSt.mbti = { idx:0, scores:{ei:0,sn:0,tf:0,jp:0}, done:false, sent:false };
+        }
         function drawMBTI() {
             const st = gameSt.mbti;
             const cx = width/2, cy = height/2; ctx.fillStyle = '#1a0505'; ctx.fillRect(0,0,width,height);
@@ -873,7 +1007,8 @@
                 const q = mbtiData.qs[st.idx];
                 drawProgress(st.idx+1, mbtiData.qs.length);
                 drawTitle("RPG 職業測驗", cx, SAFE_TOP + 50, styles.nodes.MBTI.color);
-                ctx.fillStyle='#fff'; ctx.font='28px "Noto Sans TC"'; ctx.textAlign='center'; wrapText(q.q, cx, cy-80, Math.min(600, width-60), 40);
+                ctx.fillStyle='#fff'; ctx.font='28px "Noto Sans TC"'; ctx.textAlign='center';
+                wrapText(q.q, cx, cy-80, Math.min(600, width-60), 40);
                 if (isMobile) {
                     drawCard(cx, cy+20, width-60, 90, "A", q.a, '#ff3333', ()=>{ st.scores[q.d]-=q.v; nextMBTI(); });
                     drawCard(cx, cy+130, width-60, 90, "B", q.b, '#ff3333', ()=>{ st.scores[q.d]+=q.v; nextMBTI(); });
@@ -884,7 +1019,8 @@
             } else {
                 const type = (st.scores.ei<0?'E':'I')+(st.scores.sn<0?'S':'N')+(st.scores.tf<0?'T':'F')+(st.scores.jp<0?'J':'P');
                 const res = mbtiData.results[type] || mbtiData.results['ISTJ'];
-                if(!st.sent) { sendGAEvent('level_end', { level_name: 'MBTI', result_id: type, success: true }); st.sent = true; }
+                if(!st.sent) { sendGAEvent('level_end', { level_name: 'MBTI', result_id: type, success: true }); st.sent = true;
+                }
                 drawTitle(res.t + " " + res.e, cx, SAFE_TOP + 50, '#ffcc00');
                 ctx.font='20px Orbitron'; ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.fillText(type, cx, SAFE_TOP + 90);
                 ctx.font='18px "Noto Sans TC"'; ctx.fillStyle='#ccc'; ctx.fillText(res.oneLine, cx, SAFE_TOP + 120);
@@ -892,14 +1028,17 @@
                 textY = drawSectionTitle("【團隊角色】", startX, textY, '#ffcc00'); textY = wrapText(res.teamRole, startX, textY, maxW, 26) + 15;
                 textY = drawSectionTitle("【最在意的是】", startX, textY, '#ffcc00'); textY = wrapText(res.careMost, startX, textY, maxW, 26) + 15;
                 textY = drawSectionTitle("【合作小秘訣】", startX, textY, '#ff9999'); textY = drawBulletList(res.coopTips, startX, textY, maxW);
-                textY = drawSectionTitle("【職涯適配】", startX, textY, '#99ff99'); textY = drawBulletList(res.careerHint, startX, textY, maxW);
+                textY = drawSectionTitle("【職涯適配】", startX, textY, '#99ff99');
+                textY = drawBulletList(res.careerHint, startX, textY, maxW);
                 drawBtn(cx, height-SAFE_BOTTOM-60, "返回旅程", 'rgba(255,255,255,0.2)', returnLobby);
             }
         }
-        function nextMBTI() { if(gameSt.mbti.idx < mbtiData.qs.length-1) gameSt.mbti.idx++; else gameSt.mbti.done=true; }
+        function nextMBTI() { if(gameSt.mbti.idx < mbtiData.qs.length-1) gameSt.mbti.idx++;
+        else gameSt.mbti.done=true; }
 
         // --- 3. ENNEAGRAM GAME ---
-        function startEnneagram() { gameSt.enn = { idx:0, scores:new Array(10).fill(0), done:false, sent:false }; }
+        function startEnneagram() { gameSt.enn = { idx:0, scores:new Array(10).fill(0), done:false, sent:false };
+        }
         function drawEnneagram() {
             const st = gameSt.enn;
             const cx=width/2, cy=height/2;
@@ -913,23 +1052,31 @@
                 drawBtn(cx, cy+10, q.a, '#cd7f32', ()=>{ q.ta.forEach(x=>st.scores[x]++); nextEnn(); }, w);
                 drawBtn(cx, cy+90, q.b, '#555', ()=>{ q.tb.forEach(x=>st.scores[x]++); nextEnn(); }, w);
             } else {
-                let max = -1, type = 1; for(let i=1;i<=9;i++) if(st.scores[i]>max) { max=st.scores[i]; type=i; }
+                let max = -1, type = 1;
+                for(let i=1;i<=9;i++) if(st.scores[i]>max) { max=st.scores[i]; type=i; }
                 const res = ennData.results[type];
-                if(!st.sent) { sendGAEvent('level_end', { level_name: 'ENNEAGRAM', result_id: type, success: true }); st.sent = true; }
+                if(!st.sent) { sendGAEvent('level_end', { level_name: 'ENNEAGRAM', result_id: type, success: true }); st.sent = true;
+                }
                 drawTitle(res.t, cx, SAFE_TOP + 50, '#ffd700');
                 ctx.font='18px "Noto Sans TC"'; ctx.fillStyle='#ccc'; ctx.textAlign='center'; wrapText(res.oneLine, cx, SAFE_TOP + 90, width-40, 26);
-                let textY = SAFE_TOP + 140; const maxW = Math.min(width * 0.85, 520); const startX = cx - maxW/2;
-                textY = drawSectionTitle("【核心動機】", startX, textY, '#ffd700'); textY = wrapText(res.motive, startX, textY, maxW, 26) + 15;
-                textY = drawSectionTitle("【壓力反應】", startX, textY, '#ff6666'); textY = wrapText(res.stress, startX, textY, maxW, 26) + 15;
-                textY = drawSectionTitle("【工作優勢】", startX, textY, '#ffd700'); textY = drawBulletList(res.workStrength, startX, textY, maxW);
+                let textY = SAFE_TOP + 140;
+                const maxW = Math.min(width * 0.85, 520); const startX = cx - maxW/2;
+                textY = drawSectionTitle("【核心動機】", startX, textY, '#ffd700');
+                textY = wrapText(res.motive, startX, textY, maxW, 26) + 15;
+                textY = drawSectionTitle("【壓力反應】", startX, textY, '#ff6666');
+                textY = wrapText(res.stress, startX, textY, maxW, 26) + 15;
+                textY = drawSectionTitle("【工作優勢】", startX, textY, '#ffd700');
+                textY = drawBulletList(res.workStrength, startX, textY, maxW);
                 textY = drawSectionTitle("【成長建議】", startX, textY, '#66ff66'); textY = drawBulletList(res.growthTips, startX, textY, maxW);
                 drawBtn(cx, height-SAFE_BOTTOM-60, "返回旅程", 'rgba(255,255,255,0.2)', returnLobby);
             }
         }
-        function nextEnn() { if(gameSt.enn.idx < ennData.qs.length-1) gameSt.enn.idx++; else gameSt.enn.done=true; }
+        function nextEnn() { if(gameSt.enn.idx < ennData.qs.length-1) gameSt.enn.idx++;
+        else gameSt.enn.done=true; }
 
         // --- 4. RIASEC GAME ---
-        function startRIASEC() { gameSt.riasec = { idx:0, scores:{R:0,I:0,A:0,S:0,E:0,C:0}, done:false, sent:false }; }
+        function startRIASEC() { gameSt.riasec = { idx:0, scores:{R:0,I:0,A:0,S:0,E:0,C:0}, done:false, sent:false };
+        }
         function drawRIASEC() {
             const st = gameSt.riasec;
             const cx=width/2, cy=height/2; ctx.fillStyle='#001a1a'; ctx.fillRect(0,0,width,height);
@@ -944,22 +1091,27 @@
                 const sorted = Object.entries(st.scores).sort((a,b)=>b[1]-a[1]);
                 const code = sorted.slice(0,3).map(x=>x[0]).join('-');
                 const top3 = sorted.slice(0,3);
-                if(!st.sent) { sendGAEvent('level_end', { level_name: 'RIASEC', result_id: code, success: true }); st.sent = true; }
+                if(!st.sent) { sendGAEvent('level_end', { level_name: 'RIASEC', result_id: code, success: true });
+                st.sent = true; }
                 drawHexagon(cx, SAFE_TOP + 100, 60, st.scores);
                 ctx.fillStyle='#00ffcc'; ctx.font='bold 40px Orbitron'; ctx.textAlign='center'; ctx.fillText(code, cx, SAFE_TOP + 210);
-                let textY = SAFE_TOP + 250; const maxW = Math.min(width * 0.85, 520); const startX = cx - maxW/2;
+                let textY = SAFE_TOP + 250;
+                const maxW = Math.min(width * 0.85, 520); const startX = cx - maxW/2;
                 top3.forEach(item => {
                     const data = riasecData.results[item[0]];
                     textY = drawSectionTitle(data.name, startX, textY, '#00ffcc');
                     textY = wrapText(data.oneLine, startX, textY, maxW, 24) + 5;
-                    textY = drawBulletList(data.workEnv, startX, textY, maxW, 22);
+                    textY = 
+                    drawBulletList(data.workEnv, startX, textY, maxW, 22);
                 });
                 drawBtn(cx, height-SAFE_BOTTOM-60, "返回旅程", 'rgba(255,255,255,0.2)', returnLobby);
             }
         }
-        function nextRIASEC() { if(gameSt.riasec.idx < riasecData.qs.length-1) gameSt.riasec.idx++; else gameSt.riasec.done=true; }
+        function nextRIASEC() { if(gameSt.riasec.idx < riasecData.qs.length-1) gameSt.riasec.idx++;
+        else gameSt.riasec.done=true; }
         function drawHexagon(cx, cy, r, scores) {
-            ctx.strokeStyle='#00ffcc'; ctx.lineWidth=1; ctx.beginPath();
+            ctx.strokeStyle='#00ffcc';
+            ctx.lineWidth=1; ctx.beginPath();
             for(let i=0;i<6;i++) { const a=i/6*Math.PI*2-Math.PI/2; ctx[i===0?'moveTo':'lineTo'](cx+Math.cos(a)*r, cy+Math.sin(a)*r); } ctx.closePath(); ctx.stroke();
             const keys=['R','I','A','S','E','C']; ctx.fillStyle='rgba(0,255,204,0.3)'; ctx.beginPath();
             for(let i=0;i<6;i++) { const v=Math.min(scores[keys[i]]||0, 3)/3*r; const a=i/6*Math.PI*2-Math.PI/2; ctx[i===0?'moveTo':'lineTo'](cx+Math.cos(a)*v, cy+Math.sin(a)*v); } ctx.closePath(); ctx.fill();
@@ -967,8 +1119,9 @@
             for(let i=0;i<6;i++) { const a=i/6*Math.PI*2-Math.PI/2; ctx.fillText(keys[i], cx+Math.cos(a)*(r+15), cy+Math.sin(a)*(r+15)+5); }
         }
 
-        // --- 5. COLOR GAME (BUG FIX INCLUDED) ---
-        function startColorTest() { gameSt.color = { phase:0, sel:[], auraT:0, done:false, sent:false }; }
+        // --- 5. COLOR GAME ---
+        function startColorTest() { gameSt.color = { phase:0, sel:[], auraT:0, done:false, sent:false };
+        }
         function drawColorTest() {
             const st = gameSt.color;
             const cx=width/2, cy=height/2; ctx.fillStyle='#111'; ctx.fillRect(0,0,width,height);
@@ -977,7 +1130,8 @@
                 let txt = "直覺選擇最吸引你的顏色";
                 if(st.phase===1) txt = "選擇第二吸引你的顏色";
                 if(st.phase===2) txt = "選擇最不喜歡的顏色";
-                ctx.fillStyle='#fff'; ctx.font='22px "Noto Sans TC"'; ctx.textAlign='center'; wrapText(txt, cx, cy-150, width-60, 30);
+                ctx.fillStyle='#fff'; ctx.font='22px "Noto Sans TC"'; ctx.textAlign='center';
+                wrapText(txt, cx, cy-150, width-60, 30);
                 const palette = [{id:1,c:'#A9A9A9'},{id:2,c:'#0000FF'},{id:3,c:'#008000'},{id:4,c:'#FF0000'},{id:5,c:'#FFFF00'},{id:6,c:'#800080'},{id:7,c:'#8B4513'},{id:8,c:'#333333'}];
                 palette.forEach((c,i)=>{
                     if(st.sel.find(s=>s.id===c.id)) return;
@@ -988,7 +1142,7 @@
                         action:()=>{ 
                             st.sel.push(c); 
                             st.phase++; 
-                            if(st.phase===3) st.done = true; // FIX: Mark done immediately
+                            if(st.phase===3) st.done = true; 
                         }
                     });
                 });
@@ -998,21 +1152,26 @@
                 const d=Math.sin(st.auraT)*10; 
                 let g=ctx.createRadialGradient(cx,SAFE_TOP+100,20,cx,SAFE_TOP+100,120+d); g.addColorStop(0,c1.c); g.addColorStop(1,'transparent');
                 ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,SAFE_TOP+100,120+d,0,Math.PI*2); ctx.fill();
-                if(!st.sent) { sendGAEvent('level_end', { level_name: 'COLOR', result_id: colorMeanings[c1.id].label, success: true }); st.sent = true; }
+                if(!st.sent) { sendGAEvent('level_end', { level_name: 'COLOR', result_id: colorMeanings[c1.id].label, success: true }); st.sent = true;
+                }
                 drawTitle("你的心靈光譜", cx, SAFE_TOP + 50, '#fff');
                 let textY = SAFE_TOP + 200; const maxW = Math.min(width * 0.85, 520); const startX = cx - maxW/2;
                 const d1 = colorMeanings[c1.id];
-                textY = drawSectionTitle(`顯性渴望 (${d1.label})`, startX, textY, c1.c); textY = wrapText(d1.want, startX, textY, maxW, 26) + 5; textY = wrapText(d1.state, startX, textY, maxW, 26) + 15;
+                textY = drawSectionTitle(`顯性渴望 (${d1.label})`, startX, textY, c1.c); textY = wrapText(d1.want, startX, textY, maxW, 26) + 5;
+                textY = wrapText(d1.state, startX, textY, maxW, 26) + 15;
                 const d2 = colorMeanings[c2.id];
-                textY = drawSectionTitle(`次要動力 (${d2.label})`, startX, textY, c2.c); textY = wrapText(d2.want, startX, textY, maxW, 26) + 15;
-                textY = drawSectionTitle(`自我照顧建議`, startX, textY, '#fff'); textY = drawBulletList(d1.selfCare, startX, textY, maxW);
+                textY = drawSectionTitle(`次要動力 (${d2.label})`, startX, textY, c2.c);
+                textY = wrapText(d2.want, startX, textY, maxW, 26) + 15;
+                textY = drawSectionTitle(`自我照顧建議`, startX, textY, '#fff');
+                textY = drawBulletList(d1.selfCare, startX, textY, maxW);
                 ctx.fillStyle='#666'; ctx.font='14px "Noto Sans TC"'; ctx.textAlign='center'; ctx.fillText("*此結果反映你近期的心理狀態", cx, textY + 20);
                 drawBtn(cx, height-SAFE_BOTTOM-60, "返回旅程", 'rgba(255,255,255,0.2)', returnLobby);
             }
         }
 
         // --- 6. ANIMAL GAME ---
-        function startAnimalTest() { gameSt.animal = { idx:0, pos:{x:0, y:0}, done:false, sent:false }; }
+        function startAnimalTest() { gameSt.animal = { idx:0, pos:{x:0, y:0}, done:false, sent:false };
+        }
         function drawAnimalTest() {
             const st = gameSt.animal;
             const cx=width/2, cy=height/2; ctx.fillStyle='#051105'; ctx.fillRect(0,0,width,height);
@@ -1031,18 +1190,24 @@
             } else {
                 const x=st.pos.x, y=st.pos.y;
                 let res=animalData.results['D']; if(x>0 && y<=0) res=animalData.results['I']; else if(x>0 && y>0) res=animalData.results['S']; else if(x<=0 && y>0) res=animalData.results['C'];
-                if(!st.sent) { sendGAEvent('level_end', { level_name: 'ANIMAL', result_id: res.t, success: true }); st.sent = true; }
+                if(!st.sent) { sendGAEvent('level_end', { level_name: 'ANIMAL', result_id: res.t, success: true }); st.sent = true;
+                }
                 drawTitle(res.t + " " + res.e, cx, SAFE_TOP + 50, '#adff2f');
                 ctx.font='18px "Noto Sans TC"'; ctx.fillStyle='#ccc'; ctx.textAlign='center'; wrapText(res.oneLine, cx, SAFE_TOP + 90, width-40, 26);
-                let textY = SAFE_TOP + 140; const maxW = Math.min(width * 0.85, 520); const startX = cx - maxW/2;
-                textY = drawSectionTitle("【溝通風格】", startX, textY, '#adff2f'); textY = wrapText(res.commStyle, startX, textY, maxW, 26) + 15;
-                textY = drawSectionTitle("【容易被誤會】", startX, textY, '#ff6666'); textY = wrapText(res.beMisunderstood, startX, textY, maxW, 26) + 15;
-                textY = drawSectionTitle("【合作小撇步】", startX, textY, '#adff2f'); textY = drawBulletList(res.coopTips, startX, textY, maxW);
+                let textY = SAFE_TOP + 140;
+                const maxW = Math.min(width * 0.85, 520); const startX = cx - maxW/2;
+                textY = drawSectionTitle("【溝通風格】", startX, textY, '#adff2f');
+                textY = wrapText(res.commStyle, startX, textY, maxW, 26) + 15;
+                textY = drawSectionTitle("【容易被誤會】", startX, textY, '#ff6666');
+                textY = wrapText(res.beMisunderstood, startX, textY, maxW, 26) + 15;
+                textY = drawSectionTitle("【合作小撇步】", startX, textY, '#adff2f');
+                textY = drawBulletList(res.coopTips, startX, textY, maxW);
                 textY = drawSectionTitle("【自我調整】", startX, textY, '#ffff99'); textY = drawBulletList(res.selfAdjust, startX, textY, maxW);
                 drawBtn(cx, height-SAFE_BOTTOM-60, "返回旅程", 'rgba(255,255,255,0.2)', returnLobby);
             }
         }
-        function nextAnimal() { if(gameSt.animal.idx<animalData.qs.length-1) gameSt.animal.idx++; else gameSt.animal.done=true; }
+        function nextAnimal() { if(gameSt.animal.idx<animalData.qs.length-1) gameSt.animal.idx++;
+        else gameSt.animal.done=true; }
 
         init(); loop();
     </script>
