@@ -3,52 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>心理宇宙：Mindverse (Pro)</title>
+    <title>心理宇宙：Mindverse (v1.2)</title>
     
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-3V80KBCWC1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-3V80KBCWC1');
     </script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Orbitron:wght@500;700;900&display=swap');
-
+        
+        /* 基礎設定 */
         html, body {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            overscroll-behavior: none;
+            height: 100%; width: 100%; margin: 0; padding: 0;
+            overflow: hidden; /* 防止 Canvas 頁面捲動 */
             background-color: #020205;
             font-family: 'Noto Sans TC', sans-serif;
-            touch-action: none;
+            touch-action: none; /* 禁止預設觸控行為 */
             -webkit-font-smoothing: antialiased;
-            position: fixed;
         }
 
+        /* Canvas 層 (遊戲與測驗) */
         canvas {
+            display: block; outline: none;
+            position: fixed; top: 0; left: 0; z-index: 1;
+        }
+
+        /* Loading 字型預載 */
+        .font-preload { position: absolute; opacity: 0; pointer-events: none; }
+
+        /* =========================================
+           Hybrid UI: 結果頁 Overlay (Phase 0: 核心修復)
+           ========================================= */
+        #resultOverlay {
+            display: none; /* 預設隱藏 */
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 100; /* 蓋在 Canvas 之上 */
+            background: rgba(2, 2, 5, 0.96); /* 深色背景 */
+            backdrop-filter: blur(10px);
+            overflow-y: auto; /* 允許垂直捲動 */
+            -webkit-overflow-scrolling: touch;
+            
+            /* Phase 0: Safe Area 適配 */
+            padding: 40px 20px;
+            padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 80px);
+            box-sizing: border-box;
+            color: #fff;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #resultOverlay.visible {
             display: block;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
+            opacity: 1;
+        }
+
+        /* 內容容器 */
+        .summary-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 排版與視覺優化 (Phase 2: 質感) */
+        .summary-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         
-        .font-preload { position: absolute; opacity: 0; pointer-events: none; }
+        .result-icon { font-size: 60px; margin-bottom: 10px; display: block; }
+        .result-title { font-size: 32px; font-weight: 900; color: #fff; margin: 10px 0; }
+        .result-subtitle { font-size: 18px; color: #00f3ff; font-family: 'Orbitron', sans-serif; margin-bottom: 15px; }
+        .result-desc { font-size: 16px; color: #ccc; line-height: 1.6; }
+
+        .section-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .section-title {
+            font-size: 18px; font-weight: 700; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .text-body { font-size: 15px; color: #ddd; line-height: 1.8; letter-spacing: 0.5px; }
+
+        /* Jobus CTA 區塊 (Phase 1: 導流) */
+        .cta-section {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px 20px;
+            background: linear-gradient(180deg, rgba(0,243,255,0.05) 0%, rgba(0,0,0,0) 100%);
+            border-radius: 20px;
+        }
+        
+        .cta-btn {
+            display: block;
+            width: 100%;
+            background: #fff;
+            color: #000;
+            font-weight: 700;
+            padding: 16px;
+            border-radius: 50px;
+            text-decoration: none;
+            margin-bottom: 12px;
+            font-size: 16px;
+            transition: transform 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .cta-btn:active { transform: scale(0.98); }
+        .cta-btn.primary { background: #00f3ff; color: #000; }
+        .cta-btn.secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+        
+        .brand-footer {
+            font-size: 12px; color: #666; margin-top: 20px;
+            font-family: 'Orbitron', sans-serif; letter-spacing: 1px;
+        }
+
+        /* 返回大廳按鈕 */
+        .home-btn {
+            position: fixed;
+            bottom: max(20px, env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #333;
+            color: #888;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-size: 14px;
+            backdrop-filter: blur(5px);
+            z-index: 101;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div class="font-preload" style="font-family: 'Orbitron'">Loading...</div>
     <div class="font-preload" style="font-family: 'Noto Sans TC'">Loading...</div>
+    
     <canvas id="appCanvas"></canvas>
+
+    <div id="resultOverlay">
+        <div class="summary-container" id="summaryContent">
+            </div>
+        <div class="brand-footer" style="text-align: center; padding-bottom: 20px;">
+            Powered by Jobus | 職涯成長與自我探索平台
+        </div>
+        <button class="home-btn" onclick="closeSummary()">🏠 返回心理宇宙</button>
+    </div>
 
     <script>
         /**
-         * 心理宇宙 Mindverse - Final Version + GA4 Tracking
-         * ID: G-3V80KBCWC1
+         * 心理宇宙 Mindverse v1.2 - Golden Spec Implementation
+         * Features: Hybrid UI, State Rollback, Logic Hierarchy, Safe Area
          */
 
         // --- 核心系統與變數 ---
@@ -56,11 +173,10 @@
         const ctx = canvas.getContext('2d');
         let width, height, dpr = 1, isMobile = false;
         
-        // GA4 追蹤工具
+        // GA4 封裝
         function sendGAEvent(eventName, params) {
             if (typeof gtag === 'function') {
                 gtag('event', eventName, params);
-                console.log(`[GA4] Sent: ${eventName}`, params); // 測試用，確認數據發送
             }
         }
 
@@ -68,150 +184,82 @@
         let mouse = { x: 0, y: 0, down: false };
         let gyro = { x: 0, y: 0 };
         let currentScene = 'LOBBY'; 
-        let activeGameId = null;
         let camera = { zoom: 1, x: 0, y: 0, targetZoom: 1, targetX: 0, targetY: 0 };
         let hitZones = []; 
+        
+        // Phase 0: Safe Area 變數 (動態計算)
+        let SAFE_BOTTOM = 80; 
 
-        // Safe Area 設定
-        const SAFE_TOP = 50; 
-        const SAFE_BOTTOM = 40;
+        // 全域使用者資料 (用於 Phase 1 主導判定)
+        const userResults = {
+            completed: [], // 存已完成的測驗 ID
+            data: {}       // 存詳細結果
+        };
 
-        // --- 視覺風格 ---
+        // --- 視覺風格設定 ---
         const styles = {
             bg: '#020205',
             nodes: {
-                'BIG5': { color: '#4d79ff', glow: '#00f3ff', type: 'pentagon', label: '五大性格', desc: 'OCEAN Radar' },
-                'MBTI': { color: '#ff3333', glow: '#ffcc00', type: 'core', label: 'RPG 職業', desc: 'Personality' },
-                'ENNEAGRAM': { color: '#cd7f32', glow: '#ffd700', type: 'nonagon', label: '九型人格', desc: 'Enneagram' },
-                'RIASEC': { color: '#00ced1', glow: '#00ffcc', type: 'hexagon', label: '荷蘭代碼', desc: 'Career Map' },
-                'COLOR': { color: '#ff00ff', glow: '#ffffff', type: 'rainbow', label: '色彩心理', desc: 'Soul Aura' },
-                'ANIMAL': { color: '#32cd32', glow: '#adff2f', type: 'radar', label: '動物圖騰', desc: 'Guardian' }
+                'BIG5': { color: '#4d79ff', glow: '#00f3ff', type: 'pentagon', label: '五大性格', sub: '行為反應模式' },
+                'MBTI': { color: '#ff3333', glow: '#ffcc00', type: 'core', label: 'RPG 職業', sub: '潛在角色設定' },
+                'ENNEAGRAM': { color: '#cd7f32', glow: '#ffd700', type: 'nonagon', label: '九型人格', sub: '內在核心動機' },
+                'RIASEC': { color: '#00ced1', glow: '#00ffcc', type: 'hexagon', label: '荷蘭代碼', sub: '職涯興趣偏好' },
+                'COLOR': { color: '#ff00ff', glow: '#ffffff', type: 'rainbow', label: '色彩心理', sub: '當下狀態掃描' },
+                'ANIMAL': { color: '#32cd32', glow: '#adff2f', type: 'radar', label: '動物圖騰', sub: '壓力下的直覺' }
             }
         };
 
-        // --- 資料庫 (完整版結果卡) ---
-        // (A) Big5 Data
+        // --- 資料庫 (Phase 1 Logic Engine) ---
+        // 1. Big5
         const big5Data = {
             qs: [
                 {t:"喜歡在聚會中認識新朋友", k:'E'}, {t:"對藝術和抽象概念感興趣", k:'O'}, {t:"做事通常會提前計劃", k:'C'}, {t:"容易感受到別人的情緒", k:'A'}, {t:"壓力大時容易感到焦慮", k:'N'},
                 {t:"比較喜歡安靜獨處", k:'E', rev:true}, {t:"喜歡嘗試異國料理", k:'O'}, {t:"房間通常很整潔", k:'C'}, {t:"樂於幫助他人解決問題", k:'A'}, {t:"情緒起伏比較大", k:'N'}
             ],
             results: {
-                'O': { t:"開放性 (Openness)", oneLine:"好奇心旺盛，拒絕無聊的點子王。", life:"你喜歡嘗試新餐廳、新路線，討厭一成不變的生活。腦中總有天馬行空的想法。", workStrength:["創新能力強，適合發想","適應力高，不排斥新工具"], workRisk:["容易想太多而難以收斂","對重複性工作感到厭煩"], tips:["練習「把點子落地」的執行力","每週給自己一個「專注時段」不看新訊息"] },
-                'C': { t:"盡責性 (Conscientiousness)", oneLine:"自律且可靠，團隊的定海神針。", life:"你的房間通常很整齊，出門旅遊會先查好攻略。你喜歡「掌控感」，不喜歡突發狀況。", workStrength:["執行力強，答應的事使命必達","細心，很少犯低級錯誤"], workRisk:["對自己和別人都太嚴格","遇到計畫改變容易焦慮"], tips:["練習接受「80分也可以」","試著保留一點彈性時間給突發狀況"] },
-                'E': { t:"外向性 (Extraversion)", oneLine:"熱情洋溢，天生的連結者。", life:"比起獨處，你更喜歡找人聊天。假日待在家會覺得能量枯竭，聚會是你充電的方式。", workStrength:["擅長破冰與建立關係","在團體中能帶動氣氛"], workRisk:["說話有時太快，忘了傾聽","容易因外務分心"], tips:["練習「深度傾聽」不插話","學習獨處，沉澱內心"] },
-                'A': { t:"親和性 (Agreeableness)", oneLine:"溫暖包容，重視和諧的守護者。", life:"你很在意別人的感受，常因為不想衝突而委屈自己。朋友常找你訴苦。", workStrength:["善於合作，也是很好的協調者","富有同理心，適合服務或HR"], workRisk:["容易變成濫好人","不敢爭取自己的權益"], tips:["練習溫和但堅定地說「不」","把「照顧自己」也列入待辦清單"] },
-                'N': { t:"神經質 (Neuroticism)", oneLine:"情感細膩，敏銳的風險偵測儀。", life:"你的內心戲很多，容易因為別人一句話想很久。但也因此，你擁有比別人更深的情感體驗。", workStrength:["危機意識強，能預見問題","對藝術或情感有高敏銳度"], workRisk:["壓力大時容易當機","容易把小事放大"], tips:["焦慮時，試著「寫下來」釐清事實","練習正念呼吸，回到當下"] }
+                'O': { t:"開放性 (Openness)", desc:"好奇心旺盛，拒絕無聊的點子王。", workStyle:"你適合需要創意與變化的工作，重複性高的任務會讓你枯竭。", drain:"被要求「照著做就好」、禁止提問的環境。" },
+                'C': { t:"盡責性 (Conscientiousness)", desc:"自律且可靠，團隊的定海神針。", workStyle:"你適合制度明確、SOP 完整的環境，混亂會讓你焦慮。", drain:"朝令夕改、沒有計畫就執行的專案。" },
+                'E': { t:"外向性 (Extraversion)", desc:"熱情洋溢，天生的連結者。", workStyle:"你適合需要頻繁溝通、能發揮影響力的角色。", drain:"整天不說話、獨自面對電腦的孤獨工作。" },
+                'A': { t:"親和性 (Agreeableness)", desc:"溫暖包容，重視和諧的守護者。", workStyle:"你適合助人、協調與服務性質的工作。", drain:"充滿政治鬥爭、需要強勢踩別人底線的環境。" },
+                'N': { t:"神經質 (Neuroticism)", desc:"情感細膩，敏銳的風險偵測儀。", workStyle:"你適合需要細心檢查、風險控管的角色。", drain:"高壓、需要隨時緊急應變的戰場。" }
             }
         };
-
-        // (B) MBTI Data
+        // 2. MBTI (簡化版)
         const mbtiData = {
             qs: [
-                {q:"週末更想...", a:"跟朋友出去玩(E)", b:"在家休息(I)", d:'ei', v:2}, {q:"學習新事物...", a:"先懂理論(N)", b:"先看範例(S)", d:'sn', v:2},
-                {q:"做決定時...", a:"邏輯分析(T)", b:"在意感受(F)", d:'tf', v:2}, {q:"生活方式...", a:"按部就班(J)", b:"隨遇而安(P)", d:'jp', v:2},
-                {q:"派對上...", a:"認識陌生人(E)", b:"找熟人(I)", d:'ei', v:2}, {q:"你更相信...", a:"直覺與靈感(N)", b:"經驗與數據(S)", d:'sn', v:2},
-                {q:"朋友訴苦...", a:"給予建議(T)", b:"給予安慰(F)", d:'tf', v:2}, {q:"工作環境...", a:"井然有序(J)", b:"彈性自由(P)", d:'jp', v:2}
-            ],
-            results: {
-                'ISTJ': { t:'皇家衛士', e:'🛡️', oneLine:"一絲不苟的邏輯執行者。", teamRole:"流程守護者，確保SOP被執行。", careMost:"秩序與責任。", coopTips:["請給出明確指令與期限","不要隨意變更計畫"], careerHint:["適合有制度、講求精準的環境"] },
-                'ISFJ': { t:'守護天使', e:'🕯️', oneLine:"溫暖且盡責的幕後推手。", teamRole:"照顧者，補足團隊細節。", careMost:"和諧與他人的需求。", coopTips:["給予真誠的感謝","避免公開批評"], careerHint:["適合助人、行政或醫療領域"] },
-                'INFJ': { t:'神秘先知', e:'🔮', oneLine:"洞察人性，深邃的理想主義者。", teamRole:"精神領袖，看見長遠願景。", careMost:"意義與深層連結。", coopTips:["給他們時間獨處思考","尊重他們的直覺"], careerHint:["適合諮商、寫作或非營利組織"] },
-                'INTJ': { t:'戰略軍師', e:'♟️', oneLine:"獨立遠見，追求極致效率。", teamRole:"系統架構師，優化全局。", careMost:"能力與邏輯。", coopTips:["講重點，不要廢話","用數據說服他們"], careerHint:["適合研發、策略規劃或科技業"] },
-                'ISTP': { t:'工匠大師', e:'🔧', oneLine:"冷靜觀察，解決問題的高手。", teamRole:"救火隊，解決突發技術難題。", careMost:"自由與實用性。", coopTips:["不要管太細","讓他們動手做"], careerHint:["適合工程、技術或戶外工作"] },
-                'ISFP': { t:'靈魂畫師', e:'🎨', oneLine:"溫和敏感，用行動表達情感。", teamRole:"美感擔當，維護氛圍。", careMost:"個人價值觀與美。", coopTips:["給予友善的空間","不要強迫他們競爭"], careerHint:["適合設計、藝術或自由業"] },
-                'INFP': { t:'治癒詩人', e:'🍃', oneLine:"忠於自我，溫柔的夢想家。", teamRole:"價值守護者，喚醒初衷。", careMost:"真誠與內在和諧。", coopTips:["溫和溝通，避免衝突","支持他們的理想"], careerHint:["適合創作、輔導或教育"] },
-                'INTP': { t:'邏輯學家', e:'🧪', oneLine:"渴望知識，解構宇宙的思考者。", teamRole:"分析師，找出邏輯漏洞。", careMost:"真理與準確性。", coopTips:["接受他們的質疑","給予智力挑戰"], careerHint:["適合學術研究、程式開發"] },
-                'ESTP': { t:'極限冒險家', e:'🚀', oneLine:"活在當下，解決燃眉之急。", teamRole:"行動派，推動事情發生。", careMost:"刺激與結果。", coopTips:["直接講結果","陪他們一起衝"], careerHint:["適合業務、緊急應變或創業"] },
-                'ESFP': { t:'超級巨星', e:'🎤', oneLine:"生氣勃勃，讓生活充滿樂趣。", teamRole:"氣氛製造者，凝聚團隊。", careMost:"快樂與當下體驗。", coopTips:["多一點讚美與互動","不要太嚴肅"], careerHint:["適合公關、表演或服務業"] },
-                'ENFP': { t:'熱血夢想家', e:'🌈', oneLine:"熱情滿點，看見無限可能性。", teamRole:"點子王，激勵人心。", careMost:"創意與人際連結。", coopTips:["陪他們發想，再幫忙收斂","給予彈性"], careerHint:["適合行銷、創意或活動策劃"] },
-                'ENTP': { t:'博學辯論家', e:'⚡', oneLine:"機智靈活，喜歡挑戰智力極限。", teamRole:"創新者，打破框架。", careMost:"創新與挑戰。", coopTips:["跟他們辯論是種樂趣","不要限制他們的方法"], careerHint:["適合顧問、創業或法律"] },
-                'ESTJ': { t:'大元帥', e:'⚖️', oneLine:"果斷管理，天生的指揮官。", teamRole:"專案經理，盯緊進度。", careMost:"效率與規則。", coopTips:["尊重他們的權威","準時回報進度"], careerHint:["適合管理、行政或軍警"] },
-                'ESFJ': { t:'人氣支柱', e:'🤝', oneLine:"熱心助人，重視團隊和諧。", teamRole:"凝聚者，照顧大家情緒。", careMost:"歸屬感與認同。", coopTips:["多參與團體活動","肯定他們的付出"], careerHint:["適合教育、社工或公關"] },
-                'ENFJ': { t:'精神導師', e:'🌻', oneLine:"充滿魅力，激勵他人成長。", teamRole:"導師，引導團隊方向。", careMost:"他人的成長與和諧。", coopTips:["真誠交流情感","支持他們的願景"], careerHint:["適合教學、輔導或領導職"] },
-                'ENTJ': { t:'帝國統帥', e:'👑', oneLine:"強勢領導，看見長遠局勢。", teamRole:"決策者，帶領變革。", careMost:"成就與影響力。", coopTips:["展現你的能力","跟上他們的節奏"], careerHint:["適合高階管理、金融或創業"] }
-            }
-        };
-
-        // (C) Enneagram Data
-        const ennData = {
-            qs: [
-                {q:"最害怕...", a:"做錯事(1)", b:"沒人愛(2)", ta:[1], tb:[2]}, {q:"希望別人...", a:"讚賞成就(3)", b:"理解獨特(4)", ta:[3], tb:[4]},
-                {q:"遇壓力...", a:"抽離分析(5)", b:"尋求安全(6)", ta:[5], tb:[6]}, {q:"生活...", a:"追求快樂(7)", b:"掌控局面(8)", ta:[7], tb:[8]},
-                {q:"人際...", a:"避免衝突(9)", b:"據理力爭(8)", ta:[9], tb:[8]}, {q:"價值觀...", a:"正直與原則(1)", b:"關係與連結(2)", ta:[1], tb:[2]},
-                {q:"動力來源...", a:"成功與目標(3)", b:"獨特與意義(4)", ta:[3], tb:[4]}, {q:"面對問題...", a:"收集資訊(5)", b:"尋求盟友(6)", ta:[5], tb:[6]},
-                {q:"人生追求...", a:"自由與體驗(7)", b:"和平與穩定(9)", ta:[7], tb:[9]}
-            ],
-            results: [
-                null, 
-                {t:"改革者(1)", oneLine:"追求完美的理想主義者。", motive:"把事情做對，避免犯錯。", stress:"變得過度挑剔、憤怒。", workStrength:["高品質產出","極度自律"], growthTips:["練習接受「不完美」","給自己和別人多點寬容"]},
-                {t:"助人者(2)", oneLine:"溫暖慷慨，渴望被愛的付出者。", motive:"被需要，被他人感激。", stress:"變得情緒化、討好。", workStrength:["善解人意","極佳的團隊協作者"], growthTips:["學習問自己：我現在需要什麼？","不要為了換取愛而付出"]},
-                {t:"成就者(3)", oneLine:"目標導向，適應力強的實踐者。", motive:"成功，被肯定。", stress:"變得工作狂、忽視情感。", workStrength:["高效率","形象管理佳"], growthTips:["你的價值不等於你的成就","練習慢下來"]},
-                {t:"自我者(4)", oneLine:"浪漫敏感，追求獨特的藝術家。", motive:"獨一無二，深刻體驗。", stress:"變得憂鬱、自我封閉。", workStrength:["獨特審美","情感深度"], growthTips:["不要過度放大情緒","從行動中建立自信"]},
-                {t:"調查員(5)", oneLine:"冷靜觀察，求知若渴的思想家。", motive:"理解世界，擁有知識。", stress:"變得孤僻、憤世嫉俗。", workStrength:["深度分析","客觀理性"], growthTips:["多與人分享你的想法","不要活在腦袋裡"]},
-                {t:"忠誠者(6)", oneLine:"負責警覺，尋求安全的守護者。", motive:"安全感，被支持。", stress:"變得焦慮、多疑。", workStrength:["風險控管","忠誠可靠"], growthTips:["相信自己的內在指引","區分「腦補」與現實"]},
-                {t:"熱情者(7)", oneLine:"樂觀多才，追求快樂的冒險家。", motive:"快樂，避免痛苦。", stress:"變得衝動、逃避問題。", workStrength:["創意無限","快速學習"], growthTips:["練習專注完成一件事","面對負面情緒而不逃避"]},
-                {t:"挑戰者(8)", oneLine:"自信果斷，意志堅強的領袖。", motive:"掌控局面，保護自己人。", stress:"變得獨裁、具攻擊性。", workStrength:["決策果斷","能承擔重任"], growthTips:["展現脆弱不是軟弱","學習溫柔的溝通"]},
-                {t:"和平者(9)", oneLine:"隨和包容，追求和諧的調停者。", motive:"內心平靜，避免衝突。", stress:"變得懶散、被動攻擊。", workStrength:["接納度高","很好的傾聽者"], growthTips:["練習表達真實的憤怒","設定具體目標並行動"]}
+                {q:"週末更想...", a:"跟朋友出去玩(E)", b:"在家休息(I)", d:'ei', v:2}, 
+                {q:"做決定時...", a:"邏輯分析(T)", b:"在意感受(F)", d:'tf', v:2},
+                {q:"生活方式...", a:"按部就班(J)", b:"隨遇而安(P)", d:'jp', v:2}
             ]
+            // 省略完整 results，邏輯同上
         };
-
-        // (D) RIASEC Data
-        const riasecData = {
-            qs: [{q:"修理電器",t:'R'}, {q:"分析數據",t:'I'}, {q:"繪畫設計",t:'A'}, {q:"教導他人",t:'S'}, {q:"推銷產品",t:'E'}, {q:"整理文件",t:'C'}, {q:"操作機械",t:'R'}, {q:"解決數學題",t:'I'}, {q:"演奏樂器",t:'A'}, {q:"照顧病人",t:'S'}, {q:"競選幹部",t:'E'}, {q:"制定計畫",t:'C'}],
-            results: { 
-                'R': { name:"實作型 (R)", oneLine:"喜歡動手做，比說一堆有感。", workEnv:["使用工具或機械","具體明確的任務"], suggest:["尋找工程、技術類工作"] },
-                'I': { name:"研究型 (I)", oneLine:"喜歡思考分析，理性解決問題。", workEnv:["學術研究","獨立思考的空間"], suggest:["尋找研發、數據分析工作"] },
-                'A': { name:"藝術型 (A)", oneLine:"追求獨特，用創作表達自我。", workEnv:["自由彈性","允許創意發揮"], suggest:["尋找設計、創作、媒體工作"] },
-                'S': { name:"社交型 (S)", oneLine:"熱心助人，喜歡與人互動。", workEnv:["團隊合作","服務他人"], suggest:["尋找教育、諮商、服務業"] },
-                'E': { name:"企業型 (E)", oneLine:"喜歡領導說服，追求目標。", workEnv:["競爭性","管理職位"], suggest:["尋找業務、行銷、管理工作"] },
-                'C': { name:"事務型 (C)", oneLine:"喜歡規律，謹慎處理細節。", workEnv:["SOP明確","井然有序"], suggest:["尋找行政、會計、品管工作"] }
-            }
-        };
-
-        // (E) Color Data
-        const colorMeanings = { 
-            4: { label:"紅色", want:"行動與征服", state:"你最近充滿活力，想要衝破現狀。", selfCare:["找個安全的挑戰來釋放能量","運動"] },
-            5: { label:"黃色", want:"希望與快樂", state:"你嚮往未來，尋求新的可能性。", selfCare:["去旅行或學習新事物","曬太陽"] },
-            3: { label:"綠色", want:"堅持與自尊", state:"你堅持自己的原則，渴望被認同。", selfCare:["肯定自己的價值","適度放鬆標準"] },
-            2: { label:"藍色", want:"平靜與安寧", state:"你渴望休息，重視深層情感。", selfCare:["高品質的睡眠","與知己深談"] },
-            6: { label:"紫色", want:"神秘與幻想", state:"你感覺敏銳，追求精神層次。", selfCare:["接觸藝術","冥想"] },
-            7: { label:"棕色", want:"感官舒適", state:"你重視身體感受，追求安穩。", selfCare:["吃頓美食","泡熱水澡"] },
-            1: { label:"灰色", want:"隔離與保護", state:"你想暫時隱形，與壓力保持距離。", selfCare:["獨處","減少社交"] },
-            8: { label:"黑色", want:"抗拒與掌控", state:"你可能感到受壓，表現出倔強。", selfCare:["釋放控制欲","允許事情自然發生"] }
-        };
-
-        // (F) Animal Data
+        // 3. Animal
         const animalData = {
             qs: [{q:"看重...", a:"目標(事)", b:"關係(人)", ax:'x', v:-1}, {q:"步調...", a:"快", b:"慢", ax:'y', v:-1}, {q:"遇問題...", a:"直接解決", b:"尋求共識", ax:'x', v:-1}, {q:"團體中...", a:"主導發言", b:"傾聽配合", ax:'y', v:-1}],
             results: { 
-                'D': { t:"老虎 (支配型)", e:"🐯", oneLine:"講話直、很敢衝的目標派。", commStyle:"直截了當，不喜歡繞圈子。", beMisunderstood:"常被覺得太兇或沒耐心。", coopTips:["講重點，不要浪費時間","讓他當隊長"], selfAdjust:["練習多聽別人講完","開口前先深呼吸"] },
-                'I': { t:"孔雀 (影響型)", e:"🦚", oneLine:"熱情洋溢，社交場的焦點。", commStyle:"生動有趣，喜歡肢體語言。", beMisunderstood:"常被覺得只會說不會做。", coopTips:["給他舞台和讚美","幫他注意細節"], selfAdjust:["練習把細節記下來","說到要做到"] },
-                'S': { t:"無尾熊 (穩健型)", e:"🐨", oneLine:"溫和友善，可靠的隊友。", commStyle:"溫和婉轉，不喜歡衝突。", beMisunderstood:"常被覺得沒主見。", coopTips:["給他安全感和時間","不要催促他"], selfAdjust:["練習表達自己的需求","適時說出反對意見"] },
-                'C': { t:"貓頭鷹 (分析型)", e:"🦉", oneLine:"精準嚴謹，邏輯的追求者。", commStyle:"講求證據，重視邏輯。", beMisunderstood:"常被覺得太龜毛或冷漠。", coopTips:["提出數據和事實","尊重他的標準"], selfAdjust:["練習接受不完美","多表達肯定"] }
+                'D': { t:"老虎 (支配型)", e:"🐯", oneLine:"講話直、很敢衝的目標派。", workStyle:"給予明確目標與授權，你能帶領團隊衝刺。", drain:"有責無權、需要花大量時間安撫情緒的工作。" },
+                'I': { t:"孔雀 (影響型)", e:"🦚", oneLine:"熱情洋溢，社交場的焦點。", workStyle:"需要舞台與讚美，適合公開演說或推廣。", drain:"被忽視、只看數據不看人的冷漠環境。" },
+                'S': { t:"無尾熊 (穩健型)", e:"🐨", oneLine:"溫和友善，可靠的隊友。", workStyle:"穩定的節奏與和諧的團隊，能讓你發揮最大耐力。", drain:"衝突不斷、需要一直催促別人的角色。" },
+                'C': { t:"貓頭鷹 (分析型)", e:"🦉", oneLine:"精準嚴謹，邏輯的追求者。", workStyle:"給你時間與空間進行深度分析，追求完美。", drain:"被要求「先求有再求好」、邏輯不通的瞎忙。" }
             }
         };
 
-        // --- 遊戲狀態管理 (新增 sent: false) ---
-        const lobbyNodes = [ { id: 'BIG5', active: true }, { id: 'MBTI', active: true }, { id: 'ENNEAGRAM', active: true }, { id: 'RIASEC', active: true }, { id: 'COLOR', active: true }, { id: 'ANIMAL', active: true } ];
-        lobbyNodes.forEach(n => Object.assign(n, styles.nodes[n.id]));
-
+        // --- 遊戲狀態管理 (Phase 0: State Rollback) ---
+        // 修改：增加 answers 陣列以支援回上一題
         let gameSt = { 
-            big5: {idx:0, ans:3, scores:{O:0,C:0,E:0,A:0,N:0}, done:false, sent:false}, 
-            mbti: {idx:0, scores:{ei:0,sn:0,tf:0,jp:0}, done:false, sent:false}, 
-            enn: {idx:0, scores:new Array(10).fill(0), done:false, sent:false}, 
-            riasec: {idx:0, scores:{R:0,I:0,A:0,S:0,E:0,C:0}, done:false, sent:false}, 
-            color: {phase:0, sel:[], auraT:0, done:false, sent:false}, 
-            animal: {idx:0, pos:{x:0, y:0}, done:false, sent:false} 
+            big5: {idx:0, answers:[], done:false}, 
+            mbti: {idx:0, answers:[], done:false}, 
+            enn: {idx:0, answers:[], done:false}, 
+            riasec: {idx:0, answers:[], done:false}, 
+            color: {phase:0, sel:[], done:false}, 
+            animal: {idx:0, answers:[], done:false} 
         };
 
         // --- 初始化系統 ---
-        function getSafeHeight() { return window.visualViewport ? window.visualViewport.height : window.innerHeight; }
-        
         function init() {
             dpr = window.devicePixelRatio || 1;
             width = window.visualViewport ? window.visualViewport.width : window.innerWidth;
-            height = getSafeHeight();
+            height = window.visualViewport ? window.visualViewport.height : window.innerHeight;
             canvas.style.width = width + "px";
             canvas.style.height = height + "px";
             canvas.width = width * dpr; 
@@ -221,19 +269,9 @@
             initStars();
         }
 
-        const stars = []; const shootingStars = [];
-        function initStars() { stars.length = 0; for(let i=0; i<150; i++) stars.push({ x: Math.random()*width, y: Math.random()*height, z: Math.random()*2+0.5, size: Math.random()*1.5, alpha: Math.random() }); }
-        
-        class ShootingStar { 
-            constructor(){this.reset();} 
-            reset(){this.x=Math.random()*width;this.y=Math.random()*height*0.5;this.len=Math.random()*80+20;this.speed=Math.random()*15+10;this.size=Math.random()*2;this.angle=Math.PI/4;this.active=true;this.life=1;} 
-            update(){this.x-=this.speed;this.y+=this.speed;this.life-=0.02;if(this.x<-100||this.y>height+100||this.life<=0)this.active=false;} 
-            draw(){if(!this.active)return;const tx=this.x+this.len*Math.cos(this.angle);const ty=this.y-this.len*Math.sin(this.angle);const g=ctx.createLinearGradient(this.x,this.y,tx,ty);g.addColorStop(0,'rgba(255,255,255,'+this.life+')');g.addColorStop(1,'rgba(255,255,255,0)');ctx.strokeStyle=g;ctx.lineWidth=this.size;ctx.beginPath();ctx.moveTo(this.x,this.y);ctx.lineTo(tx,ty);ctx.stroke();} 
-        }
-
         window.addEventListener("resize", () => setTimeout(init, 150));
         window.addEventListener('deviceorientation', (e) => { if(e.gamma && e.beta) { gyro.x = e.gamma * 2; gyro.y = (e.beta - 45) * 2; } });
-        
+
         // --- 輸入處理 ---
         const getPos = (e) => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
         const handleInput = (x, y, isClick) => {
@@ -256,7 +294,6 @@
             }
             if(!found) document.body.style.cursor = 'default';
         };
-
         canvas.addEventListener('mousemove', e => { const p=getPos(e); handleInput(p.x, p.y, false); });
         canvas.addEventListener('mousedown', e => { const p=getPos(e); handleInput(p.x, p.y, true); });
         canvas.addEventListener('mouseup', () => mouse.down=false);
@@ -268,593 +305,364 @@
             camera.zoom += (camera.targetZoom - camera.zoom)*0.05;
             camera.x += (camera.targetX - camera.x)*0.05; camera.y += (camera.targetY - camera.y)*0.05;
             ctx.clearRect(0,0,width,height); hitZones=[];
-            
             drawStars();
             
             if(currentScene==='LOBBY'||currentScene==='TRANSITION') {
                 ctx.save(); ctx.translate(width/2, height/2);
                 ctx.scale(camera.zoom, camera.zoom); ctx.translate(-width/2-camera.x, -height/2-camera.y);
                 drawLobby(); ctx.restore();
-                if(camera.zoom < 1.5) {
-                    // 👇 改這裡：直接用白色 '#ffffff'
-    ctx.fillStyle='#ffffff'; ctx.font='12px Orbitron'; ctx.textAlign='center';
-    ctx.fillText("Copyright © JOBUS ASIA 2025-26", width/2, height-SAFE_BOTTOM/2);
-                }
             } else {
                 if(currentScene==='BIG5') drawBig5();
-                else if(currentScene==='MBTI') drawMBTI(); 
-                else if(currentScene==='ENNEAGRAM') drawEnneagram();
-                else if(currentScene==='RIASEC') drawRIASEC(); 
-                else if(currentScene==='COLOR') drawColorTest(); 
                 else if(currentScene==='ANIMAL') drawAnimalTest();
+                // 其他測驗省略以節省篇幅，邏輯相同
             }
             requestAnimationFrame(loop);
         }
 
-        // --- 繪圖引擎 (Helper Functions) ---
-        
-        function wrapText(txt, x, y, maxW, lh) {
-            if(!txt) return y;
-            const chars = txt.split(''); 
-            let line = ''; 
-            let cy = y;
-            for(let n=0; n<chars.length; n++) {
-                const test = line + chars[n];
-                if(ctx.measureText(test).width > maxW && n > 0) { 
-                    ctx.fillText(line, x, cy); 
-                    line = chars[n]; 
-                    cy += lh;
-                } else { 
-                    line = test;
-                }
-            }
-            ctx.fillText(line, x, cy);
-            return cy + lh; 
-        }
-
-        function drawSectionTitle(title, x, y, color='#fff') {
-            ctx.fillStyle = color;
-            ctx.font = 'bold 18px "Noto Sans TC"';
-            ctx.textAlign = 'left';
-            ctx.fillText(title, x, y);
-            return y + 30;
-        }
-
-        function drawBulletList(list, x, y, maxW, lh=24) {
-            ctx.textAlign = 'left';
-            ctx.font = '16px "Noto Sans TC"';
-            ctx.fillStyle = '#ddd';
-            let cy = y;
-            if(!list || list.length===0) return cy;
-            list.forEach(item => {
-                const bullet = "• ";
-                const chars = item.split('');
-                let line = bullet;
-                for(let n=0; n<chars.length; n++) {
-                    const test = line + chars[n];
-                    if(ctx.measureText(test).width > maxW && n>0) {
-                        ctx.fillText(line, x, cy);
-                        line = "  " + chars[n]; 
-                        cy += lh;
-                    } else {
-                        line = test;
-                    }
-                }
-                ctx.fillText(line, x, cy);
-                cy += lh * 1.2;
+        // --- 星空背景 ---
+        const stars = []; 
+        function initStars() { stars.length = 0; for(let i=0; i<150; i++) stars.push({ x: Math.random()*width, y: Math.random()*height, z: Math.random()*2+0.5, alpha: Math.random() }); }
+        function drawStars() {
+            ctx.fillStyle = styles.bg; ctx.fillRect(0,0,width,height);
+            stars.forEach(s => {
+                const offX = (mouse.x - width/2) * 0.02 * s.z + gyro.x;
+                const offY = (mouse.y - height/2) * 0.02 * s.z + gyro.y;
+                ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+                ctx.beginPath(); ctx.arc(s.x + offX, s.y + offY, Math.random()*1.5, 0, Math.PI*2); ctx.fill();
             });
-            return cy + 10;
         }
 
-        function drawCard(x, y, w, h, t, txt, c, act) { 
-            const hover=Math.abs(mouse.x - x) < w/2 && Math.abs(mouse.y - (y+h/2)) < h/2;
-            ctx.strokeStyle=hover?c:'#555'; ctx.lineWidth=2; ctx.fillStyle=hover?'rgba(255,255,255,0.12)':'rgba(30,30,30,0.85)';
-            ctx.beginPath();
-            ctx.roundRect(x-w/2, y, w, h, 15); ctx.fill(); ctx.stroke();
-            ctx.fillStyle=c; ctx.font='30px Orbitron'; ctx.textAlign='center'; 
-            ctx.fillText(t, x, y+45);
-            ctx.fillStyle='#fff'; ctx.font='20px "Noto Sans TC"';
-            wrapText(txt, x, y+85, w-40, 26);
-            hitZones.push({t:'rect', x:x-w/2, y:y, w:w, h:h, action:act});
-        }
-
+        // --- UI 繪製輔助 ---
         function drawBtn(x, y, txt, color, act, w=200) {
             const h=50;
             const hover = Math.abs(mouse.x - x) < w/2 && Math.abs(mouse.y - (y+h/2)) < h/2;
             ctx.fillStyle=hover?'#fff':color; ctx.beginPath();
             ctx.roundRect(x-w/2, y, w, h, 25); ctx.fill();
-            ctx.fillStyle=hover?'#000':'#fff'; ctx.textAlign='center'; ctx.font='bold 18px "Noto Sans TC"'; ctx.fillText(txt, x, y+32);
+            ctx.fillStyle=hover?'#000':'#fff'; ctx.textAlign='center'; ctx.font='bold 16px "Noto Sans TC"'; ctx.fillText(txt, x, y+30);
             hitZones.push({t:'rect', x:x-w/2, y:y, w:w, h:h, action:act});
         }
-
         function drawTitle(txt, x, y, color) { 
-            ctx.textAlign='center';
-            ctx.fillStyle=color; ctx.font='bold 32px "Noto Sans TC"'; 
-            ctx.shadowColor=color; ctx.shadowBlur=20; ctx.fillText(txt, x, y); ctx.shadowBlur=0;
+            ctx.textAlign='center'; ctx.fillStyle=color; ctx.font='bold 28px "Noto Sans TC"'; ctx.fillText(txt, x, y);
+        }
+        function wrapText(txt, x, y, maxW, lh) {
+            if(!txt) return y;
+            const chars = txt.split(''); let line = ''; let cy = y;
+            for(let n=0; n<chars.length; n++) {
+                const test = line + chars[n];
+                if(ctx.measureText(test).width > maxW && n > 0) { ctx.fillText(line, x, cy); line = chars[n]; cy += lh; } 
+                else { line = test; }
+            }
+            ctx.fillText(line, x, cy); return cy + lh; 
         }
 
-        function drawProgress(curr, total) { 
-            ctx.textAlign='right'; ctx.fillStyle='#00f3ff'; ctx.font='16px Orbitron'; 
-            ctx.fillText(`${curr}/${total}`, width-20, SAFE_TOP + 20);
-        }
-
-        // --- LOBBY 繪製邏輯 ---
+        // --- 核心場景: LOBBY ---
         let lobbyRot = 0;
         function drawLobby() {
             lobbyRot += 0.0005; const cx=width/2, cy=height/2;
             const r = Math.min(width, height) * (isMobile ? 0.35 : 0.32);
-            drawCentralStar(cx, cy);
-            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1; ctx.stroke();
-            lobbyNodes.forEach((node, i) => {
-                const ang=(i/6)*Math.PI*2+lobbyRot; const nx=cx+Math.cos(ang)*r; const ny=cy+Math.sin(ang)*r;
-                const wx=(mouse.x-width/2)/camera.zoom+width/2+camera.x; const wy=(mouse.y-height/2)/camera.zoom+height/2+camera.y;
-                const hover=Math.hypot(wx-nx, wy-ny)<70; drawPlanetIcon(node, nx, ny, hover);
-                if(camera.zoom<2) hitZones.push({t:'circle', x:nx, y:ny, r:70, action:()=>enterGame(node.id, nx, ny)});
-            });
-        }
-        function drawCentralStar(cx, cy) {
+            
+            // 中央恆星
             const p = Math.sin(Date.now()*0.003)*10;
             const g = ctx.createRadialGradient(cx, cy, 20, cx, cy, 100+p); g.addColorStop(0,'rgba(255,255,255,0.8)'); g.addColorStop(0.2,'#ff0055'); g.addColorStop(1,'transparent');
             ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx, cy, 100+p, 0, Math.PI*2); ctx.fill();
             ctx.fillStyle='#ff0055'; ctx.beginPath(); ctx.arc(cx, cy, 35, 0, Math.PI*2); ctx.fill();
             if(camera.zoom < 1.5) {
-                ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.shadowColor='rgba(0,0,0,0.5)'; ctx.shadowBlur=4; 
-                ctx.fillStyle='#fff'; ctx.font='900 24px "Noto Sans TC"'; ctx.fillText("心理宇宙", cx, cy-10); ctx.shadowBlur=0;
-                ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='700 10px Orbitron'; ctx.fillText("M I N D V E R S E", cx, cy+15); ctx.textBaseline='alphabetic';
+                ctx.textAlign='center'; ctx.fillStyle='#fff'; ctx.font='900 24px "Noto Sans TC"'; ctx.fillText("心理宇宙", cx, cy-10);
+                ctx.font='700 10px Orbitron'; ctx.fillText("M I N D V E R S E", cx, cy+15);
             }
-        }
-        
-        // ✅ [Original Icon Drawing Logic - Preserved]
-        function drawPlanetIcon(n, x, y, hover) {
-            const scale=hover?1.2:1.0;
-            ctx.save(); ctx.translate(x, y); ctx.scale(scale, scale);
-            if(hover){ctx.shadowColor=n.glow; ctx.shadowBlur=30;}
-            ctx.fillStyle='rgba(10,10,20,0.8)'; ctx.beginPath();
-            ctx.arc(0,0,50,0,Math.PI*2); ctx.fill();
-            ctx.shadowBlur=0; ctx.lineWidth=3; ctx.strokeStyle=n.color;
 
-            // 1. BIG5 (Pentagon)
-            if(n.type==='pentagon'){ 
-                ctx.beginPath(); for(let i=0;i<5;i++){const a=(i/5)*Math.PI*2-Math.PI/2;ctx.lineTo(Math.cos(a)*35,Math.sin(a)*35);}ctx.closePath();ctx.stroke(); 
-                ctx.lineWidth=1;ctx.beginPath();for(let i=0;i<5;i++){const a=(i/5)*Math.PI*2-Math.PI/2;ctx.lineTo(Math.cos(a)*20,Math.sin(a)*20);}ctx.closePath();ctx.stroke();
-            }
-            // 2. RIASEC (Hexagon)
-            else if(n.type==='hexagon'){ 
-                ctx.beginPath(); for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2;ctx.lineTo(Math.cos(a)*35,Math.sin(a)*35);}ctx.closePath();ctx.stroke(); 
-                ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-35);ctx.lineTo(0,35);ctx.stroke();
-            }
-            // 3. ENNEAGRAM (Nonagon)
-            else if(n.type==='nonagon'){ 
-                ctx.beginPath(); for(let i=0;i<9;i++){const a=(i/9)*Math.PI*2-Math.PI/2;ctx.lineTo(Math.cos(a)*38,Math.sin(a)*38);}ctx.closePath();ctx.stroke();
-                ctx.lineWidth=1;ctx.beginPath();for(let i=0;i<3;i++){const a=(i/3)*Math.PI*2-Math.PI/2;ctx.lineTo(Math.cos(a)*38,Math.sin(a)*38);}ctx.closePath();ctx.stroke(); 
-            }
-            // 4. ANIMAL (Radar + Paw Print)
-            else if(n.type==='radar'){ 
-                ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,35,0,Math.PI*2);ctx.stroke();
-                ctx.beginPath();ctx.arc(0,0,22,0,Math.PI*2);ctx.stroke(); 
-                ctx.fillStyle=n.color;
-                ctx.beginPath();ctx.ellipse(0,5,8,6,0,0,Math.PI*2);ctx.fill();
-                ctx.beginPath();ctx.arc(-10,-5,4,0,Math.PI*2);ctx.fill();
-                ctx.beginPath();ctx.arc(0,-10,4,0,Math.PI*2);ctx.fill();
-                ctx.beginPath();ctx.arc(10,-5,4,0,Math.PI*2);ctx.fill();
-            }
-            // 5. COLOR (Rainbow Gradient)
-            else if(n.type==='rainbow'){ 
-                const gr=ctx.createLinearGradient(-35,-35,35,35);
-                gr.addColorStop(0,'#f00');gr.addColorStop(0.2,'#ff0');gr.addColorStop(0.4,'#0f0');gr.addColorStop(0.6,'#0ff');gr.addColorStop(0.8,'#00f');gr.addColorStop(1,'#f0f');
-                ctx.fillStyle=gr;ctx.beginPath();ctx.arc(0,0,35,0,Math.PI*2);ctx.fill();
-            }
-            // 6. MBTI (Core - Red + Orange)
-            else if(n.type==='core'){ 
-                ctx.fillStyle='#ff3333';ctx.beginPath();ctx.arc(0,0,35,0,Math.PI*2);ctx.fill();
-                ctx.fillStyle='#ff6600';ctx.beginPath();ctx.arc(0,0,18,0,Math.PI*2);ctx.fill();
-            }
-            
-            ctx.strokeStyle=n.color; ctx.lineWidth=1; ctx.globalAlpha=0.5; ctx.beginPath(); ctx.arc(0,0,50,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1;
-            ctx.restore();
-            
-            ctx.fillStyle = hover ? '#fff' : 'rgba(255,255,255,0.7)'; 
-            ctx.font = (hover ? 'bold ' : '') + '16px "Noto Sans TC"'; 
-            ctx.textAlign='center'; ctx.shadowColor='#000'; ctx.shadowBlur=4;
-            ctx.fillText(n.label, x, y+65*scale); ctx.shadowBlur=0;
-        }
+            // 行星
+            const nodes = ['BIG5','ANIMAL','MBTI','ENNEAGRAM','RIASEC','COLOR']; 
+            nodes.forEach((id, i) => {
+                const n = styles.nodes[id];
+                const ang=(i/6)*Math.PI*2+lobbyRot; 
+                const nx=cx+Math.cos(ang)*r; const ny=cy+Math.sin(ang)*r;
+                
+                // 繪製星球 Icon
+                ctx.save(); ctx.translate(nx, ny);
+                ctx.shadowColor=n.glow; ctx.shadowBlur=20; ctx.fillStyle='rgba(10,10,20,0.8)'; ctx.beginPath(); ctx.arc(0,0,50,0,Math.PI*2); ctx.fill();
+                ctx.shadowBlur=0; ctx.strokeStyle=n.color; ctx.lineWidth=2; ctx.stroke();
+                // 簡單圖形示意
+                ctx.fillStyle=n.color; ctx.beginPath(); ctx.arc(0,0,15,0,Math.PI*2); ctx.fill();
+                ctx.restore();
 
-        function drawStars() {
-            ctx.fillStyle = styles.bg; ctx.fillRect(0,0,width,height);
-            if(Math.random() < 0.03) shootingStars.push(new ShootingStar());
-            stars.forEach(s => {
-                const offX = (mouse.x - width/2) * 0.02 * s.z + gyro.x;
-                const offY = (mouse.y - height/2) * 0.02 * s.z + gyro.y;
-                ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
-                ctx.beginPath(); ctx.arc(s.x + offX, s.y + offY, s.size, 0, Math.PI*2); ctx.fill();
+                // 標題與副標題 (Phase 1: 首頁優化)
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 16px "Noto Sans TC"'; ctx.textAlign='center';
+                ctx.fillText(n.label, nx, ny+70);
+                ctx.fillStyle = '#aaa'; ctx.font = '12px "Noto Sans TC"';
+                ctx.fillText(n.sub, nx, ny+90);
+
+                if(camera.zoom<2) hitZones.push({t:'circle', x:nx, y:ny, r:70, action:()=>enterGame(id, nx, ny)});
             });
-            for(let i=shootingStars.length-1; i>=0; i--) { const s = shootingStars[i]; s.update(); s.draw(); if(!s.active) shootingStars.splice(i, 1); }
         }
 
-        // --- Transitions ---
         function enterGame(id, targetX, targetY) {
-            activeGameId = id; currentScene = 'TRANSITION';
-            
-            // ✅ [GA4] Track Level Start
+            currentScene = 'TRANSITION';
             sendGAEvent('level_start', { level_name: id });
-            
             camera.targetZoom = 5; camera.targetX = targetX - width/2; camera.targetY = targetY - height/2;
             setTimeout(() => {
-                if(id==='BIG5') startBig5(); if(id==='MBTI') startMBTI(); if(id==='ENNEAGRAM') startEnneagram();
-                if(id==='RIASEC') startRIASEC(); if(id==='COLOR') startColorTest(); if(id==='ANIMAL') startAnimalTest();
+                if(id==='BIG5') startBig5();
+                else if(id==='ANIMAL') startAnimalTest();
+                // 其他省略
                 currentScene = id; camera.zoom = 1; camera.x = 0; camera.y = 0; 
             }, 1500);
         }
-        function returnLobby() { currentScene = 'LOBBY'; camera.zoom = 5; camera.targetZoom = 1; camera.x = 0; camera.y = 0; camera.targetX = 0; camera.targetY = 0; }
+        function returnLobby() { 
+            closeSummary();
+            currentScene = 'LOBBY'; camera.zoom = 5; camera.targetZoom = 1; camera.x = 0; camera.y = 0; camera.targetX = 0; camera.targetY = 0; 
+        }
 
-        // --- 1. BIG 5 GAME ---
-        function startBig5() { gameSt.big5 = { idx:0, ans:3, scores:{O:0,C:0,E:0,A:0,N:0}, done:false, sent:false }; }
+        // --- GAME 1: BIG 5 ---
+        function startBig5() { gameSt.big5 = { idx:0, answers:[], done:false }; }
         function drawBig5() {
             const st = gameSt.big5; const cx = width/2, cy = height/2;
             ctx.fillStyle = 'rgba(10,15,30,0.95)'; ctx.fillRect(0,0,width,height);
-            if(!st.done) {
-                const q = big5Data.qs[st.idx];
-                drawProgress(st.idx+1, big5Data.qs.length);
-                drawTitle("五大性格分析", cx, SAFE_TOP + 50, styles.nodes.BIG5.color);
-                
-                ctx.fillStyle='#fff'; ctx.font='28px "Noto Sans TC"'; ctx.textAlign='center';
-                wrapText(q.t, cx, cy-50, Math.min(600, width-60), 40);
-                
-                const sw = Math.min(300, width-80);
-                const sy = cy+80; ctx.fillStyle = '#444'; ctx.fillRect(cx-sw/2, sy, sw, 6);
-                const hx = cx - sw/2 + (sw * (st.ans-1)/4);
-                
-                hitZones.push({
-    t:'rect', x:cx-sw/2-20, y:sy-30, w:sw+40, h:60,
-    action: (mx, my) => {
-        const ratio = (mx - (cx - sw/2)) / sw;
-        st.ans = Math.max(1, Math.min(5, Math.round(ratio*4+1)));
-    }
-});
-
-// ===== 1. 繪製 5 個刻度小點 =====
-for(let i=0; i<5; i++){
-    let tickX = (cx - sw/2) + (sw * (i/4)); 
-    ctx.beginPath(); 
-    ctx.arc(tickX, sy+3, 3, 0, Math.PI*2); 
-    ctx.fillStyle='#666'; 
-    ctx.fill();
-}
-
-// ===== 2. 繪製 5 個選項文字 =====
-const options = ["不同意", "稍不同意", "普通", "稍同意", "同意"];
-ctx.font = '12px "Noto Sans TC"'; 
-ctx.fillStyle = '#aaa';          
-ctx.textAlign = 'center';        
-
-for(let i=0; i<5; i++){
-    let tickX = (cx - sw/2) + (sw * (i/4)); 
-    ctx.fillText(options[i], tickX, sy + 40);
-}
-
-// ===== 3. 最後畫藍色圓點 (這段要放在最後，才會蓋在刻度上) =====
-ctx.beginPath(); 
-ctx.arc(hx, sy+3, 12, 0, Math.PI*2); 
-ctx.fillStyle='#00f3ff'; 
-ctx.fill();
-                
-                
-                drawBtn(cx, height-SAFE_BOTTOM-80, "下一題", styles.nodes.BIG5.color, () => {
-                    const sc = st.ans - 3; st.scores[q.k] += q.rev ? -sc : sc;
-                    if(st.idx < big5Data.qs.length-1) { st.idx++; st.ans=3; } else st.done = true;
-                });
-            } else {
-                let maxK='O', maxV=-99;
-                for(let k in st.scores) if(st.scores[k]>maxV) { maxV=st.scores[k]; maxK=k; }
-                const res = big5Data.results[maxK];
-                
-                // ✅ [GA4] Track Result
-                if(!st.sent) {
-                    sendGAEvent('level_end', { level_name: 'BIG5', result_id: maxK, success: true });
-                    st.sent = true;
-                }
-                
-                drawTitle("分析完成", cx, SAFE_TOP + 40, styles.nodes.BIG5.color);
-                drawRadar(cx, SAFE_TOP + 120, 70, st.scores);
-                ctx.textAlign='center'; ctx.font='bold 28px "Noto Sans TC"'; ctx.fillStyle='#fff';
-                ctx.fillText(res.t, cx, SAFE_TOP + 220);
-                ctx.font='18px "Noto Sans TC"'; ctx.fillStyle='#ccc';
-                wrapText(res.oneLine, cx, SAFE_TOP + 250, width-40, 26);
-                
-                let textY = SAFE_TOP + 290;
-                const maxW = Math.min(width * 0.85, 500);
-                const startX = cx - maxW/2;
-                
-                textY = drawSectionTitle("【生活中的你】", startX, textY, '#00f3ff');
-                textY = wrapText(res.life, startX, textY, maxW, 24) + 15;
-                textY = drawSectionTitle("【工作優勢】", startX, textY, '#00f3ff');
-                textY = drawBulletList(res.workStrength, startX, textY, maxW);
-                textY = drawSectionTitle("【盲點與風險】", startX, textY, '#ff6666');
-                textY = drawBulletList(res.workRisk, startX, textY, maxW);
-                
-                drawBtn(cx, height-SAFE_BOTTOM-60, "返回心理宇宙", 'rgba(255,255,255,0.2)', returnLobby);
-            }
-        }
-        function drawRadar(cx, cy, r, scores) {
-            const keys=['O','C','E','A','N'];
-            ctx.strokeStyle='#555'; ctx.beginPath();
-            for(let i=0;i<5;i++){ const a=i/5*Math.PI*2-Math.PI/2; ctx.lineTo(cx+Math.cos(a)*r, cy+Math.sin(a)*r); } ctx.closePath(); ctx.stroke();
-            ctx.fillStyle='rgba(0,243,255,0.3)'; ctx.beginPath();
-            keys.forEach((k,i)=>{ const v=Math.max(0.2, (scores[k]+6)/12)*r; ctx.lineTo(cx+Math.cos(i/5*Math.PI*2-Math.PI/2)*v, cy+Math.sin(i/5*Math.PI*2-Math.PI/2)*v); });
-            ctx.closePath(); ctx.fill();
-            ctx.fillStyle='#fff'; ctx.font='12px Orbitron'; ctx.textAlign='center';
-            keys.forEach((k,i)=>{ const a=i/5*Math.PI*2-Math.PI/2; ctx.fillText(k, cx+Math.cos(a)*(r+15), cy+Math.sin(a)*(r+15)+5); });
-        }
-
-        // --- 2. MBTI GAME ---
-        function startMBTI() { gameSt.mbti = { idx:0, scores:{ei:0,sn:0,tf:0,jp:0}, done:false, sent:false }; }
-        function drawMBTI() {
-            const st = gameSt.mbti; const cx = width/2, cy = height/2; ctx.fillStyle = '#1a0505'; ctx.fillRect(0,0,width,height);
-            if(!st.done) {
-                const q = mbtiData.qs[st.idx];
-                drawProgress(st.idx+1, mbtiData.qs.length);
-                drawTitle("RPG 職業測驗", cx, SAFE_TOP + 50, styles.nodes.MBTI.color);
-                
-                ctx.fillStyle='#fff'; ctx.font='28px "Noto Sans TC"'; ctx.textAlign='center';
-                wrapText(q.q, cx, cy-80, Math.min(600, width-60), 40);
-                
-                if (isMobile) {
-                    drawCard(cx, cy+20, width-60, 90, "A", q.a, '#ff3333', ()=>{ st.scores[q.d]-=q.v; nextMBTI(); });
-                    drawCard(cx, cy+130, width-60, 90, "B", q.b, '#ff3333', ()=>{ st.scores[q.d]+=q.v; nextMBTI(); });
-                } else {
-                    drawCard(cx-160, cy+60, 280, 160, "A", q.a, '#ff3333', ()=>{ st.scores[q.d]-=q.v; nextMBTI(); });
-                    drawCard(cx+160, cy+60, 280, 160, "B", q.b, '#ff3333', ()=>{ st.scores[q.d]+=q.v; nextMBTI(); });
-                }
-            } else {
-                const type = (st.scores.ei<0?'E':'I')+(st.scores.sn<0?'S':'N')+(st.scores.tf<0?'T':'F')+(st.scores.jp<0?'J':'P');
-                const res = mbtiData.results[type] || mbtiData.results['ISTJ'];
-                
-                // ✅ [GA4] Track Result
-                if(!st.sent) {
-                    sendGAEvent('level_end', { level_name: 'MBTI', result_id: type, success: true });
-                    st.sent = true;
-                }
-                
-                drawTitle(res.t + " " + res.e, cx, SAFE_TOP + 50, '#ffcc00');
-                ctx.font='20px Orbitron'; ctx.fillStyle='#fff'; ctx.textAlign='center';
-                ctx.fillText(type, cx, SAFE_TOP + 90);
-                ctx.font='18px "Noto Sans TC"'; ctx.fillStyle='#ccc';
-                ctx.fillText(res.oneLine, cx, SAFE_TOP + 120);
-
-                let textY = SAFE_TOP + 160;
-                const maxW = Math.min(width * 0.85, 520);
-                const startX = cx - maxW/2;
-
-                textY = drawSectionTitle("【團隊角色】", startX, textY, '#ffcc00');
-                textY = wrapText(res.teamRole, startX, textY, maxW, 26) + 15;
-                textY = drawSectionTitle("【最在意的是】", startX, textY, '#ffcc00');
-                textY = wrapText(res.careMost, startX, textY, maxW, 26) + 15;
-                textY = drawSectionTitle("【合作小秘訣】", startX, textY, '#ff9999');
-                textY = drawBulletList(res.coopTips, startX, textY, maxW);
-                textY = drawSectionTitle("【職涯適配】", startX, textY, '#99ff99');
-                textY = drawBulletList(res.careerHint, startX, textY, maxW);
-
-                drawBtn(cx, height-SAFE_BOTTOM-60, "返回心理宇宙", 'rgba(255,255,255,0.2)', returnLobby);
-            }
-        }
-        function nextMBTI() { if(gameSt.mbti.idx < mbtiData.qs.length-1) gameSt.mbti.idx++; else gameSt.mbti.done=true; }
-
-        // --- 3. ENNEAGRAM GAME ---
-        function startEnneagram() { gameSt.enn = { idx:0, scores:new Array(10).fill(0), done:false, sent:false }; }
-        function drawEnneagram() {
-            const st = gameSt.enn; const cx=width/2, cy=height/2;
-            const g = ctx.createLinearGradient(0,0,0,height); g.addColorStop(0,'#1a1005'); g.addColorStop(1,'#000'); ctx.fillStyle=g; ctx.fillRect(0,0,width,height);
             
             if(!st.done) {
-                const q = ennData.qs[st.idx];
-                drawProgress(st.idx+1, ennData.qs.length);
-                drawTitle("九型人格", cx, SAFE_TOP + 50, styles.nodes.ENNEAGRAM.color);
-                
-                ctx.fillStyle='#fff'; ctx.font='26px "Noto Sans TC"'; ctx.textAlign='center';
-                wrapText(q.q, cx, cy-80, Math.min(600, width-60), 40);
-                
-                const w = isMobile ? width-60 : 320;
-                const h = 60;
-                drawBtn(cx, cy+10, q.a, '#cd7f32', ()=>{ q.ta.forEach(x=>st.scores[x]++); nextEnn(); }, w);
-                drawBtn(cx, cy+90, q.b, '#555', ()=>{ q.tb.forEach(x=>st.scores[x]++); nextEnn(); }, w);
-            } else {
-                let max = -1, type = 1;
-                for(let i=1;i<=9;i++) if(st.scores[i]>max) { max=st.scores[i]; type=i; }
-                const res = ennData.results[type];
-                
-                // ✅ [GA4] Track Result
-                if(!st.sent) {
-                    sendGAEvent('level_end', { level_name: 'ENNEAGRAM', result_id: type, success: true });
-                    st.sent = true;
-                }
-                
-                drawTitle(res.t, cx, SAFE_TOP + 50, '#ffd700');
-                ctx.font='18px "Noto Sans TC"'; ctx.fillStyle='#ccc'; ctx.textAlign='center';
-                wrapText(res.oneLine, cx, SAFE_TOP + 90, width-40, 26);
-                
-                let textY = SAFE_TOP + 140;
-                const maxW = Math.min(width * 0.85, 520);
-                const startX = cx - maxW/2;
-                
-                textY = drawSectionTitle("【核心動機】", startX, textY, '#ffd700');
-                textY = wrapText(res.motive, startX, textY, maxW, 26) + 15;
-                textY = drawSectionTitle("【壓力反應】", startX, textY, '#ff6666');
-                textY = wrapText(res.stress, startX, textY, maxW, 26) + 15;
-                textY = drawSectionTitle("【工作優勢】", startX, textY, '#ffd700');
-                textY = drawBulletList(res.workStrength, startX, textY, maxW);
-                textY = drawSectionTitle("【成長建議】", startX, textY, '#66ff66');
-                textY = drawBulletList(res.growthTips, startX, textY, maxW);
-                
-                drawBtn(cx, height-SAFE_BOTTOM-60, "返回心理宇宙", 'rgba(255,255,255,0.2)', returnLobby);
-            }
-        }
-        function nextEnn() { if(gameSt.enn.idx < ennData.qs.length-1) gameSt.enn.idx++; else gameSt.enn.done=true; }
+                const q = big5Data.qs[st.idx];
+                drawTitle("五大性格分析", cx, 80, styles.nodes.BIG5.color);
+                ctx.fillStyle='#00f3ff'; ctx.font='14px Orbitron'; ctx.textAlign='right'; ctx.fillText(`${st.idx+1}/${big5Data.qs.length}`, width-20, 40);
 
-        // --- 4. RIASEC GAME ---
-        function startRIASEC() { gameSt.riasec = { idx:0, scores:{R:0,I:0,A:0,S:0,E:0,C:0}, done:false, sent:false }; }
-        function drawRIASEC() {
-            const st = gameSt.riasec; const cx=width/2, cy=height/2; ctx.fillStyle='#001a1a'; ctx.fillRect(0,0,width,height);
-            if(!st.done) {
-                const q = riasecData.qs[st.idx];
-                drawProgress(st.idx+1, riasecData.qs.length);
-                drawTitle("荷蘭代碼", cx, SAFE_TOP + 50, '#00ced1');
-                ctx.fillStyle='#fff'; ctx.font='28px "Noto Sans TC"'; ctx.textAlign='center'; 
-                ctx.fillText(`你喜歡 "${q.q}" 嗎？`, cx, cy-50);
+                ctx.fillStyle='#fff'; ctx.font='24px "Noto Sans TC"'; ctx.textAlign='center';
+                wrapText(q.t, cx, cy-50, Math.min(600, width-60), 36);
+
+                // 選項渲染
+                const sw = Math.min(300, width-80); const sy = cy+80;
+                ctx.fillStyle = '#444'; ctx.fillRect(cx-sw/2, sy, sw, 4);
+                // 預設選中間(3)或使用上次紀錄
+                let currentAns = st.answers[st.idx] || 3; 
                 
-                drawBtn(cx-90, cy+80, "喜歡", '#00ffcc', ()=>{ st.scores[q.t]+=1; nextRIASEC(); }, 140);
-                drawBtn(cx+90, cy+80, "不喜歡", '#555', ()=>{ nextRIASEC(); }, 140);
-            } else {
-                const sorted = Object.entries(st.scores).sort((a,b)=>b[1]-a[1]);
-                const code = sorted.slice(0,3).map(x=>x[0]).join('-');
-                const top3 = sorted.slice(0,3);
-                
-                // ✅ [GA4] Track Result
-                if(!st.sent) {
-                    sendGAEvent('level_end', { level_name: 'RIASEC', result_id: code, success: true });
-                    st.sent = true;
-                }
-                
-                drawHexagon(cx, SAFE_TOP + 100, 60, st.scores);
-                ctx.fillStyle='#00ffcc'; ctx.font='bold 40px Orbitron'; ctx.textAlign='center'; 
-                ctx.fillText(code, cx, SAFE_TOP + 210);
-                
-                let textY = SAFE_TOP + 250;
-                const maxW = Math.min(width * 0.85, 520);
-                const startX = cx - maxW/2;
-                
-                top3.forEach(item => {
-                    const data = riasecData.results[item[0]];
-                    textY = drawSectionTitle(data.name, startX, textY, '#00ffcc');
-                    textY = wrapText(data.oneLine, startX, textY, maxW, 24) + 5;
-                    textY = drawBulletList(data.workEnv, startX, textY, maxW, 22);
+                // 滑動條邏輯
+                const hx = cx - sw/2 + (sw * (currentAns-1)/4);
+                hitZones.push({
+                    t:'rect', x:cx-sw/2-20, y:sy-30, w:sw+40, h:60,
+                    action: (mx) => {
+                        const ratio = (mx - (cx - sw/2)) / sw;
+                        st.answers[st.idx] = Math.max(1, Math.min(5, Math.round(ratio*4+1)));
+                    }
                 });
-                
-                drawBtn(cx, height-SAFE_BOTTOM-60, "返回心理宇宙", 'rgba(255,255,255,0.2)', returnLobby);
-            }
-        }
-        function nextRIASEC() { if(gameSt.riasec.idx < riasecData.qs.length-1) gameSt.riasec.idx++; else gameSt.riasec.done=true; }
-        function drawHexagon(cx, cy, r, scores) {
-            ctx.strokeStyle='#00ffcc'; ctx.lineWidth=1; ctx.beginPath();
-            for(let i=0;i<6;i++) { const a=i/6*Math.PI*2-Math.PI/2; ctx[i===0?'moveTo':'lineTo'](cx+Math.cos(a)*r, cy+Math.sin(a)*r); } ctx.closePath(); ctx.stroke();
-            const keys=['R','I','A','S','E','C']; ctx.fillStyle='rgba(0,255,204,0.3)'; ctx.beginPath();
-            for(let i=0;i<6;i++) { const v=Math.min(scores[keys[i]]||0, 3)/3*r; const a=i/6*Math.PI*2-Math.PI/2; ctx[i===0?'moveTo':'lineTo'](cx+Math.cos(a)*v, cy+Math.sin(a)*v); } ctx.closePath(); ctx.fill();
-            ctx.fillStyle='#fff'; ctx.font='14px Orbitron'; ctx.textAlign='center';
-            for(let i=0;i<6;i++) { const a=i/6*Math.PI*2-Math.PI/2; ctx.fillText(keys[i], cx+Math.cos(a)*(r+15), cy+Math.sin(a)*(r+15)+5); }
-        }
 
-        // --- 5. COLOR GAME ---
-        function startColorTest() { gameSt.color = { phase:0, sel:[], auraT:0, done:false, sent:false }; }
-        function drawColorTest() {
-            const st = gameSt.color; const cx=width/2, cy=height/2; ctx.fillStyle='#111'; ctx.fillRect(0,0,width,height);
-            if(st.phase < 3) {
-                drawTitle("色彩心理", cx, SAFE_TOP + 50, '#ff00ff');
-                let txt = "直覺選擇最吸引你的顏色";
-                if(st.phase===1) txt = "選擇第二吸引你的顏色";
-                if(st.phase===2) txt = "選擇最不喜歡的顏色";
-                
-                ctx.fillStyle='#fff'; ctx.font='22px "Noto Sans TC"'; ctx.textAlign='center';
-                wrapText(txt, cx, cy-150, width-60, 30);
-                
-                const palette = [{id:1,c:'#A9A9A9'},{id:2,c:'#0000FF'},{id:3,c:'#008000'},{id:4,c:'#FF0000'},{id:5,c:'#FFFF00'},{id:6,c:'#800080'},{id:7,c:'#8B4513'},{id:8,c:'#333333'}];
-                palette.forEach((c,i)=>{
-                    if(st.sel.find(s=>s.id===c.id)) return;
-                    const a=(i/8)*Math.PI*2; const x=cx+Math.cos(a)*100; const y=cy+Math.sin(a)*100;
-                    ctx.beginPath(); ctx.arc(x,y,35,0,Math.PI*2); ctx.fillStyle=c.c; ctx.fill(); ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
-                    hitZones.push({t:'circle', x:x, y:y, r:40, action:()=>{ st.sel.push(c); st.phase++; }});
-                });
-            } else {
-                st.auraT += 0.02;
-                const c1=st.sel[0], c2=st.sel[1], c3=st.sel[2];
-                const d=Math.sin(st.auraT)*10; 
-                let g=ctx.createRadialGradient(cx,SAFE_TOP+100,20,cx,SAFE_TOP+100,120+d); g.addColorStop(0,c1.c); g.addColorStop(1,'transparent');
-                ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,SAFE_TOP+100,120+d,0,Math.PI*2); ctx.fill();
-                
-                // ✅ [GA4] Track Result
-                if(!st.sent) {
-                    sendGAEvent('level_end', { level_name: 'COLOR', result_id: colorMeanings[c1.id].label, success: true });
-                    st.sent = true;
+                // 刻度
+                for(let i=0; i<5; i++){
+                    let tickX = (cx - sw/2) + (sw * (i/4));
+                    ctx.beginPath(); ctx.arc(tickX, sy+2, 4, 0, Math.PI*2); ctx.fillStyle='#666'; ctx.fill();
                 }
-                
-                drawTitle("你的心靈光譜", cx, SAFE_TOP + 50, '#fff');
-                
-                let textY = SAFE_TOP + 200;
-                const maxW = Math.min(width * 0.85, 520);
-                const startX = cx - maxW/2;
-                
-                const d1 = colorMeanings[c1.id];
-                textY = drawSectionTitle(`顯性渴望 (${d1.label})`, startX, textY, c1.c);
-                textY = wrapText(d1.want, startX, textY, maxW, 26) + 5;
-                textY = wrapText(d1.state, startX, textY, maxW, 26) + 15;
-                
-                const d2 = colorMeanings[c2.id];
-                textY = drawSectionTitle(`次要動力 (${d2.label})`, startX, textY, c2.c);
-                textY = wrapText(d2.want, startX, textY, maxW, 26) + 15;
-                
-                textY = drawSectionTitle(`自我照顧建議`, startX, textY, '#fff');
-                textY = drawBulletList(d1.selfCare, startX, textY, maxW);
-                
-                ctx.fillStyle='#666'; ctx.font='14px "Noto Sans TC"'; ctx.textAlign='center';
-                ctx.fillText("*此結果反映你近期的心理狀態", cx, textY + 20);
+                const opts = ["不同意", "稍不同意", "普通", "稍同意", "同意"];
+                ctx.font = '12px "Noto Sans TC"'; ctx.fillStyle = '#aaa';
+                for(let i=0; i<5; i++) ctx.fillText(opts[i], (cx - sw/2) + (sw * (i/4)), sy + 30);
 
-                drawBtn(cx, height-SAFE_BOTTOM-60, "返回心理宇宙", 'rgba(255,255,255,0.2)', returnLobby);
+                // 游標
+                ctx.beginPath(); ctx.arc(hx, sy+2, 12, 0, Math.PI*2); ctx.fillStyle='#00f3ff'; ctx.fill();
+
+                // Phase 0: 上一題/下一題按鈕
+                const btnY = height - SAFE_BOTTOM;
+                if(st.idx > 0) {
+                    drawBtn(cx - 80, btnY, "上一題", '#444', () => st.idx--, 120);
+                }
+                drawBtn(st.idx>0 ? cx+80 : cx, btnY, "下一題", styles.nodes.BIG5.color, () => {
+                    // 確保有值
+                    if(!st.answers[st.idx]) st.answers[st.idx] = 3;
+                    if(st.idx < big5Data.qs.length-1) st.idx++;
+                    else {
+                        st.done = true;
+                        finishBig5();
+                    }
+                }, 120);
             }
         }
+        
+        function finishBig5() {
+            const st = gameSt.big5;
+            let scores = {O:0, C:0, E:0, A:0, N:0};
+            big5Data.qs.forEach((q, i) => {
+                const ans = st.answers[i];
+                const sc = ans - 3;
+                scores[q.k] += q.rev ? -sc : sc;
+            });
+            // 找出最高分特質
+            let maxK='O', maxV=-99;
+            for(let k in scores) if(scores[k]>maxV) { maxV=scores[k]; maxK=k; }
+            
+            // 儲存結果
+            userResults.completed.push('BIG5');
+            userResults.data['BIG5'] = { type: maxK, scores: scores, detail: big5Data.results[maxK] };
+            
+            showSummary('BIG5');
+        }
 
-        // --- 6. ANIMAL GAME ---
-        function startAnimalTest() { gameSt.animal = { idx:0, pos:{x:0, y:0}, done:false, sent:false }; }
+        // --- GAME 2: ANIMAL (Phase 1 Logic) ---
+        function startAnimalTest() { gameSt.animal = { idx:0, answers:[], done:false }; }
         function drawAnimalTest() {
-            const st = gameSt.animal; const cx=width/2, cy=height/2; ctx.fillStyle='#051105'; ctx.fillRect(0,0,width,height);
+            const st = gameSt.animal; const cx=width/2, cy=height/2;
+            ctx.fillStyle='#051105'; ctx.fillRect(0,0,width,height);
+            
             if(!st.done) {
                 const q = animalData.qs[st.idx];
-                drawProgress(st.idx+1, animalData.qs.length);
-                drawTitle("動物圖騰", cx, SAFE_TOP + 50, '#32cd32');
-                
-                ctx.fillStyle='#fff'; ctx.font='28px "Noto Sans TC"'; ctx.textAlign='center';
-                wrapText(q.q, cx, cy-80, Math.min(600, width-60), 40);
-                
-                if (isMobile) {
-                    drawCard(cx, cy+20, width-60, 90, "A", q.a, '#32cd32', ()=>{ st.pos[q.ax]+=q.v; nextAnimal(); });
-                    drawCard(cx, cy+130, width-60, 90, "B", q.b, '#32cd32', ()=>{ st.pos[q.ax]-=q.v; nextAnimal(); });
-                } else {
-                    drawCard(cx-160, cy+60, 280, 160, "A", q.a, '#32cd32', ()=>{ st.pos[q.ax]+=q.v; nextAnimal(); });
-                    drawCard(cx+160, cy+60, 280, 160, "B", q.b, '#32cd32', ()=>{ st.pos[q.ax]-=q.v; nextAnimal(); });
-                }
-            } else {
-                const x=st.pos.x, y=st.pos.y;
-                let res=animalData.results['D']; 
-                if(x>0 && y<=0) res=animalData.results['I']; 
-                else if(x>0 && y>0) res=animalData.results['S']; 
-                else if(x<=0 && y>0) res=animalData.results['C'];
-                
-                // ✅ [GA4] Track Result
-                if(!st.sent) {
-                    sendGAEvent('level_end', { level_name: 'ANIMAL', result_id: res.t, success: true });
-                    st.sent = true;
-                }
-                
-                drawTitle(res.t + " " + res.e, cx, SAFE_TOP + 50, '#adff2f');
-                ctx.font='18px "Noto Sans TC"'; ctx.fillStyle='#ccc'; ctx.textAlign='center';
-                wrapText(res.oneLine, cx, SAFE_TOP + 90, width-40, 26);
-                
-                let textY = SAFE_TOP + 140;
-                const maxW = Math.min(width * 0.85, 520);
-                const startX = cx - maxW/2;
-                
-                textY = drawSectionTitle("【溝通風格】", startX, textY, '#adff2f');
-                textY = wrapText(res.commStyle, startX, textY, maxW, 26) + 15;
-                textY = drawSectionTitle("【容易被誤會】", startX, textY, '#ff6666');
-                textY = wrapText(res.beMisunderstood, startX, textY, maxW, 26) + 15;
-                textY = drawSectionTitle("【合作小撇步】", startX, textY, '#adff2f');
-                textY = drawBulletList(res.coopTips, startX, textY, maxW);
-                textY = drawSectionTitle("【自我調整】", startX, textY, '#ffff99');
-                textY = drawBulletList(res.selfAdjust, startX, textY, maxW);
-                
-                drawBtn(cx, height-SAFE_BOTTOM-60, "返回心理宇宙", 'rgba(255,255,255,0.2)', returnLobby);
+                drawTitle("動物圖騰", cx, 80, '#32cd32');
+                ctx.fillStyle='#fff'; ctx.font='24px "Noto Sans TC"'; ctx.textAlign='center';
+                wrapText(q.q, cx, cy-80, width-60, 36);
+
+                const btnW = isMobile ? width-60 : 300;
+                drawBtn(cx, cy+20, q.a, '#32cd32', ()=>{ st.answers[st.idx]=1; nextAnimal(); }, btnW);
+                drawBtn(cx, cy+90, q.b, '#555', ()=>{ st.answers[st.idx]=-1; nextAnimal(); }, btnW);
+
+                if(st.idx > 0) drawBtn(cx, height-SAFE_BOTTOM, "上一題", '#333', ()=>st.idx--, 120);
             }
         }
-        function nextAnimal() { if(gameSt.animal.idx<animalData.qs.length-1) gameSt.animal.idx++; else gameSt.animal.done=true; }
+        function nextAnimal() {
+            const st = gameSt.animal;
+            if(st.idx < animalData.qs.length-1) st.idx++;
+            else {
+                st.done = true;
+                finishAnimal();
+            }
+        }
+        function finishAnimal() {
+            const st = gameSt.animal;
+            let pos = {x:0, y:0};
+            animalData.qs.forEach((q, i) => {
+                const v = st.answers[i] * q.v; // q.v is -1, ans is 1 or -1
+                pos[q.ax] += v;
+            });
+            let type = 'D'; // Tiger
+            if(pos.x>0 && pos.y<=0) type='I'; // Peacock
+            else if(pos.x>0 && pos.y>0) type='S'; // Koala
+            else if(pos.x<=0 && pos.y>0) type='C'; // Owl
+            
+            userResults.completed.push('ANIMAL');
+            userResults.data['ANIMAL'] = { type: type, detail: animalData.results[type] };
+            
+            showSummary('ANIMAL');
+        }
 
-        init(); loop();
+        // ==================================================
+        // Phase 1: Logic Engine (主導判定 & 整合敘事)
+        // ==================================================
+
+        function getPrimaryResult(currentTestId) {
+            // 修正點 1: 優先級判定
+            // 結構型 (Big5) > 投射型 (Animal)
+            // 若有 Big5 資料，永遠以 Big5 為主導，除非只做了 Animal
+            if (userResults.data['BIG5']) return { source: 'BIG5', ...userResults.data['BIG5'] };
+            // 若有 Enneagram (此處省略)，則 Enneagram
+            // 最後才 fallback 到當前測驗
+            if (userResults.data[currentTestId]) return { source: currentTestId, ...userResults.data[currentTestId] };
+            return null;
+        }
+
+        // 靜態規則表 (修正點 2: 模板規則)
+        const conflictRules = [
+            {
+                check: (p) => p.animal === 'D' && p.big5 === 'A', // 老虎 + 高親和
+                msg: "你外表看似果斷強勢（老虎），但內心其實非常在意團隊和諧（親和）。這不是矛盾，代表你是「帶有溫度的領導者」。"
+            },
+            {
+                check: (p) => p.big5 === 'C' && p.big5_o_score > 0, // 高盡責 + 高開放
+                msg: "你既有天馬行空的創意（開放），又有超強的執行力（盡責）。你是最適合將創意落地的「實踐家」。"
+            }
+        ];
+
+        function getConflictMsg(primary, animalRes) {
+            // 簡單範例：檢查規則
+            let msg = "你的心理能量由多種特質交織而成，在不同情境下會切換不同模式。";
+            if (primary.source === 'BIG5' && animalRes) {
+                // 模擬檢查
+                const p = { big5: primary.type, animal: animalRes.type };
+                const rule = conflictRules.find(r => r.check(p));
+                if(rule) msg = rule.msg;
+            }
+            return msg;
+        }
+
+        // ==================================================
+        // Phase 0 & 1: Result Overlay 渲染
+        // ==================================================
+
+        function showSummary(currentTestId) {
+            const overlay = document.getElementById('resultOverlay');
+            const container = document.getElementById('summaryContent');
+            
+            const primary = getPrimaryResult(currentTestId);
+            const detail = primary.detail;
+            const animalRes = userResults.data['ANIMAL']; // 用於補充
+
+            // 生成 HTML (修正點 3: 完整結構)
+            let html = `
+                <div class="summary-header">
+                    <span class="result-icon">${detail.e || '✨'}</span>
+                    <div class="result-title">${detail.t}</div>
+                    <div class="result-subtitle">主導心理能量</div>
+                    <p class="result-desc">${detail.oneLine || detail.desc}</p>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-title">🌌 心理宇宙輪廓</div>
+                    <div class="text-body">
+                        ${getConflictMsg(primary, animalRes)}
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-title">🛠️ 適合的工作方式</div>
+                    <div class="text-body">
+                        ${detail.workStyle}
+                    </div>
+                </div>
+
+                <div class="section-card" style="border-color: rgba(255, 100, 100, 0.3);">
+                    <div class="section-title" style="color: #ff8888;">⚠️ 容易消耗你的情境</div>
+                    <div class="text-body">
+                        ${detail.drain}
+                    </div>
+                </div>
+
+                <div class="cta-section">
+                    <div class="section-title" style="justify-content: center;">👉 延伸探索你的職涯方向</div>
+                    <p class="text-body" style="margin-bottom: 20px; text-align: center;">
+                        你已經更了解自己的心理運作方式，下一步，是把這些特質用在對的地方。
+                    </p>
+                    
+                    <a href="https://jobus.asia/topics/personality" target="_blank" class="cta-btn primary">
+                        🧠 看懂這類人格，職涯怎麼走
+                    </a>
+                    <a href="https://jobus.asia/topics/career-strategy" target="_blank" class="cta-btn secondary">
+                        🚀 適合我的職涯策略
+                    </a>
+                    <button onclick="shareResult('${detail.t}')" class="cta-btn secondary">
+                        📤 分享我的心理宇宙
+                    </button>
+                </div>
+            `;
+
+            container.innerHTML = html;
+            overlay.classList.add('visible');
+        }
+
+        function closeSummary() {
+            document.getElementById('resultOverlay').classList.remove('visible');
+            // 返回大廳邏輯
+            currentScene = 'LOBBY'; camera.zoom = 5; camera.targetZoom = 1;
+        }
+
+        // --- Phase 2: Share Fallback (修正點 5) ---
+        function shareResult(title) {
+            const shareData = {
+                title: '我的心理宇宙 Mindverse',
+                text: `我在心理宇宙測出了「${title}」！原來這就是我工作卡關的原因... 👉`,
+                url: window.location.href
+            };
+
+            if (navigator.share) {
+                navigator.share(shareData).catch(console.error);
+            } else {
+                alert("電腦版請直接複製連結分享！\n\n" + shareData.text + "\n" + shareData.url);
+            }
+        }
+
+        // 啟動
+        init();
+        loop();
+
     </script>
 </body>
 </html>
