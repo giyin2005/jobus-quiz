@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobus | 履歷指令包</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts (Noto Sans TC) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        /* 自定義捲軸樣式 (Optional) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-rose-200">
+
+    <!-- Navbar / Header -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-400 to-orange-400 flex items-center justify-center text-white font-bold text-lg">
+                    J
+                </div>
+                <span class="font-bold text-lg tracking-tight">Jobus <span class="text-slate-400 font-normal">| 履歷指令包</span></span>
+            </div>
+            <div class="text-xs font-medium px-3 py-1 bg-rose-100 text-rose-600 rounded-full">
+                Limited Free
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-6 py-12 pb-24">
+        
+        <!-- Hero Section -->
+        <div class="text-center mb-12 space-y-4">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-600 text-sm font-medium mb-4">
+                <i data-lucide="sparkles" class="w-4 h-4 text-yellow-500"></i>
+                <span>Gemini Canvas 專用指令</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight">
+                別再用 PDF 了。<br/>
+                讓你的履歷 <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-500">動起來</span>。
+            </h1>
+            <p class="text-lg text-slate-500 max-w-xl mx-auto">
+                不需要會寫程式。選擇喜歡的風格，一鍵複製指令，貼給 Gemini，30 秒生成你的互動式個人網站。
+            </p>
+        </div>
+
+        <!-- Prompt Cards Container -->
+        <div id="cards-container" class="grid gap-6">
+            <!-- Cards will be injected here by JavaScript -->
+        </div>
+
+        <!-- Footer CTA -->
+        <div class="mt-16 text-center border-t border-slate-200 pt-12">
+            <p class="text-slate-400 mb-6">想要更多 AI 工作術？</p>
+            <a 
+                href="https://www.instagram.com/jobus.asia/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 text-rose-500 font-bold hover:gap-4 transition-all"
+            >
+                追蹤 Jobus 看更多教學 <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+        </div>
+
+    </main>
+
+    <script>
+        // Data Structure (Same as React code)
+        const prompts = [
+            {
+                id: 1,
+                title: "極簡藝廊風 (適合設計/攝影)",
+                iconName: "palette",
+                iconClass: "w-8 h-8 text-pink-500", // Adjusted for inner icon usage
+                bgIconClass: "text-white", // Color inside the gradient box
+                tag: "視覺系必備",
+                color: "from-pink-500 to-rose-500",
+                desc: "打造像美術館一樣的瀏覽體驗，強調圖片展示與互動細節。",
+                content: `請扮演專業的前端工程師，使用 HTML 和 Tailwind CSS 製作一個單頁式個人作品集網站。
+
+【風格要求】：
+1. 極簡主義 (Minimalist)：背景使用米白色 (#FAFAF9)，文字使用深灰色。
+2. 藝廊排版：作品集區塊採用 Masonry (瀑布流) 或格狀佈局。
+3. 互動特效：滑鼠懸停在作品圖片上時，圖片要微幅放大 (Scale up) 並出現半透明遮罩顯示標題。
+4. 字體：使用 Noto Sans TC，強調留白與呼吸感。
+
+【必要區塊】：
+- Hero Section：大字標題自我介紹，配上一張去背的人像照或抽象幾何圖形。
+- Gallery：6-8 張作品展示卡片。
+- About：簡短的兩欄式介紹。
+- Contact：極簡的 Email 連結與社群 Icon。
+
+請給我完整的單一 HTML 檔案，包含所有 CSS 和假圖占位符 (Placeholders)。`
+            },
+            {
+                id: 2,
+                title: "專業數據風 (適合行銷/PM)",
+                iconName: "trending-up",
+                iconClass: "w-8 h-8 text-blue-500",
+                bgIconClass: "text-white",
+                tag: "強調成效",
+                color: "from-blue-500 to-cyan-500",
+                desc: "用動態數字和時間軸展示你的 KPI 成就，建立專業信任感。",
+                content: `請使用 HTML 和 Tailwind CSS 製作一個專業感的個人履歷網頁，目標受眾是獵頭與面試官。
+
+【風格要求】：
+1. 信任感配色：主色調使用深海藍 (#0F172A) 搭配金色或是亮藍色點綴。
+2. 結構清晰：使用卡片式設計 (Card Design) 區分不同經歷。
+3. 數據視覺化：這是重點，請製作「動態計數器 (Counter Animation)」，讓數字 (如 ROI 成長 30%) 從 0 跑到指定數值。
+
+【必要區塊】：
+- Header：姓名、職稱、一句話亮點 (Tagline)。
+- Key Achievements：3 個並排的數據卡片 (例如：管理預算、營收成長、專案數量)。
+- Experience：使用垂直時間軸 (Timeline) 呈現過往工作經歷。
+- Skills：使用進度條 (Progress Bar) 展示軟硬實力。
+
+請確保在行動裝置上也能完美閱讀，並給我完整的程式碼。`
+            },
+            {
+                id: 3,
+                title: "黑客科技風 (適合工程/通用)",
+                iconName: "code",
+                iconClass: "w-8 h-8 text-green-500",
+                bgIconClass: "text-white",
+                tag: "Geek 最愛",
+                color: "from-green-500 to-emerald-500",
+                desc: "深色模式搭配打字機特效，展現你的技術力與獨特個性。",
+                content: `請幫我製作一個具有「科技感」的深色模式 (Dark Mode) 個人網站，使用 HTML 和 Tailwind CSS。
+
+【風格要求】：
+1. 駭客風格：背景全黑 (#000000) 或深灰，文字使用螢光綠 (#00FF00) 或霓虹紫。
+2. 字體：請使用等寬字體 (Monospace) 模擬程式碼編輯器。
+3. 動畫：Hero Section 的標題要有「打字機效果 (Typewriter Effect)」，游標要閃爍。
+
+【必要區塊】：
+- Terminal Intro：模擬終端機介面，輸入指令後顯示自我介紹。
+- Tech Stack：使用帶有發光效果 (Glow effect) 的標籤雲展示技能。
+- Projects：專案列表，每個專案都要有 GitHub 連結按鈕。
+- Footer：簡單的 Copyright 宣告。
+
+請給我一個看起來非常酷炫、像是駭客控制台的網頁程式碼。`
+            }
+        ];
+
+        // Function to render cards
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            
+            prompts.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = `group relative bg-white rounded-2xl border transition-all duration-300 overflow-hidden hover:shadow-xl hover:-translate-y-1 border-slate-200 hover:border-rose-200`;
+                card.id = `card-${index}`;
+
+                card.innerHTML = `
+                    <!-- Card Header -->
+                    <div class="p-6 md:p-8 flex flex-col md:flex-row gap-6">
+                        
+                        <!-- Icon Box -->
+                        <div class="shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-lg text-white">
+                            <i data-lucide="${item.iconName}" class="w-8 h-8 text-white"></i>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="flex-1 space-y-2">
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <h3 class="text-xl font-bold text-slate-900">${item.title}</h3>
+                                <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-wider">
+                                    ${item.tag}
+                                </span>
+                            </div>
+                            <p class="text-slate-600 leading-relaxed">
+                                ${item.desc}
+                            </p>
+                            
+                            <!-- The Prompt Preview (Blurred) -->
+                            <div class="relative mt-4 bg-slate-50 rounded-lg border border-slate-100 p-4 font-mono text-xs text-slate-400 overflow-hidden h-24 select-none">
+                                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-slate-50 pointer-events-none"></div>
+                                ${item.content.replace(/\n/g, '<br>')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Bar -->
+                    <div class="bg-slate-50 px-6 py-4 flex items-center justify-between border-t border-slate-100">
+                        <div class="flex items-center gap-2 text-xs font-semibold text-slate-400">
+                            <i data-lucide="zap" class="w-4 h-4"></i>
+                            點擊複製 Prompt
+                        </div>
+                        <button
+                            onclick="handleCopy(this, ${index})"
+                            data-content="${encodeURIComponent(item.content)}"
+                            class="relative overflow-hidden flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 shadow-sm bg-slate-900 text-white hover:bg-rose-500 hover:shadow-rose-200 active:scale-95 btn-copy"
+                        >
+                            <span class="flex items-center gap-2 content-normal">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                                一鍵複製
+                            </span>
+                            <span class="hidden flex items-center gap-2 content-copied">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                                已複製指令！
+                            </span>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            
+            // Re-initialize icons for the new content
+            lucide.createIcons();
+        }
+
+        // Copy Handler
+        function handleCopy(btnElement, index) {
+            // Retrieve content (decoded)
+            const text = decodeURIComponent(btnElement.getAttribute('data-content'));
+            const card = document.getElementById(`card-${index}`);
+            
+            // Clipboard logic (Using execCommand as requested/compatible)
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                
+                // Update UI state
+                updateButtonState(btnElement, card, true);
+                
+                // Reset after 2.5s
+                setTimeout(() => {
+                    updateButtonState(btnElement, card, false);
+                }, 2500);
+
+            } catch (err) {
+                console.error('複製失敗', err);
+            }
+            
+            document.body.removeChild(textarea);
+        }
+
+        function updateButtonState(btn, card, isCopied) {
+            const normalContent = btn.querySelector('.content-normal');
+            const copiedContent = btn.querySelector('.content-copied');
+
+            if (isCopied) {
+                // Change Button Style
+                btn.className = "relative overflow-hidden flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 shadow-sm bg-green-500 text-white shadow-green-200 scale-95 btn-copy";
+                
+                // Toggle Content
+                normalContent.classList.add('hidden');
+                copiedContent.classList.remove('hidden');
+                copiedContent.classList.add('flex');
+
+                // Change Card Border Style
+                card.classList.remove('border-slate-200', 'hover:border-rose-200');
+                card.classList.add('border-green-500', 'ring-2', 'ring-green-100');
+            } else {
+                // Revert Button Style
+                btn.className = "relative overflow-hidden flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 shadow-sm bg-slate-900 text-white hover:bg-rose-500 hover:shadow-rose-200 active:scale-95 btn-copy";
+                
+                // Toggle Content
+                copiedContent.classList.add('hidden');
+                copiedContent.classList.remove('flex');
+                normalContent.classList.remove('hidden');
+
+                // Revert Card Border Style
+                card.classList.remove('border-green-500', 'ring-2', 'ring-green-100');
+                card.classList.add('border-slate-200', 'hover:border-rose-200');
+            }
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            renderCards();
+            lucide.createIcons();
+        };
+
+    </script>
+</body>
+</html>
