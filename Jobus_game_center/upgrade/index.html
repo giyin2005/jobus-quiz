@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>職涯升級資源包</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc;
+        }
+        .tab-active {
+            border-bottom: 3px solid #3b82f6;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white text-center">
+            <h1 class="text-2xl md:text-3xl font-bold mb-2">🚀 職涯升級全攻略資源包</h1>
+            <p class="opacity-90">數據量化、技能習得、人脈地圖一次搞定</p>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="flex border-b text-sm md:text-base bg-gray-50">
+            <button onclick="showTab('tab1')" id="btn-tab1" class="flex-1 py-4 px-2 font-medium transition-all hover:bg-white">
+                📊 黃金數據指標
+            </button>
+            <button onclick="showTab('tab2')" id="btn-tab2" class="flex-1 py-4 px-2 font-medium transition-all hover:bg-white">
+                💡 自學地圖
+            </button>
+            <button onclick="showTab('tab3')" id="btn-tab3" class="flex-1 py-4 px-2 font-medium transition-all hover:bg-white tab-active">
+                🤝 貴人地圖
+            </button>
+        </div>
+
+        <!-- Content Area -->
+        <div class="p-6">
+            <!-- Tab 1: 考古數據指標 -->
+            <div id="tab1" class="tab-content hidden">
+                <div class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
+                    <h2 class="text-lg font-bold text-blue-900 mb-1">💡 讓履歷說話：這 4 類數據是你的薪水籌碼</h2>
+                    <p class="text-sm text-blue-800">所有的工作都能量化。沒有精確數字，就用「區間」或「對比」呈現。</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 border rounded-xl hover:shadow-md transition-shadow">
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-2">📈</span>
+                            <h3 class="font-bold text-gray-800">業績與成長 (錢)</h3>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-3">關鍵詞：營收、獲利、YoY、MoM</p>
+                        <ul class="text-sm space-y-2 text-gray-700">
+                            <li class="flex items-start"><span class="text-blue-500 mr-2">•</span>專案帶來的具體營收數字或獲利貢獻。</li>
+                            <li class="flex items-start"><span class="text-blue-500 mr-2">•</span>相較去年同期 (YoY) 或上月 (MoM) 的成長百分比。</li>
+                            <li class="bg-gray-50 p-2 rounded text-xs italic">範例：Q3 業績達 500 萬，相較去年成長 35%。</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-4 border rounded-xl hover:shadow-md transition-shadow">
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-2">⏳</span>
+                            <h3 class="font-bold text-gray-800">效率與優化 (時間)</h3>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-3">關鍵詞：工時、交付期、自動化</p>
+                        <ul class="text-sm space-y-2 text-gray-700">
+                            <li class="flex items-start"><span class="text-blue-500 mr-2">•</span>導入工具或優化流程後，省下的「總工時」。</li>
+                            <li class="flex items-start"><span class="text-blue-500 mr-2">•</span>專案交付時間從 X 天縮短至 Y 天。</li>
+                            <li class="bg-gray-50 p-2 rounded text-xs italic">範例：優化自動化流程，縮短月結耗時 80%。</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-4 border rounded-xl hover:shadow-md transition-shadow">
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-2">👥</span>
+                            <h3 class="font-bold text-gray-800">影響力與規模 (人)</h3>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-3">關鍵詞：觸及、跨部門、領導、從 0 到 1</p>
+                        <ul class="text-sm space-y-2 text-gray-700">
+                            <li class="flex items-start"><span class="text-blue-500 mr-2">•</span>協作的跨部門數量、外部廠商規模。</li>
+                            <li class="flex items-start"><span class="text-blue-500 mr-2">•</span>社群觸及、活動參加人數或管理團隊人數。</li>
+                            <li class="bg-gray-50 p-2 rounded text-xs italic">範例：從 0 到 1 建立 10 人技術團隊，服務 5 萬用戶。</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-4 border rounded-xl hover:shadow-md transition-shadow">
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-2">💰</span>
+                            <h3 class="font-bold text-gray-800">預算與控管 (成本)</h3>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-3">關鍵詞：預算總額、成本節省、ROI</p>
+                        <ul class="text-sm space-y-2 text-gray-700">
+                            <li class="flex items-start"><span class="text-blue-500 mr-2">•</span>操作過的預算總額 (證明你扛得住大錢)。</li>
+                            <li class="flex items-start"><span class="text-blue-500 mr-2">•</span>達成同樣目標下，節省了多少具體成本。</li>
+                            <li class="bg-gray-50 p-2 rounded text-xs italic">範例：管理年度預算 1,000 萬，優化後節省成本 12%。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: 高薪技能自學地圖 -->
+            <div id="tab2" class="tab-content hidden">
+                <div class="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-r-lg">
+                    <h2 class="text-lg font-bold text-green-900 mb-1">🛠️ 公費練功：年後市場需求最高技能</h2>
+                    <p class="text-sm text-green-800">💡 Jobus 策略：只要在現職成功導入一個新工具，面試就能理直氣壯地說：「我有 XX 工具實戰導入經驗。」</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="border rounded-xl p-5 bg-white shadow-sm hover:border-blue-300 transition-colors">
+                        <div class="flex items-center mb-3">
+                            <span class="text-2xl mr-2">🤖</span>
+                            <h3 class="font-bold text-gray-900">AI 生產力（效率標配）</h3>
+                        </div>
+                        <div class="mb-4 text-sm">
+                            <span class="font-semibold text-blue-600">工具：</span> ChatGPT, Claude, Midjourney
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <p class="text-xs font-bold text-gray-500 mb-2">🔥 實測練法：</p>
+                            <ul class="text-xs text-gray-700 space-y-1">
+                                <li>• 用 AI 擬定第一版企劃草稿</li>
+                                <li>• 幫長篇會議紀錄生成精簡摘要</li>
+                                <li>• 為社群貼文或簡報生成高品質配圖</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="border rounded-xl p-5 bg-white shadow-sm hover:border-blue-300 transition-colors">
+                        <div class="flex items-center mb-3">
+                            <span class="text-2xl mr-2">📊</span>
+                            <h3 class="font-bold text-gray-900">數據分析與視覺化</h3>
+                        </div>
+                        <div class="mb-4 text-sm">
+                            <span class="font-semibold text-blue-600">工具：</span> Power BI, Looker Studio, 進階 Excel
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <p class="text-xs font-bold text-gray-500 mb-2">🔥 實測練法：</p>
+                            <ul class="text-xs text-gray-700 space-y-1">
+                                <li>• 把雜亂的週報，做成視覺化儀表板</li>
+                                <li>• 透過數據對比，找出業績增長的關鍵點</li>
+                                <li>• 用圖表取代純文字說服老闆預算決策</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="border rounded-xl p-5 bg-white shadow-sm hover:border-blue-300 transition-colors">
+                        <div class="flex items-center mb-3">
+                            <span class="text-2xl mr-2">📂</span>
+                            <h3 class="font-bold text-gray-900">數位協作與專案管理</h3>
+                        </div>
+                        <div class="mb-4 text-sm">
+                            <span class="font-semibold text-blue-600">工具：</span> Notion, Trello, Asana
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <p class="text-xs font-bold text-gray-500 mb-2">🔥 實測練法：</p>
+                            <ul class="text-xs text-gray-700 space-y-1">
+                                <li>• 建立團隊知識庫 (Wiki) 減少溝通重複性</li>
+                                <li>• 把雜亂進度改用系統化「看板管理」</li>
+                                <li>• 實測非同步溝通，降低無效會議時間</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="border rounded-xl p-5 bg-white shadow-sm hover:border-blue-300 transition-colors">
+                        <div class="flex items-center mb-3">
+                            <span class="text-2xl mr-2">📱</span>
+                            <h3 class="font-bold text-gray-900">多媒體影音（跨域）</h3>
+                        </div>
+                        <div class="mb-4 text-sm">
+                            <span class="font-semibold text-blue-600">工具：</span> CapCut, Canva, Figma
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <p class="text-xs font-bold text-gray-500 mb-2">🔥 實測練法：</p>
+                            <ul class="text-xs text-gray-700 space-y-1">
+                                <li>• 幫公司活動剪一段 30 秒 Reels/Shorts</li>
+                                <li>• 設計一組更有設計感的提案簡報範本</li>
+                                <li>• 快速製作吸睛的行銷素材圖</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: 隱藏版職缺人脈庫 -->
+            <div id="tab3" class="tab-content">
+                <div class="mb-6 p-4 bg-purple-50 border-l-4 border-purple-500 rounded-r-lg">
+                    <h2 class="text-lg font-bold text-purple-900 mb-1">🤝 建立一份帶得走的「貴人地圖」</h2>
+                    <p class="text-sm text-purple-800">💡 Jobus 悄悄話：高端職缺通常不公開。當你整理好地圖，內推機會就在其中。</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- 人脈分類卡片 -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white border-2 border-blue-100 rounded-xl p-4">
+                            <h3 class="font-bold text-blue-700 flex items-center mb-2">
+                                <span class="mr-1">💎</span> 產業領路人
+                            </h3>
+                            <p class="text-xs text-gray-500 mb-2">對象：前主管、資深前輩</p>
+                            <p class="text-sm text-gray-700 leading-relaxed">重點：紀錄他們對你的評價、曾給過的關鍵建議。</p>
+                        </div>
+                        <div class="bg-white border-2 border-green-100 rounded-xl p-4">
+                            <h3 class="font-bold text-green-700 flex items-center mb-2">
+                                <span class="mr-1">🤝</span> 外部戰友
+                            </h3>
+                            <p class="text-xs text-gray-500 mb-2">對象：窗口、廠商、業務</p>
+                            <p class="text-sm text-gray-700 leading-relaxed">重點：紀錄對方的企業文化、可能的職缺類型。</p>
+                        </div>
+                        <div class="bg-white border-2 border-yellow-100 rounded-xl p-4">
+                            <h3 class="font-bold text-yellow-700 flex items-center mb-2">
+                                <span class="mr-1">💡</span> 跨域情報員
+                            </h3>
+                            <p class="text-xs text-gray-500 mb-2">對象：前同事、不同業朋友</p>
+                            <p class="text-sm text-gray-700 leading-relaxed">重點：紀錄該產業薪資天花板、年終行情。</p>
+                        </div>
+                    </div>
+
+                    <!-- 關鍵資訊區塊 -->
+                    <div class="border rounded-xl p-5 bg-gray-50">
+                        <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                            📝 整理時一定要記下的「關鍵資訊」
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-600 mb-1">1. 認識情境</h4>
+                                <p class="text-xs text-gray-500">當初合作哪個專案？<br>(方便隨時開啟話題)</p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-600 mb-1">2. 對方的強項</h4>
+                                <p class="text-xs text-gray-500">對方最讓你佩服、<br>值得學習的地方。</p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-600 mb-1">3. 互動頻率</h4>
+                                <p class="text-xs text-gray-500">維持「半年一次」問候<br>(按讚、升遷、節慶)。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 overflow-x-auto">
+                    <p class="text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">範本清單範例</p>
+                    <table class="min-w-full text-xs text-left border">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="p-2 border">類別</th>
+                                <th class="p-2 border">姓名</th>
+                                <th class="p-2 border">關鍵紀錄</th>
+                                <th class="p-2 border">下次互動日期</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr>
+                                <td class="p-2 border text-blue-600 font-medium">領路人</td>
+                                <td class="p-2 border">陳前輩</td>
+                                <td class="p-2 border text-gray-500">曾說我邏輯強但溝通太硬；現於 A 公司。</td>
+                                <td class="p-2 border text-gray-400 italic">2026/01 (農曆年)</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2 border text-green-600 font-medium">外部戰友</td>
+                                <td class="p-2 border">王經理</td>
+                                <td class="p-2 border text-gray-500">B 廠商窗口，做事嚴謹；該公司獎金穩定。</td>
+                                <td class="p-2 border text-gray-400 italic">2026/03 (Q1聚餐)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-6 bg-gray-50 border-t text-center">
+            <p class="text-sm text-gray-500">2026 職涯目標：不僅要努力，更要「聰明地努力」。</p>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            document.querySelectorAll('button').forEach(btn => {
+                btn.classList.remove('tab-active');
+            });
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('tab-active');
+        }
+    </script>
+</body>
+</html>
