@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobus 職涯導航資源包 - MVP 職涯測試法</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc;
+        }
+        .active-tab {
+            border-bottom: 4px solid #3b82f6;
+            color: #1e40af;
+        }
+        .step-content {
+            display: none;
+        }
+        .step-content.active {
+            display: block;
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        /* Checkbox styling */
+        input[type="checkbox"]:checked + span {
+            color: #1e40af;
+            font-weight: 500;
+        }
+        /* Accordion transition */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+        }
+        .accordion-item.open .accordion-content {
+            max-height: 1200px; /* 增加預期高度以容納新的內容 */
+            padding-bottom: 1.5rem;
+        }
+        .accordion-item.open .chevron {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="pb-12">
+
+    <!-- Header -->
+    <header class="bg-blue-700 text-white py-8 px-4 text-center">
+        <h1 class="text-2xl md:text-3xl font-bold mb-2">🎁 Jobus 職涯導航資源包</h1>
+        <p class="text-blue-100 opacity-90">MVP 職涯測試法：將焦慮轉化為行動</p>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="sticky top-0 bg-white border-b border-gray-200 z-10 shadow-sm">
+        <div class="max-w-4xl mx-auto flex justify-around">
+            <button onclick="showStep(1)" id="tab1" class="py-4 px-2 font-bold transition-all active-tab text-sm md:text-base">步驟一：診斷</button>
+            <button onclick="showStep(2)" id="tab2" class="py-4 px-2 font-bold transition-all text-sm md:text-base">步驟二：路徑</button>
+            <button onclick="showStep(3)" id="tab3" class="py-4 px-2 font-bold transition-all text-sm md:text-base">步驟三：行動</button>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto mt-8 px-4">
+        
+        <!-- STEP 1: Diagnosis -->
+        <section id="step1" class="step-content active">
+            <div class="bg-white p-6 md:p-8 rounded-2xl card-shadow border border-gray-100">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center mr-2">1</span>
+                    現狀失衡診斷表
+                </h2>
+                
+                <div class="bg-amber-50 border-l-4 border-amber-400 p-4 mb-6">
+                    <p class="text-amber-800 text-sm leading-relaxed">
+                        <strong>💡 使用說明：</strong> 本表採可複選。請勾選符合你目前心情的描述。
+                        <br class="hidden md:block">
+                        單一類別中<strong>勾選越多，代表該面向的失衡越嚴重</strong>，是你在調整職涯時需優先處理的紅燈區。
+                    </p>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- Achievement -->
+                    <div class="border border-gray-200 rounded-xl p-5 hover:border-blue-300 transition-colors bg-white">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-blue-700 text-lg">成就感失衡</h3>
+                            <span class="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded">能力與成長</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <label class="flex items-start space-x-3 cursor-pointer p-2 rounded hover:bg-gray-50">
+                                <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700 text-sm">覺得目前的工作內容閉著眼都能做，毫無挑戰性。</span>
+                            </label>
+                            <label class="flex items-start space-x-3 cursor-pointer p-2 rounded hover:bg-gray-50">
+                                <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700 text-sm">每天都在處理重複、機械性的瑣碎雜事。</span>
+                            </label>
+                            <label class="flex items-start space-x-3 cursor-pointer p-2 rounded hover:bg-gray-50">
+                                <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700 text-sm">感受不到專業技能的累積，感覺自己隨時可被取代。</span>
+                            </label>
+                            <label class="flex items-start space-x-3 cursor-pointer p-2 rounded hover:bg-gray-50">
+                                <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700 text-sm">工作中缺乏正向回饋，找不到努力的意義與目標。</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Value -->
+                    <div class="border border-gray-200 rounded-xl p-5 hover:border-blue-300 transition-colors bg-white">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-blue-700 text-lg">價值觀失衡</h3>
+                            <span class="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded">環境與理念</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <label class="flex items-start space-x-3 cursor-pointer p-2 rounded hover:bg-gray-50">
+                                <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700 text-sm">公司的企業文化與我的個人價值觀（如：誠實、永續）有衝突。</span>
+                            </label>
+                            <label class="flex items-start space-x-3 cursor-pointer p-2 rounded hover:bg-gray-50">
+                                <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700 text-sm">工時安排或加班文化嚴重侵蝕到我重視的私人生活與健康。</span>
+                            </label>
+                            <label class="flex items-start space-x-3 cursor-pointer p-2 rounded hover:bg-gray-50">
+                                <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700 text-sm">不認同公司的管理風格或團隊溝通方式，感到隱形內耗。</span>
+                            </label>
+                            <label class="flex items-start space-x-3 cursor-pointer p-2 rounded hover:bg-gray-50">
+                                <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700 text-sm">對於工作所產出的價值感到心虛，無法產生認同感。</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Return -->
+                    <div class="border border-gray-200 rounded-xl p-5 hover:border-blue-300 transition-colors bg-white">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-blue-700 text-lg">回報率失衡</h3>
+                            <span class="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded">報酬與未來</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <label class="flex items-start space-x-3 cursor-pointer p-2 rounded hover:bg-gray-50">
+                                <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700 text-sm">目前的薪資福利明顯低於市場行情，且調薪幅度極小。</span>
+                            </label>
+                            <label class="flex items-start space-x-3 cursor-pointer p-2 rounded hover:bg-gray-50">
+                                <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700 text-sm">在現有公司看不到升遷管道，職涯晉升處於凍結狀態。</span>
+                            </label>
+                            <label class="flex items-start space-x-3 cursor-pointer p-2 rounded hover:bg-gray-50">
+                                <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700 text-sm">投入的時間與心力換不到相對應的市場競爭力累積。</span>
+                            </label>
+                            <label class="flex items-start space-x-3 cursor-pointer p-2 rounded hover:bg-gray-50">
+                                <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700 text-sm">公司資源不足，導致我想做的事情處處受限，回報極低。</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-10 text-center">
+                    <button onclick="showStep(2)" class="bg-blue-600 text-white px-10 py-4 rounded-full font-bold hover:bg-blue-700 transition-transform active:scale-95 shadow-xl">下一步：分析路徑</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 2: Path Selection -->
+        <section id="step2" class="step-content">
+            <div class="bg-white p-6 md:p-8 rounded-2xl card-shadow border border-gray-100">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center mr-2">2</span>
+                    三大路徑決策模型
+                </h2>
+
+                <div class="bg-blue-50 rounded-xl p-5 mb-8 border border-blue-100">
+                    <h4 class="font-bold text-blue-800 mb-2">職涯不是只有「離職」或「忍耐」兩種極端</h4>
+                    <p class="text-sm text-blue-700 leading-relaxed">
+                        當你發現失衡時，別急著裸辭！裸辭的壓力往往會讓你做出錯誤的決定。根據你的<strong>風險承受度</strong>與<strong>過去累積的資產</strong>，我們將策略分為三種。每一種路徑都是為了讓你在「保有後路」的前提下，更精準地切換跑道。
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Path A -->
+                    <div class="bg-green-50 p-6 rounded-2xl border border-green-100 flex flex-col h-full shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                            <span class="text-green-600 font-bold text-xs tracking-wider uppercase">低風險：垂直深耕</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-green-900 mb-3 underline decoration-green-200 decoration-4">換個環境繼續贏</h3>
+                        <p class="text-sm text-green-800 mb-6 leading-relaxed flex-grow">
+                            保持現有職能，跳槽到更具成長性、文化更契合的公司。這能解決<strong>環境不對</strong>導致的失衡，同時不丟棄已有的年資。
+                        </p>
+                        <div class="mt-2 mb-4">
+                            <span class="text-xs font-bold text-green-700 block mb-2">📍 實踐關鍵：</span>
+                            <ul class="text-xs text-green-800 space-y-2">
+                                <li class="flex items-start bg-white/50 p-1 rounded"><span class="mr-2">✔️</span>爭取參與公司內部核心專案</li>
+                                <li class="flex items-start bg-white/50 p-1 rounded"><span class="mr-2">✔️</span>鎖定同產業的前段班公司</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg text-xs text-green-600 font-medium border border-green-100 mt-auto">
+                            💡 適合：目前環境受限，導致成就感或回報率失衡的人。
+                        </div>
+                    </div>
+
+                    <!-- Path B -->
+                    <div class="bg-orange-50 p-6 rounded-2xl border border-orange-100 flex flex-col h-full shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+                            <span class="text-orange-600 font-bold text-xs tracking-wider uppercase">中風險：跨域轉軌</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-orange-900 mb-3 underline decoration-orange-200 decoration-4">帶著資產去冒險</h3>
+                        <p class="text-sm text-orange-800 mb-6 leading-relaxed flex-grow">
+                            利用「轉移技能」切換到相關領域。這能解決<strong>職能疲乏</strong>問題，同時保留過去累積的職場人脈與軟實力。
+                        </p>
+                        <div class="mt-2 mb-4">
+                            <span class="text-xs font-bold text-orange-700 block mb-2">📍 實踐關鍵：</span>
+                            <ul class="text-xs text-orange-800 space-y-2">
+                                <li class="flex items-start bg-white/50 p-1 rounded"><span class="mr-2">✔️</span>盤點跨部門合作的共通技能</li>
+                                <li class="flex items-start bg-white/50 p-1 rounded"><span class="mr-2">✔️</span>尋找「領域+職能」其中一項重疊的職位</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg text-xs text-orange-600 font-medium border border-orange-100 mt-auto">
+                            💡 適合：想運用既有經驗切入新賽道，不願全部歸零者。
+                        </div>
+                    </div>
+
+                    <!-- Path C -->
+                    <div class="bg-red-50 p-6 rounded-2xl border border-red-100 flex flex-col h-full shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                            <span class="text-red-600 font-bold text-xs tracking-wider uppercase">高風險：全新重啟</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-red-900 mb-3 underline decoration-red-200 decoration-4">推倒重來的決心</h3>
+                        <p class="text-sm text-red-800 mb-6 leading-relaxed flex-grow">
+                            投入完全不同的領域。雖然成本最高，但能讓你從<strong>死胡同</strong>中徹底翻身。
+                        </p>
+                        <div class="mt-2 mb-4">
+                            <span class="text-xs font-bold text-red-700 block mb-2">📍 實踐關鍵：</span>
+                            <ul class="text-xs text-red-800 space-y-2">
+                                <li class="flex items-start bg-white/50 p-1 rounded"><span class="mr-2">✔️</span>利用下班時間進行最小化測試(MVP)</li>
+                                <li class="flex items-start bg-white/50 p-1 rounded"><span class="mr-2">✔️</span>確認熱情是否足以支撐轉行陣痛期</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg text-xs text-red-600 font-medium border border-green-100 mt-auto">
+                            💡 適合：現有領域已無前景，或對新領域有強烈熱情的人。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center">
+                    <button onclick="showStep(3)" class="bg-blue-600 text-white px-10 py-4 rounded-full font-bold hover:bg-blue-700 shadow-xl transition-all active:scale-95">進入微行動練習</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 3: Actions -->
+        <section id="step3" class="step-content">
+            <div class="mb-8 px-2">
+                <h2 class="text-xl font-bold text-gray-800 mb-3 flex items-center">
+                    <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center mr-2">3</span>
+                    微行動練習清單
+                </h2>
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-xl">
+                    <p class="text-blue-800 text-sm leading-relaxed">
+                        <strong>💡 行動建議：</strong> 不必一次做完所有行動，挑一個最不費力、最想嘗試的開始就好。幫未來的自己探路！
+                    </p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Action 01: Value Reflection & Reference -->
+                <div class="accordion-item bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
+                    <button onclick="toggleAccordion(this)" class="w-full flex justify-between items-center p-6 text-left focus:outline-none hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-blue-500 font-black text-xl">01</span>
+                            <div>
+                                <h3 class="font-bold text-gray-800">深度價值觀探索</h3>
+                                <p class="text-xs text-gray-500">透過自問自答，找出你職涯中「不可退讓」的核心</p>
+                            </div>
+                        </div>
+                        <svg class="chevron w-5 h-5 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6">
+                        <div class="pt-4 space-y-6">
+                            <!-- Questions Section -->
+                            <div>
+                                <h4 class="text-sm font-bold text-blue-700 mb-3 flex items-center">
+                                    <span class="mr-2">🔍</span> 自問自答引導
+                                </h4>
+                                <div class="space-y-4">
+                                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                        <p class="text-sm font-medium text-gray-800 mb-2">Q1. 回顧過去工作最有成就感的時刻，那個「快樂」是因為什麼產生的？</p>
+                                        <p class="text-xs text-gray-500">（例如：解決了複雜難題、幫助他人解決困難、或是因為獲得大眾的讚賞？）</p>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                        <p class="text-sm font-medium text-gray-800 mb-2">Q2. 如果今天有兩份工作，一份薪水極高但完全沒有私人時間，一份薪水剛好夠用但高度自由，你會毫不猶豫選哪一個？</p>
+                                        <p class="text-xs text-gray-500">（這題能幫你分辨「金錢報酬」與「生活平衡」的優先順位。）</p>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                        <p class="text-sm font-medium text-gray-800 mb-2">Q3. 有哪些職場行為（如：惡性競爭、過度封閉）會讓你感到極度憤怒或不適？</p>
+                                        <p class="text-xs text-gray-500">（你最討厭的事情，往往反映了你最重視的價值觀反面。）</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Value Bank -->
+                            <div>
+                                <h4 class="text-sm font-bold text-blue-700 mb-3 flex items-center">
+                                    <span class="mr-2">💡</span> 價值觀參考庫
+                                </h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs border border-blue-100 font-medium">薪資報酬</span>
+                                    <span class="px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-xs border border-green-100 font-medium">生活平衡</span>
+                                    <span class="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-full text-xs border border-purple-100 font-medium">專業成就</span>
+                                    <span class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-xs border border-indigo-100 font-medium">影響力</span>
+                                    <span class="px-3 py-1.5 bg-orange-50 text-orange-700 rounded-full text-xs border border-orange-100 font-medium">穩定保障</span>
+                                    <span class="px-3 py-1.5 bg-red-50 text-red-700 rounded-full text-xs border border-red-100 font-medium">創造力</span>
+                                    <span class="px-3 py-1.5 bg-teal-50 text-teal-700 rounded-full text-xs border border-teal-100 font-medium">自主彈性</span>
+                                    <span class="px-3 py-1.5 bg-yellow-50 text-yellow-700 rounded-full text-xs border border-yellow-100 font-medium">人際契合</span>
+                                    <span class="px-3 py-1.5 bg-pink-50 text-pink-700 rounded-full text-xs border border-pink-100 font-medium">學習成長</span>
+                                    <span class="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-full text-xs border border-gray-100 font-medium">地位認同</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action 02: Skill Audit -->
+                <div class="accordion-item bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
+                    <button onclick="toggleAccordion(this)" class="w-full flex justify-between items-center p-6 text-left focus:outline-none hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-indigo-500 font-black text-xl">02</span>
+                            <div>
+                                <h3 class="font-bold text-gray-800">技能清單審核</h3>
+                                <p class="text-xs text-gray-500">拆解過去成就，找出可轉移的軟硬實力</p>
+                            </div>
+                        </div>
+                        <svg class="chevron w-5 h-5 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6">
+                        <div class="pt-4 space-y-6">
+                            <!-- Skill Bank -->
+                            <div>
+                                <h4 class="text-sm font-bold text-indigo-700 mb-3 flex items-center">
+                                    <span class="mr-2">🔍</span> 核心能力參考庫
+                                </h4>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-md text-xs border border-indigo-100">跨部門溝通</span>
+                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-md text-xs border border-indigo-100">專案管理</span>
+                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-md text-xs border border-indigo-100">數據洞察</span>
+                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-md text-xs border border-indigo-100">危機處理</span>
+                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-md text-xs border border-indigo-100">邏輯分析</span>
+                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-md text-xs border border-indigo-100">市場開發</span>
+                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-md text-xs border border-indigo-100">談判技巧</span>
+                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-md text-xs border border-indigo-100">視覺設計</span>
+                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-md text-xs border border-indigo-100">使用調研</span>
+                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-md text-xs border border-indigo-100">流程自動化</span>
+                                </div>
+                            </div>
+
+                            <!-- Input Section -->
+                            <div class="space-y-4">
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold text-gray-600 uppercase tracking-wider">成就事件實錄</label>
+                                    <input type="text" placeholder="範例：在三個月內透過 SEO 優化，將官網自然流量提升了 35%..." class="w-full border-b border-gray-200 py-2 text-sm focus:border-indigo-500 outline-none transition-colors">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold text-gray-600 uppercase tracking-wider">背後的轉移技能</label>
+                                    <input type="text" placeholder="範例：數據分析力、內容企劃、對搜尋引擎演算法的敏銳度..." class="w-full border-b border-gray-200 py-2 text-sm focus:border-indigo-500 outline-none transition-colors">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action 03: Information Interview -->
+                <div class="accordion-item bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
+                    <button onclick="toggleAccordion(this)" class="w-full flex justify-between items-center p-6 text-left focus:outline-none hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-purple-500 font-black text-xl">03</span>
+                            <div>
+                                <h3 class="font-bold text-gray-800">情報收集約訪</h3>
+                                <p class="text-xs text-gray-500">找「已經在裡面的人」詢問真實職場面貌</p>
+                            </div>
+                        </div>
+                        <svg class="chevron w-5 h-5 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6">
+                        <div class="pt-4 space-y-6">
+                            <!-- Interviewee Suggestions -->
+                            <div>
+                                <h4 class="text-sm font-bold text-purple-700 mb-3 flex items-center">
+                                    <span class="mr-2">🎯</span> 建議約訪對象與價值
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                                    <div class="p-3 bg-purple-50 rounded-lg border border-purple-100">
+                                        <p class="font-bold text-purple-800 mb-1">1. 目標領域的資深前輩 (3-5年經驗)</p>
+                                        <p class="text-purple-700 leading-relaxed">
+                                            <strong>價值：</strong>了解產業的真實天花板、晉升路徑，以及該職位最常被「美化」掉的枯燥日常。
+                                        </p>
+                                    </div>
+                                    <div class="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                        <p class="font-bold text-blue-800 mb-1">2. 跨領域轉職成功的學長姐</p>
+                                        <p class="text-blue-700 leading-relaxed">
+                                            <strong>價值：</strong>獲得轉職過程中的「排雷」經驗，知道哪些舊技能最好用，以及轉行初期的心態調適。
+                                        </p>
+                                    </div>
+                                    <div class="p-3 bg-green-50 rounded-lg border border-green-100">
+                                        <p class="font-bold text-green-800 mb-1">3. 目標企業的 HR 或 獵頭</p>
+                                        <p class="text-green-700 leading-relaxed">
+                                            <strong>價值：</strong>掌握市場最缺的人才特質、履歷篩選關鍵字，甚至可能獲得非公開職缺的推薦機會。
+                                        </p>
+                                    </div>
+                                    <div class="p-3 bg-orange-50 rounded-lg border border-orange-100">
+                                        <p class="font-bold text-orange-800 mb-1">4. 該領域入行不到一年的新人</p>
+                                        <p class="text-orange-700 leading-relaxed">
+                                            <strong>價值：</strong>了解最新的面試趨勢與入行門檻，確認你目前的技能包是否符合現狀。
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Template Section -->
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-700 mb-2">訊息範本（點擊複製）</h4>
+                                <div class="bg-gray-50 p-4 rounded-xl text-xs text-gray-600 leading-relaxed italic border border-purple-50 mb-4">
+                                    「您好，我是[名字]，目前正在評估轉向[新領域]，想請教該職位最痛苦與最有成就感的地方分別是什麼？希望能耽誤您 15 分鐘諮詢。」
+                                </div>
+                                <button onclick="copyToClipboard()" class="w-full py-2 bg-purple-50 text-purple-600 rounded-lg text-xs font-bold border border-purple-100 hover:bg-purple-100 transition-colors">複製範本</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action 04: MVP Testing -->
+                <div class="accordion-item bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
+                    <button onclick="toggleAccordion(this)" class="w-full flex justify-between items-center p-6 text-left focus:outline-none hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-pink-500 font-black text-xl">04</span>
+                            <div>
+                                <h3 class="font-bold text-gray-800">最小化測試 (MVP)</h3>
+                                <p class="text-xs text-gray-500">用低成本的微體驗，在正式投入前先排雷</p>
+                            </div>
+                        </div>
+                        <svg class="chevron w-5 h-5 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6">
+                        <div class="pt-4 space-y-6">
+                            <p class="text-sm text-gray-600">根據你目前的職涯階段，選擇最合適的測試方式：</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Freshers -->
+                                <div class="p-4 bg-pink-50 rounded-xl border border-pink-100">
+                                    <h4 class="font-bold text-pink-700 text-sm mb-3 flex items-center">
+                                        <span class="bg-pink-200 text-pink-700 w-5 h-5 rounded-full flex items-center justify-center text-[10px] mr-2 font-black">A</span>
+                                        新鮮人 / 在校生
+                                    </h4>
+                                    <ul class="space-y-3">
+                                        <li class="flex items-start">
+                                            <input type="checkbox" class="mt-1 mr-2 rounded border-pink-300 text-pink-500 focus:ring-pink-400">
+                                            <span class="text-xs text-pink-800 leading-relaxed">爭取目標領域的<strong>短期寒暑假實習</strong>，第一線觀察作業流程。</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <input type="checkbox" class="mt-1 mr-2 rounded border-pink-300 text-pink-500 focus:ring-pink-400">
+                                            <span class="text-xs text-pink-800 leading-relaxed">參加目標產業舉辦的<strong>校園大使</strong>或<strong>商業競賽</strong>，累積實戰感。</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <input type="checkbox" class="mt-1 mr-2 rounded border-pink-300 text-pink-500 focus:ring-pink-400">
+                                            <span class="text-xs text-pink-800 leading-relaxed">修習相關領域的<strong>線上課程</strong>並取得證照，測試自己對知識的吸收程度。</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- Experienced -->
+                                <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                                    <h4 class="font-bold text-indigo-700 text-sm mb-3 flex items-center">
+                                        <span class="bg-indigo-200 text-indigo-700 w-5 h-5 rounded-full flex items-center justify-center text-[10px] mr-2 font-black">B</span>
+                                        職場人 / 轉職者
+                                    </h4>
+                                    <ul class="space-y-3">
+                                        <li class="flex items-start">
+                                            <input type="checkbox" class="mt-1 mr-2 rounded border-indigo-300 text-indigo-500 focus:ring-indigo-400">
+                                            <span class="text-xs text-indigo-800 leading-relaxed">利用下班時間嘗試<strong>小型外包接案</strong>，確認市場對你技能的反應。</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <input type="checkbox" class="mt-1 mr-2 rounded border-indigo-300 text-indigo-500 focus:ring-indigo-400">
+                                            <span class="text-xs text-indigo-800 leading-relaxed">積極參與<strong>產業社群聚會</strong>，透過與業內人士交流獲得內幕資訊。</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <input type="checkbox" class="mt-1 mr-2 rounded border-indigo-300 text-indigo-500 focus:ring-indigo-400">
+                                            <span class="text-xs text-indigo-800 leading-relaxed">針對目標職位<strong>製作專屬作品集</strong>或 Side Project，驗證實作熱情。</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 p-3 rounded-lg text-[11px] text-gray-500 italic border border-gray-100">
+                                💡 專家建議：MVP 的目的是「驗錯」而非「成功」。如果你在過程中發現自己不喜歡，這反而是最成功的測試結果，因為它幫你省下了大筆轉職的時間成本。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center text-gray-400 text-sm">
+                迷霧會因為行動而散去 🚀
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-2 rounded-full text-sm opacity-0 transition-opacity pointer-events-none z-50">
+        訊息範本已複製到剪貼簿！
+    </div>
+
+    <script>
+        function showStep(stepNumber) {
+            document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(el => el.classList.remove('active-tab'));
+            document.getElementById('step' + stepNumber).classList.add('active');
+            document.getElementById('tab' + stepNumber).classList.add('active-tab');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleAccordion(button) {
+            const item = button.parentElement;
+            const isOpen = item.classList.contains('open');
+            
+            // 可選：展開一個時自動關閉其他項
+            document.querySelectorAll('.accordion-item').forEach(i => i.classList.remove('open'));
+            
+            if (!isOpen) {
+                item.classList.add('open');
+            }
+        }
+
+        function copyToClipboard() {
+            const text = "您好，我是[名字]，目前正在評估轉向[新領域]，想請教該職位最痛苦與最有成就感的地方分別是什麼？希望能耽誤您15分鐘諮詢。";
+            
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            textArea.style.top = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast();
+                }
+            } catch (err) {
+                console.error('無法複製', err);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.style.opacity = '1';
+            setTimeout(() => toast.style.opacity = '0', 2000);
+        }
+    </script>
+</body>
+</html>
