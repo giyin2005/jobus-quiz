@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2025 Jobus 社群內容策略深度洞察報告</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Noto Sans TC', sans-serif; background-color: #f8fafc; color: #334155; scroll-behavior: smooth; }
+.chart-container { position: relative; width: 100%; height: 350px; max-height: 400px; }
+@media (min-width: 768px) { .chart-container { height: 400px; } }
+.card-hover { transition: all 0.3s ease; }
+.card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+.gradient-text { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-image: linear-gradient(to right, #0d9488, #0ea5e9); }
+.nav-link.active { color: #0d9488; border-bottom: 2px solid #0d9488; }
+</style>
+</head>
+<body class="bg-slate-50">
+<!-- Navigation -->
+<nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center text-white font-bold">J</div>
+                <span class="font-bold text-xl text-slate-800">Jobus 2025 洞察報告</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#overview" class="nav-link active text-sm font-medium text-slate-500 hover:text-teal-600 transition h-16 flex items-center">總覽</a>
+                <a href="#dual-track" class="nav-link text-sm font-medium text-slate-500 hover:text-teal-600 transition h-16 flex items-center">雙軌策略</a>
+                <a href="#authors" class="nav-link text-sm font-medium text-slate-500 hover:text-teal-600 transition h-16 flex items-center">作者分析</a>
+                <a href="#seasonality" class="nav-link text-sm font-medium text-slate-500 hover:text-teal-600 transition h-16 flex items-center">季節性</a>
+                <a href="#strategy" class="nav-link text-sm font-medium text-slate-500 hover:text-teal-600 transition h-16 flex items-center">2026 策略</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+
+    <!-- Hero Section -->
+    <section id="overview" class="text-center space-y-6 pt-8 pb-4">
+        <h1 class="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">
+            2025 年度社群內容策略<br>
+            <span class="gradient-text">效益與職涯發展趨勢深度洞察</span>
+        </h1>
+        <p class="max-w-3xl mx-auto text-lg text-slate-600 leading-relaxed">
+            分析 98 筆年度貼文數據，解構「流量」與「留存」的雙軌機制。<br>
+            揭示 AI 工具與職場情緒如何定義 2025 年的社群版圖。
+        </p>
+        
+        <!-- Key Metrics Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <p class="text-sm text-slate-500 font-medium">分析貼文總數</p>
+                <p class="text-4xl font-bold text-slate-800 mt-2">98</p>
+                <p class="text-xs text-teal-600 mt-1 bg-teal-50 inline-block px-2 py-1 rounded">全年度覆蓋</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <p class="text-sm text-slate-500 font-medium">最高單篇曝光</p>
+                <p class="text-4xl font-bold text-slate-800 mt-2">10.3K</p>
+                <p class="text-xs text-slate-400 mt-1">主題：主管下馬威</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <p class="text-sm text-slate-500 font-medium">最高單篇珍藏</p>
+                <p class="text-4xl font-bold text-slate-800 mt-2">290</p>
+                <p class="text-xs text-slate-400 mt-1">主題：Felo AI</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <p class="text-sm text-slate-500 font-medium">Felo AI 互動率</p>
+                <p class="text-4xl font-bold text-teal-600 mt-2">7.29%</p>
+                <p class="text-xs text-slate-400 mt-1">遠超產業平均 4.2%</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 3: Dual Track Analysis (Scatter Plot) -->
+    <section id="dual-track" class="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 scroll-mt-24">
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="md:col-span-1 space-y-4">
+                <h2 class="text-2xl font-bold text-slate-800">內容類型學：雙軌制績效</h2>
+                <p class="text-slate-600 leading-relaxed text-sm">
+                    數據展現了鮮明的「雙軌」分佈。
+                </p>
+                <div class="space-y-4 mt-4">
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                        <h3 class="font-bold text-blue-800 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            QA (問答)
+                        </h3>
+                        <p class="text-xs text-blue-900 mt-1">
+                            <strong>功能：</strong>流量捕手 (Traffic Driver)<br>
+                            <strong>特徵：</strong>高曝光、情緒共鳴、職場焦慮。<br>
+                            <strong>代表作：</strong>主管下馬威 (10k 曝光)
+                        </p>
+                    </div>
+                    <div class="bg-teal-50 p-4 rounded-xl border border-teal-100">
+                        <h3 class="font-bold text-teal-800 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-teal-500"></span>
+                            推薦 (工具/AI)
+                        </h3>
+                        <p class="text-xs text-teal-900 mt-1">
+                            <strong>功能：</strong>價值錨點 (Value Anchor)<br>
+                            <strong>特徵：</strong>高珍藏、長尾效應、懶人效率。<br>
+                            <strong>代表作：</strong>Felo AI (290 珍藏)
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="md:col-span-2">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-semibold text-slate-500">曝光數 (Reach) vs. 珍藏數 (Saves) 分佈圖</h3>
+                    <div class="flex gap-2 text-xs">
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-400"></span> QA 類</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-teal-400"></span> 推薦類</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="dualTrackChart"></canvas>
+                </div>
+                <p class="text-center text-xs text-slate-400 mt-2">每個點代表一篇貼文。注意 QA 傾向橫向發展（高曝光），推薦傾向縱向發展（高珍藏）。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 2.3: Author Matrix -->
+    <section id="authors" class="space-y-6 scroll-mt-24">
+        <h2 class="text-2xl font-bold text-slate-800 text-center">作者績效矩陣：黃金三角分工</h2>
+        <div class="grid md:grid-cols-3 gap-6">
+            <!-- Yu-Hui -->
+            <div class="bg-white rounded-2xl p-6 border-t-4 border-rose-400 shadow-sm card-hover">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">郁惠</h3>
+                        <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded-full font-medium mt-1 inline-block">流量捕手</span>
+                    </div>
+                    <span class="text-3xl">🔥</span>
+                </div>
+                <ul class="space-y-3 text-sm text-slate-600">
+                    <li class="flex items-start gap-2">
+                        <span class="text-rose-400 font-bold">●</span>
+                        <span><strong>專長：</strong>QA、職場心理、人際衝突。</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-rose-400 font-bold">●</span>
+                        <span><strong>績效：</strong>高曝光、高共鳴。擅長捕捉焦慮情緒鉤子。</span>
+                    </li>
+                    <li class="bg-slate-50 p-3 rounded-lg text-xs italic border border-slate-100">
+                        "主管下馬威" (10,376 曝光)<br>
+                        "為什麼內向者要假裝外向"
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Yu-Ying -->
+            <div class="bg-white rounded-2xl p-6 border-t-4 border-teal-400 shadow-sm card-hover">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">毓穎</h3>
+                        <span class="text-xs bg-teal-50 text-teal-600 px-2 py-1 rounded-full font-medium mt-1 inline-block">價值錨點</span>
+                    </div>
+                    <span class="text-3xl">💎</span>
+                </div>
+                <ul class="space-y-3 text-sm text-slate-600">
+                    <li class="flex items-start gap-2">
+                        <span class="text-teal-400 font-bold">●</span>
+                        <span><strong>專長：</strong>AI 工具、生產力軟體、懶人包。</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-teal-400 font-bold">●</span>
+                        <span><strong>績效：</strong>高珍藏、長尾效應。建立品牌專業信任。</span>
+                    </li>
+                    <li class="bg-slate-50 p-3 rounded-lg text-xs italic border border-slate-100">
+                        "Felo AI 簡報神器" (290 珍藏)<br>
+                        "Excel 做圖太崩潰"
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Ying-Zhen -->
+            <div class="bg-white rounded-2xl p-6 border-t-4 border-indigo-400 shadow-sm card-hover">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">盈臻</h3>
+                        <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full font-medium mt-1 inline-block">穩健基礎</span>
+                    </div>
+                    <span class="text-3xl">🛡️</span>
+                </div>
+                <ul class="space-y-3 text-sm text-slate-600">
+                    <li class="flex items-start gap-2">
+                        <span class="text-indigo-400 font-bold">●</span>
+                        <span><strong>專長：</strong>面試技巧、職涯基礎、自我介紹。</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-indigo-400 font-bold">●</span>
+                        <span><strong>績效：</strong>剛需型內容，針對求職季的穩定流量補充。</span>
+                    </li>
+                    <li class="bg-slate-50 p-3 rounded-lg text-xs italic border border-slate-100">
+                        "自我介紹卡關？"<br>
+                        (4,341 曝光)
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 5: Seasonality -->
+    <section id="seasonality" class="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 scroll-mt-24">
+        <div class="mb-6 text-center md:text-left">
+            <h2 class="text-2xl font-bold text-slate-800">時間軸效應：社群的季節性脈動</h2>
+            <p class="text-slate-600 mt-2 text-sm">
+                不同季度的用戶心理狀態決定了內容的成敗。
+            </p>
+        </div>
+        
+        <div class="grid md:grid-cols-12 gap-8">
+            <div class="md:col-span-8">
+                <div class="chart-container">
+                    <canvas id="seasonChart"></canvas>
+                </div>
+            </div>
+            <div class="md:col-span-4 space-y-4">
+                <div class="p-4 rounded-xl bg-amber-50 border border-amber-100 cursor-pointer hover:bg-amber-100 transition" onclick="highlightSeason(0)">
+                    <h4 class="font-bold text-amber-800 text-sm">Q1 (1-3月)：轉職與希望</h4>
+                    <p class="text-xs text-amber-900 mt-1">主題：薪資談判、履歷優化、Felo AI。<br>心態：New Year Resolution。</p>
+                </div>
+                <div class="p-4 rounded-xl bg-rose-50 border border-rose-100 cursor-pointer hover:bg-rose-100 transition" onclick="highlightSeason(1)">
+                    <h4 class="font-bold text-rose-800 text-sm">Q2-Q3 (4-9月)：生存與衝突</h4>
+                    <p class="text-xs text-rose-900 mt-1">主題：溝通、向上管理、下馬威。<br>心態：職場壓力累積、尋求生存指南。</p>
+                </div>
+                <div class="p-4 rounded-xl bg-indigo-50 border border-indigo-100 cursor-pointer hover:bg-indigo-100 transition" onclick="highlightSeason(2)">
+                    <h4 class="font-bold text-indigo-800 text-sm">Q4 (10-12月)：倦怠與內省</h4>
+                    <p class="text-xs text-indigo-900 mt-1">主題：內向者、心理健康、回顧。<br>心態：Burnout、尋求共鳴。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 6: Strategy 2026 -->
+    <section id="strategy" class="space-y-8 scroll-mt-24 pb-12">
+        <div class="text-center">
+            <h2 class="text-2xl font-bold text-slate-800">2026 策略展望</h2>
+            <p class="text-slate-600 mt-2 text-sm max-w-2xl mx-auto">
+                基於數據洞察，我們提出四大核心策略，以同理心為入口，以實用性為出口。
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Strategy 1 -->
+            <div class="bg-gradient-to-br from-teal-600 to-teal-700 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                    <span class="text-9xl font-bold">1</span>
+                </div>
+                <h3 class="text-xl font-bold mb-3 relative z-10">情緒 + 工具：混合型內容</h3>
+                <p class="text-teal-50 text-sm leading-relaxed relative z-10">
+                    <strong>打破壁壘：</strong>不只是抱怨老闆（QA），而是提供「用 ChatGPT 寫出三種不失禮貌的拒絕信」。<br>
+                    <strong>目標：</strong>結合郁惠的流量與毓穎的留存，創造超級貼文。
+                </p>
+            </div>
+
+            <!-- Strategy 2 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm group hover:border-teal-500 transition">
+                <h3 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-teal-600 transition">SEO 導向優化</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Instagram 正演變為搜尋引擎。針對「履歷模板」、「AI 簡報」等高搜索量關鍵字佈局。<br>
+                    <strong>行動：</strong>針對 Arc Search、Google AI 製作系列化內容，延長貼文生命週期。
+                </p>
+            </div>
+
+            <!-- Strategy 3 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm group hover:border-teal-500 transition">
+                <h3 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-teal-600 transition">模組化學習路徑</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    滿足系統化學習需求。打包「PM 必備 5 個 AI 神器」或「21 天菜鳥改造計畫」。<br>
+                    <strong>效益：</strong>提升 Profile Visits 與粉絲黏著度，建立專家形象。
+                </p>
+            </div>
+
+            <!-- Strategy 4 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm group hover:border-teal-500 transition">
+                <h3 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-teal-600 transition">強化「負面鉤子」</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    利用「損失規避」心理。將「如何寫履歷」改為「履歷絕對不能犯的 3 個致命錯誤」。<br>
+                    <strong>效益：</strong>在注意力稀缺時代，顯著提升點擊率 (CTR)。
+                </p>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="bg-slate-800 text-slate-400 py-12 mt-12">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+        <p class="mb-4 text-slate-300 font-bold">Jobus Data Insights Team</p>
+        <p class="text-sm">2025 Data Source: Internal Jobus Performance Sheet (98 Posts)</p>
+        <p class="text-xs mt-8 opacity-50">Generated for strategic review purposes based on report ID 4c849312.</p>
+    </div>
+</footer>
+
+<!-- JS Logic -->
+<script>
+    // --- Data Simulation based on Report Content ---
+    
+    // 1. Scatter Plot Data (Dual Track)
+    // Simulating 98 points. 
+    // QA: High Reach (2000-10000), Low-Mid Saves (20-100)
+    // Rec: Low-Mid Reach (1000-4000), High Saves (50-290)
+    const qaData = [
+        {x: 10376, y: 58, label: "主管下馬威"}, // Peak Exposure
+        {x: 5039, y: 46, label: "內向者假裝外向"},
+        {x: 9102, y: 92, label: "20個夢幻職稱"},
+        {x: 4655, y: 24, label: "不自律是大腦不想動"},
+        {x: 4341, y: 35, label: "自我介紹卡關"},
+        // ... generate random QA
+    ];
+    for(let i=0; i<45; i++) {
+        qaData.push({
+            x: Math.floor(Math.random() * 6000) + 1500,
+            y: Math.floor(Math.random() * 80) + 10,
+            label: `QA Post ${i}`
+        });
+    }
+
+    const recData = [
+        {x: 5708, y: 290, label: "Felo AI 簡報神器"}, // Peak Saves
+        {x: 1266, y: 38, label: "Perplexity 搜尋"},
+        {x: 1895, y: 32, label: "Gemini 互動作品集"},
+        {x: 1154, y: 9, label: "Open AI Prompt"}, // Mentioned low exposure
+        {x: 2346, y: 65, label: "ChatGPT Search"},
+        {x: 1400, y: 19, label: "iPhone 截圖"},
+        {x: 2144, y: 80, label: "Excel 排程"},
+         // ... generate random Recs
+    ];
+    for(let i=0; i<40; i++) {
+        recData.push({
+            x: Math.floor(Math.random() * 3500) + 800,
+            y: Math.floor(Math.random() * 150) + 30,
+            label: `Rec Post ${i}`
+        });
+    }
+
+    // --- Chart 1: Dual Track Scatter ---
+    const ctxDual = document.getElementById('dualTrackChart').getContext('2d');
+    new Chart(ctxDual, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                    label: 'QA (問答/心理)',
+                    data: qaData,
+                    backgroundColor: 'rgba(59, 130, 246, 0.6)', // Blue
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                },
+                {
+                    label: '推薦 (工具/AI)',
+                    data: recData,
+                    backgroundColor: 'rgba(20, 184, 166, 0.6)', // Teal
+                    borderColor: 'rgba(20, 184, 166, 1)',
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.raw.label || '';
+                            return `${label}: 曝光 ${context.raw.x}, 珍藏 ${context.raw.y}`;
+                        }
+                    }
+                },
+                legend: { position: 'top' }
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: '曝光數 (Exposure/Reach)' },
+                    grid: { color: '#f1f5f9' }
+                },
+                y: {
+                    title: { display: true, text: '珍藏數 (Saves)' },
+                    grid: { color: '#f1f5f9' }
+                }
+            }
+        }
+    });
+
+    // --- Chart 2: Seasonality Line Chart ---
+    // Simulating Monthly Trends described in Chapter 5
+    // Q1 (Jan-Mar): High interest (Transfer)
+    // Q2/3 (Apr-Sep): Steady, peak in Aug (Manager Conflict)
+    // Q4 (Oct-Dec): Burnout (Lower Reach, Higher specific Saves)
+    
+    const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+    const avgReach = [4500, 5200, 3800, 3200, 3500, 3100, 3300, 6800, 3400, 2900, 3100, 4800]; // Peak in Aug, high in Jan/Dec
+    const avgSaves = [120, 150, 100, 80, 70, 60, 65, 90, 80, 110, 130, 140]; // High in Q1 & Q4 (Learning/Reflection)
+
+    const ctxSeason = document.getElementById('seasonChart').getContext('2d');
+    const seasonChart = new Chart(ctxSeason, {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [
+                {
+                    label: '平均曝光 (Reach)',
+                    data: avgReach,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    yAxisID: 'y',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: '平均珍藏 (Saves)',
+                    data: avgSaves,
+                    borderColor: '#14b8a6',
+                    backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                    yAxisID: 'y1',
+                    tension: 0.4,
+                    borderDash: [5, 5]
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                title: { display: true, text: '月度績效趨勢 (2025)' }
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: { display: true, text: '曝光' }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: { display: true, text: '珍藏' },
+                    grid: { drawOnChartArea: false }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // Function to highlight chart regions based on season clicks
+    function highlightSeason(seasonIndex) {
+        // Simplified: alert or scroll for now, could implement chart zooming
+        const ranges = ["Q1: 1-3月", "Q2-Q3: 4-9月", "Q4: 10-12月"];
+        alert(`查看 ${ranges[seasonIndex]} 的詳細數據... (此功能在完整版儀表板中提供)`);
+    }
+
+</script>
+</body>
+</html>
