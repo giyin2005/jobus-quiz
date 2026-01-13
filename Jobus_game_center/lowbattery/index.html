@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Jobus 下班回血清單</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            /* 確保內容不會被 iPhone 的 Home Indicator 擋住 */
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        /* 側邊裝飾條 */
+        .guide-box { border-left: 4px solid #3b82f6; }
+        
+        /* 編輯區域佔位符優化 */
+        [contenteditable]:empty:before {
+            content: attr(placeholder);
+            color: #9ca3af;
+            font-style: italic;
+            pointer-events: none;
+            display: block; /* 確保在某些瀏覽器下正確顯示 */
+        }
+        
+        /* 漸層背景 */
+        .success-bg { 
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); 
+        }
+        
+        /* 連結卡片：優化觸控回饋與層級 */
+        .link-card { 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .link-card:active { 
+            transform: scale(0.97);
+            background-color: #f9fafb;
+        }
+
+        /* 輸入框聚焦效果：避免手機鍵盤彈出時跑版 */
+        [contenteditable] {
+            min-height: 1.5rem;
+            word-break: break-all;
+            outline: none;
+        }
+        [contenteditable]:focus {
+            border-bottom: 2px solid #3b82f6;
+            transition: border-color 0.2s;
+        }
+
+        /* 針對窄屏手機的微調 */
+        @media (max-width: 340px) {
+            h1 { font-size: 1.25rem !important; }
+            .success-bg { padding: 1.5rem !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen">
+    <div class="max-w-md mx-auto px-6 pt-10 pb-20">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <div class="inline-block bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-[10px] font-black mb-3 tracking-widest uppercase">Energy Management</div>
+            <h1 class="text-2xl font-black text-gray-900 mb-2 tracking-tight">💡 下班無腦切換</h1>
+            <p class="text-sm text-gray-500 font-medium">這是一個「方法引導工具」，學會後請帶走使用！</p>
+        </header>
+
+        <!-- Intro -->
+        <div class="mb-10 p-5 bg-white rounded-2xl shadow-sm border border-gray-100 text-sm leading-relaxed text-gray-600">
+            下班後沒動力，是因為你還沒建立<span class="text-blue-600 font-bold">「自動化導航」</span>。在這裡練習設定你的清單，完成後請將內容填入你的 Notion / 手機備忘錄。
+        </div>
+
+        <!-- Step 1-3 -->
+        <div class="space-y-12">
+            
+            <!-- 10% Level -->
+            <section>
+                <div class="flex items-center mb-4">
+                    <div class="bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3 shadow-lg shadow-red-200">1</div>
+                    <h2 class="text-lg font-bold text-gray-800">設定「10% 補血清單」</h2>
+                </div>
+                
+                <div class="guide-box bg-blue-50 p-4 mb-4 rounded-r-xl text-sm">
+                    <p class="font-bold text-blue-900 mb-1 flex items-center">
+                        <span class="mr-1">💡</span> 專家 Tips：
+                    </p>
+                    <p class="text-blue-800">填寫「連大腦都不用動」的事。如果現在連滑手機都覺得累，我有什麼方法能讓身體舒服一點？</p>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                    <div class="p-5">
+                        <p class="text-[10px] text-gray-400 mb-4 uppercase tracking-widest font-black">填寫區（點擊文字即可編輯）</p>
+                        <ul class="space-y-5">
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mt-0.5 mr-3 flex-shrink-0">📍</span>
+                                <div class="w-full border-b border-gray-100 pb-2 text-sm leading-relaxed" contenteditable="true" placeholder="例如：聽一首最愛的純音樂"></div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mt-0.5 mr-3 flex-shrink-0">📍</span>
+                                <div class="w-full border-b border-gray-100 pb-2 text-sm leading-relaxed" contenteditable="true" placeholder="例如：在沙發上閉眼放空 5 分鐘"></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 30% Level -->
+            <section>
+                <div class="flex items-center mb-4">
+                    <div class="bg-yellow-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3 shadow-lg shadow-yellow-200">2</div>
+                    <h2 class="text-lg font-bold text-gray-800">設定「30% 微啟動清單」</h2>
+                </div>
+                
+                <div class="guide-box bg-blue-50 p-4 mb-4 rounded-r-xl text-sm">
+                    <p class="font-bold text-blue-900 mb-1 flex items-center">
+                        <span class="mr-1">💡</span> 專家 Tips：
+                    </p>
+                    <p class="text-blue-800">這區要填「5 分鐘能看到結果」的事。重點是「實感」，透過簡單家務找回對環境的掌控感。</p>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                    <div class="p-5">
+                        <p class="text-[10px] text-gray-400 mb-4 uppercase tracking-widest font-black">填寫區</p>
+                        <ul class="space-y-5">
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mt-0.5 mr-3 flex-shrink-0">📍</span>
+                                <div class="w-full border-b border-gray-100 pb-2 text-sm leading-relaxed" contenteditable="true" placeholder="例如：摺好三件晾乾的衣服"></div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mt-0.5 mr-3 flex-shrink-0">📍</span>
+                                <div class="w-full border-b border-gray-100 pb-2 text-sm leading-relaxed" contenteditable="true" placeholder="例如：寫下明天最重要的 3 件事"></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 50% Level -->
+            <section>
+                <div class="flex items-center mb-4">
+                    <div class="bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3 shadow-lg shadow-green-200">3</div>
+                    <h2 class="text-lg font-bold text-gray-800">設定「50% 小累積清單」</h2>
+                </div>
+                
+                <div class="guide-box bg-blue-50 p-4 mb-4 rounded-r-xl text-sm">
+                    <p class="font-bold text-blue-900 mb-1 flex items-center">
+                        <span class="mr-1">💡</span> 專家 Tips：
+                    </p>
+                    <p class="text-blue-800">填寫「為明天減負」。把學習變成一種「順便」，像是邊做家事邊聽專業 Podcast 或音頻。</p>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                    <div class="p-5">
+                        <p class="text-[10px] text-gray-400 mb-4 uppercase tracking-widest font-black">填寫區</p>
+                        <ul class="space-y-5">
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mt-0.5 mr-3 flex-shrink-0">📍</span>
+                                <div class="w-full border-b border-gray-100 pb-2 text-sm leading-relaxed" contenteditable="true" placeholder="例如：聽 15 分鐘專業 Podcast"></div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mt-0.5 mr-3 flex-shrink-0">📍</span>
+                                <div class="w-full border-b border-gray-100 pb-2 text-sm leading-relaxed" contenteditable="true" placeholder="例如：準備好明早要穿的衣服"></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Summary & Action -->
+        <div class="mt-16 p-8 success-bg rounded-[2.5rem] text-white text-center shadow-2xl mb-12 relative overflow-hidden">
+            <div class="relative z-10">
+                <div class="inline-block bg-blue-600 p-4 rounded-full mb-6 shadow-inner ring-4 ring-blue-500/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h3 class="font-black text-2xl mb-3">恭喜完成設定！</h3>
+                <p class="text-sm text-gray-400 mb-8 leading-relaxed px-2">
+                    你已經學會如何依照能量設定清單了！現在，請將內容手動複製到常用工具中，開啟你的下班新生活！
+                </p>
+                <div class="text-[10px] tracking-widest text-blue-400 font-black bg-blue-900/40 py-2.5 px-4 rounded-xl inline-block uppercase border border-blue-800/50">
+                    #Jobus #下班成長 #無痛切換
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Links Section Title -->
+        <p class="text-center text-[10px] font-black text-gray-300 mb-6 tracking-[0.2em] uppercase">Connect With Us</p>
+
+        <!-- Jobus Links -->
+        <div class="space-y-4">
+            <a href="https://www.instagram.com/jobus.asia/" target="_blank" class="link-card flex items-center p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                <div class="bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-2.5 rounded-xl mr-4 shadow-sm">
+                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.058-1.69-.072-4.949-.072zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-gray-900">追蹤 Jobus Instagram</p>
+                    <p class="text-[10px] text-gray-400 font-bold tracking-tight uppercase">Daily Career Hacks</p>
+                </div>
+            </a>
+
+            <a href="https://www.instagram.com/channel/AbYlVmdoYRGEcxXH/" target="_blank" class="link-card flex items-center p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                <div class="bg-blue-100 p-2.5 rounded-xl mr-4">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-gray-900">加入 Jobus 廣播專區</p>
+                    <p class="text-[10px] text-gray-400 font-bold tracking-tight uppercase">Exclusive Updates</p>
+                </div>
+            </a>
+        </div>
+
+        <footer class="mt-16 text-center">
+            <p class="text-[10px] text-gray-400 tracking-[0.2em] font-black uppercase">Jobus asia © 2026</p>
+            <p class="text-[9px] text-gray-300 mt-2 font-medium">Empowering your post-work life</p>
+        </footer>
+    </div>
+</body>
+</html>
