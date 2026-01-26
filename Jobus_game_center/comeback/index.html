@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobus 面試敗部復活實戰工具箱</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        /* Custom scrollbar hiding */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Animation classes */
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fade-in-up 0.5s ease-out forwards;
+        }
+
+        .tab-active {
+            background-color: #0f172a; /* slate-900 */
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-inactive {
+            color: #64748b; /* slate-500 */
+        }
+        .tab-inactive:hover {
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 pb-20 overflow-x-hidden">
+
+    <!-- Header Section -->
+    <header class="bg-slate-900 text-white py-12 md:py-20 px-6 relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 opacity-10 rotate-12">
+            <i data-lucide="award" class="w-48 h-48 md:w-64 md:h-64"></i>
+        </div>
+        
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <div class="inline-flex items-center space-x-2 bg-blue-600 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold mb-6 uppercase tracking-widest shadow-lg shadow-blue-900/20">
+                <span>Jobus Exclusive</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold mb-6 tracking-tight leading-tight">
+                Jobus 面試敗部復活 <br class="hidden md:block" />
+                <span class="text-blue-400">實戰工具箱</span>
+            </h1>
+            <p class="text-slate-400 text-sm md:text-xl max-w-2xl mx-auto leading-relaxed px-2">
+                當別人收到感謝函就放棄時，你的機會才剛剛開始。
+                <span class="text-blue-500 font-semibold block mt-3 italic">—— 讓 Jobus 帶你重新奪回求職主動權</span>
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 -mt-8 relative z-20">
+        <!-- Navigation Tabs -->
+        <div class="flex bg-white rounded-2xl shadow-xl p-1.5 mb-8 border border-slate-200 overflow-x-auto no-scrollbar">
+            <button onclick="switchTab(0)" id="tab-0" class="flex-1 flex items-center justify-center py-3.5 md:py-4 px-2 rounded-xl transition-all duration-300 min-w-[120px] tab-active">
+                <i data-lucide="target" class="w-4 h-4 md:w-5 md:h-5 mr-2"></i>
+                <span class="font-bold text-xs md:text-base tracking-wide whitespace-nowrap">面試失敗復盤</span>
+            </button>
+            <button onclick="switchTab(1)" id="tab-1" class="flex-1 flex items-center justify-center py-3.5 md:py-4 px-2 rounded-xl transition-all duration-300 min-w-[120px] tab-inactive">
+                <i data-lucide="mail" class="w-4 h-4 md:w-5 md:h-5 mr-2"></i>
+                <span class="font-bold text-xs md:text-base tracking-wide whitespace-nowrap">敗部復活信</span>
+            </button>
+            <button onclick="switchTab(2)" id="tab-2" class="flex-1 flex items-center justify-center py-3.5 md:py-4 px-2 rounded-xl transition-all duration-300 min-w-[120px] tab-inactive">
+                <i data-lucide="linkedin" class="w-4 h-4 md:w-5 md:h-5 mr-2"></i>
+                <span class="font-bold text-xs md:text-base tracking-wide whitespace-nowrap">LinkedIn 突圍</span>
+            </button>
+        </div>
+
+        <!-- Strategy Section -->
+        <div id="content-area" class="space-y-6 animate-fade-in-up">
+            <!-- Dynamic Content will be injected here via JS -->
+            <div id="strategy-box" class="p-6 md:p-8 rounded-2xl border-l-4 md:border-l-8 shadow-sm bg-emerald-50 border-emerald-600">
+                <h3 id="strategy-title" class="text-lg font-bold flex items-center mb-4 text-emerald-900">
+                    <i data-lucide="zap" class="w-5 h-5 mr-2 fill-current"></i>
+                    策略心法：為什麼要這樣做？
+                </h3>
+                <div id="strategy-text" class="space-y-4 text-slate-700 leading-relaxed text-sm md:text-base">
+                    <!-- Initial Content for Tab 0 -->
+                    <p>
+                        <span class="font-bold text-emerald-700 underline underline-offset-4 decoration-emerald-200 decoration-2">把拒絕原因記錄下來，發現缺什麼就補什麼！</span> 
+                    </p>
+                    <p>
+                        比如面試後發現缺 Python 技能，就用 2 週去考證照或做一個專案放在 GitHub。回信時附上更新履歷：「感謝建議，我已補強 X 技能」，這會讓企業對你的<span class="font-bold">執行力與成長速度</span>感到驚艷！
+                    </p>
+                    <div class="text-xs md:text-sm text-slate-600 bg-white/60 p-4 rounded-xl border border-emerald-100 italic">
+                        "Jobus 成長邏輯：失敗不可怕，可怕的是不知道為什麼失敗。建立自己的面試資料庫，是開掛的第一步。"
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template Display -->
+            <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden">
+                <div class="bg-slate-50 px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <div id="step-indicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+                        <span id="template-label" class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">
+                            視覺表格預覽
+                        </span>
+                    </div>
+                    <button onclick="handleCopy()" id="copy-btn" class="flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all transform active:scale-95 bg-slate-900 text-white hover:bg-slate-800">
+                        <i id="copy-icon" data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
+                        <span id="copy-text">複製 Google Sheet 格式</span>
+                    </button>
+                </div>
+                
+                <div class="p-6 md:p-8">
+                    <div id="template-content" class="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+                        <!-- Initial Content for Tab 0 (Table) -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse min-w-[800px]">
+                                <thead>
+                                    <tr class="bg-slate-100 border-b border-slate-200">
+                                        <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">面試日期</th>
+                                        <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">公司名稱</th>
+                                        <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">應徵職位</th>
+                                        <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">失敗原因</th>
+                                        <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">技能缺口</th>
+                                        <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">補強計畫</th>
+                                        <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">預計日期</th>
+                                        <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">進度</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="bg-white border-b border-slate-100 last:border-0">
+                                        <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium">2024/05/20</td>
+                                        <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium">Jobus Tech</td>
+                                        <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium">數據分析師</td>
+                                        <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium text-red-500">Python 能力不足</td>
+                                        <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium">Pandas/NumPy</td>
+                                        <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium text-emerald-600 font-bold underline decoration-emerald-200">完成 GitHub 專案</td>
+                                        <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium">2024/06/15</td>
+                                        <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium">進行中</td>
+                                    </tr>
+                                    <tr class="bg-slate-50/50">
+                                        <td colspan="8" class="px-4 py-4 text-xs text-slate-300 italic text-center">(待填寫...)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="footer-helper" class="mt-6 flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                        <div class="flex items-center text-[10px] md:text-xs text-slate-500">
+                            <i data-lucide="chevron-right" class="w-3 h-3 mr-1 text-blue-500"></i> 
+                            <span id="helper-text">點擊複製後，在 Google Sheet 第一格直接貼上即可</span>
+                        </div>
+                        <a id="sheet-link" href="https://sheets.new" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-1 text-[10px] font-bold text-blue-600 hover:text-blue-700 transition-colors">
+                            <span>開啟全新 Google Sheet</span>
+                            <i data-lucide="external-link" class="w-3 h-3"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action Footer -->
+        <div class="mt-16 pt-12 border-t border-slate-200 text-center space-y-8">
+            <div class="space-y-2">
+                <p class="text-slate-400 text-[10px] md:text-xs uppercase tracking-[0.3em] font-black">Join Jobus Community</p>
+                <h4 class="font-bold text-slate-800 text-xl md:text-2xl">跟著 Jobus，讓你的職涯一路開掛</h4>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 px-6">
+                <a href="https://www.instagram.com/jobus.asia/" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto flex items-center justify-center space-x-3 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95">
+                    <i data-lucide="instagram" class="w-6 h-6"></i>
+                    <span>追蹤 Jobus IG</span>
+                </a>
+                
+                <a href="https://www.instagram.com/channel/AbYlVmdoYRGEcxXH/" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto flex items-center justify-center space-x-3 bg-white border-2 border-slate-900 text-slate-900 px-8 py-4 rounded-2xl font-bold hover:bg-slate-900 hover:text-white transition-all shadow-md active:scale-95">
+                    <i data-lucide="users" class="w-6 h-6"></i>
+                    <span>加入廣播專區</span>
+                </a>
+            </div>
+            
+            <div class="pt-8">
+               <p class="text-slate-400 text-[10px]">
+                © <span id="year"></span> Jobus Asia. 專為不甘平凡的求職者打造。
+              </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-2xl z-50 flex items-center space-x-3 border border-slate-700">
+        <div class="bg-green-500 p-1 rounded-full">
+            <i data-lucide="check-circle" class="w-4 h-4 text-white"></i>
+        </div>
+        <span id="toast-message" class="text-sm font-bold tracking-wide">模板內容已成功複製！</span>
+    </div>
+
+    <script>
+        // Set current year
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // State
+        let activeStep = 0;
+        const templates = {
+            review: `面試日期\t公司名稱\t應徵職位\t失敗/拒絕原因\t關鍵技能缺口\t補強計畫 (行動方案)\t預計完成日期\t進度紀錄
+2024/05/20\tJobus Tech\t數據分析師\tPython 實作能力不足\tPython (Pandas/NumPy)\t完成 Coursera 課程並做一個 GitHub 專案\t2024/06/15\t進行中`,
+
+            thankYou: `親愛的 [面試官姓名] 您好，
+
+我是參與昨日 [職位名稱] 面試的 [你的姓名]。
+
+非常感謝您撥冗與我面試。在對談中，我對於貴司提到的 [面試中的具體收穫] 印象非常深刻，這讓我對該領域有了更深層的理解。
+
+此外，我也非常認同貴司 [公司文化/價值觀] 的企業文化，這正是我一直以來追求的職涯環境。
+
+雖然很遺憾這次未能錄取，但我仍對貴司的發展充滿期待。若未來有合適的機會，懇請優先考慮，希望能有機會為 [公司名稱] 貢獻心力。
+
+祝 順頌商祺`,
+
+            linkedin: `您好 [前輩/主管姓名]，我是先前曾參與 [職位] 面試的 [你的姓名]。
+
+感謝上次的面試交流。面試後我針對貴司在 [財報/Glassdoor/面試對談] 中提到的 [具體挑戰/痛點] 做了一些研究與復盤。
+
+我整理了一份關於 [優化方案主題] 的 2 頁簡要報告，內容包含我對該產業痛點的觀察與具體建議，希望能與您分享並請教您的看法。
+
+隨附上這份文件，希望能對貴司有所貢獻，也期待未來有合作契機。謝謝！`
+        };
+
+        const config = {
+            0: {
+                color: 'emerald',
+                titleColor: 'text-emerald-900',
+                borderColor: 'border-emerald-600',
+                bgColor: 'bg-emerald-50',
+                btnColor: 'bg-emerald-400',
+                icon: 'file-spreadsheet',
+                label: '視覺表格預覽',
+                btnText: '複製 Google Sheet 格式',
+                helperText: '點擊複製後，在 Google Sheet 第一格直接貼上即可'
+            },
+            1: {
+                color: 'blue',
+                titleColor: 'text-blue-900',
+                borderColor: 'border-blue-600',
+                bgColor: 'bg-blue-50',
+                btnColor: 'bg-blue-400',
+                icon: 'copy',
+                label: '實戰複製品',
+                btnText: '複製範本內容',
+                helperText: '請記得修改 [ 中括號 ] 內的內容以符合實際情況'
+            },
+            2: {
+                color: 'indigo',
+                titleColor: 'text-indigo-900',
+                borderColor: 'border-indigo-600',
+                bgColor: 'bg-indigo-50',
+                btnColor: 'bg-indigo-400',
+                icon: 'copy',
+                label: 'LinkedIn 溝通策略',
+                btnText: '複製範本內容',
+                helperText: '搭配 PDF 報告發送，效果提升 200%'
+            }
+        };
+
+        // Initialize Icons
+        lucide.createIcons();
+
+        function switchTab(step) {
+            activeStep = step;
+            const conf = config[step];
+
+            // 1. Update Tab Styles
+            for(let i=0; i<3; i++) {
+                const btn = document.getElementById(`tab-${i}`);
+                if(i === step) {
+                    btn.classList.add('tab-active');
+                    btn.classList.remove('tab-inactive');
+                } else {
+                    btn.classList.add('tab-inactive');
+                    btn.classList.remove('tab-active');
+                }
+            }
+
+            // 2. Update Strategy Box Style
+            const strategyBox = document.getElementById('strategy-box');
+            strategyBox.className = `p-6 md:p-8 rounded-2xl border-l-4 md:border-l-8 shadow-sm ${conf.bgColor} ${conf.borderColor}`;
+
+            // 3. Update Title Color
+            const strategyTitle = document.getElementById('strategy-title');
+            strategyTitle.className = `text-lg font-bold flex items-center mb-4 ${conf.titleColor}`;
+
+            // 4. Update Strategy Text Content
+            const strategyText = document.getElementById('strategy-text');
+            if (step === 0) {
+                strategyText.innerHTML = `
+                    <p><span class="font-bold text-emerald-700 underline underline-offset-4 decoration-emerald-200 decoration-2">把拒絕原因記錄下來，發現缺什麼就補什麼！</span></p>
+                    <p>比如面試後發現缺 Python 技能，就用 2 週去考證照或做一個專案放在 GitHub。回信時附上更新履歷：「感謝建議，我已補強 X 技能」，這會讓企業對你的<span class="font-bold">執行力與成長速度</span>感到驚艷！</p>
+                    <div class="text-xs md:text-sm text-slate-600 bg-white/60 p-4 rounded-xl border border-emerald-100 italic">"Jobus 成長邏輯：失敗不可怕，可怕的是不知道為什麼失敗。建立自己的面試資料庫，是開掛的第一步。"</div>
+                `;
+            } else if (step === 1) {
+                strategyText.innerHTML = `
+                    <p><span class="font-bold text-blue-700 underline underline-offset-4 decoration-blue-200 decoration-2">99% 的面試者在收到拒絕信後會沈默</span>。這封信的核心不在於再次乞求工作，而在於「職場品牌經營」。</p>
+                    <p class="text-xs md:text-sm text-slate-600 bg-white/60 p-4 rounded-xl border border-blue-100 italic">"Jobus 復活公式：感謝 + 收穫 + 認同。這向面試官證明即便沒錄取，你仍具有極高的情緒穩定度與職業素養。"</p>
+                `;
+            } else {
+                strategyText.innerHTML = `
+                    <p>HR 的職責是過濾，而主管的職責是<span class="font-bold text-indigo-700 underline underline-offset-4 decoration-indigo-200 decoration-2">解決部門痛點</span>。</p>
+                    <div class="bg-white/60 p-4 md:p-6 rounded-xl border border-indigo-100 space-y-3">
+                        <p class="font-bold text-indigo-900 flex items-center"><i data-lucide="lightbulb" class="w-4 h-4 mr-2"></i> 深入研究的關鍵途徑：</p>
+                        <ul class="list-disc list-inside text-xs md:text-sm text-slate-600 space-y-2">
+                            <li><span class="text-indigo-700 font-semibold">分析財報：</span>從 Q3/Q4 報告找出公司目前毛利下降的原因或重點發展方向。</li>
+                            <li><span class="text-indigo-700 font-semibold">Glassdoor/Dcard：</span>觀察內部員工抱怨最多的流程，那可能就是你的切入點。</li>
+                            <li><span class="text-indigo-700 font-semibold">2 頁解決方案：</span>製作一個簡單的 PDF 報告，直接展示「如果我來，我會怎麼優化」。</li>
+                        </ul>
+                    </div>
+                    <p class="text-xs md:text-sm text-slate-600 italic">"透過 LinkedIn 繞過篩選機制，直接與前輩分享產業洞見。這種主動性，能讓主管在下次有缺時第一個想到你。"</p>
+                `;
+                lucide.createIcons(); // Refresh icons inside innerHTML
+            }
+
+            // 5. Update Template Display (Dot color, Label, Content)
+            const stepIndicator = document.getElementById('step-indicator');
+            stepIndicator.className = `w-2.5 h-2.5 rounded-full ${conf.btnColor}`;
+            document.getElementById('template-label').textContent = conf.label;
+            
+            // 6. Update Copy Button
+            document.getElementById('copy-text').textContent = conf.btnText;
+            
+            // 7. Update Template Content Body
+            const templateContent = document.getElementById('template-content');
+            if (step === 0) {
+                // Table
+                templateContent.innerHTML = `
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[800px]">
+                            <thead>
+                                <tr class="bg-slate-100 border-b border-slate-200">
+                                    <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">面試日期</th>
+                                    <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">公司名稱</th>
+                                    <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">應徵職位</th>
+                                    <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">失敗原因</th>
+                                    <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">技能缺口</th>
+                                    <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">補強計畫</th>
+                                    <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">預計日期</th>
+                                    <th class="px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">進度</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white border-b border-slate-100 last:border-0">
+                                    <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium">2024/05/20</td>
+                                    <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium">Jobus Tech</td>
+                                    <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium">數據分析師</td>
+                                    <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium text-red-500">Python 能力不足</td>
+                                    <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium">Pandas/NumPy</td>
+                                    <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium text-emerald-600 font-bold underline decoration-emerald-200">完成 GitHub 專案</td>
+                                    <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium">2024/06/15</td>
+                                    <td class="px-4 py-4 text-sm text-slate-700 whitespace-nowrap font-medium">進行中</td>
+                                </tr>
+                                <tr class="bg-slate-50/50">
+                                    <td colspan="8" class="px-4 py-4 text-xs text-slate-300 italic text-center">(待填寫...)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>`;
+                // Show link icon for step 0
+                document.getElementById('sheet-link').style.display = 'flex';
+                // Update button icon
+                const copyIcon = document.getElementById('copy-icon');
+                copyIcon.setAttribute('data-lucide', 'file-spreadsheet');
+            } else if (step === 1) {
+                // Thank You Letter
+                templateContent.innerHTML = `
+                    <div class="p-5 md:p-7 border border-dashed border-slate-200">
+                        <pre class="whitespace-pre-wrap break-words font-mono text-sm md:text-base text-slate-800 leading-relaxed">${templates.thankYou}</pre>
+                    </div>`;
+                document.getElementById('sheet-link').style.display = 'none';
+                const copyIcon = document.getElementById('copy-icon');
+                copyIcon.setAttribute('data-lucide', 'copy');
+            } else {
+                // LinkedIn
+                templateContent.innerHTML = `
+                    <div class="p-6 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 bg-indigo-50/50 rounded-xl border border-indigo-100 flex flex-col space-y-2">
+                                <div class="flex items-center text-indigo-900 font-bold text-sm"><i data-lucide="file-text" class="w-4 h-4 mr-2"></i> 2 頁解決方案 PDF 內容建議</div>
+                                <p class="text-xs text-slate-600 leading-relaxed">P1: 當前挑戰觀察（數據佐證）<br/>P2: 具體優化策略與預期成效</p>
+                            </div>
+                            <div class="p-4 bg-indigo-50/50 rounded-xl border border-indigo-100 flex flex-col space-y-2">
+                                <div class="flex items-center text-indigo-900 font-bold text-sm"><i data-lucide="users" class="w-4 h-4 mr-2"></i> 適合聊的話題</div>
+                                <p class="text-xs text-slate-600 leading-relaxed">• 公司如何應對 [產業趨勢]？<br/>• 您對 [某特定產品] 的未來看法？</p>
+                            </div>
+                        </div>
+                        <div class="border-t border-slate-200 pt-6">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">高階溝通訊息範本</p>
+                            <pre class="whitespace-pre-wrap break-words font-mono text-sm text-slate-800 leading-relaxed bg-white p-4 rounded-xl border border-slate-100">${templates.linkedin}</pre>
+                        </div>
+                    </div>`;
+                document.getElementById('sheet-link').style.display = 'none';
+                const copyIcon = document.getElementById('copy-icon');
+                copyIcon.setAttribute('data-lucide', 'copy');
+            }
+
+            // 8. Update Footer Helper
+            document.getElementById('helper-text').textContent = conf.helperText;
+
+            // Re-render new icons
+            lucide.createIcons();
+            
+            // Animation reset
+            const contentArea = document.getElementById('content-area');
+            contentArea.classList.remove('animate-fade-in-up');
+            void contentArea.offsetWidth; // trigger reflow
+            contentArea.classList.add('animate-fade-in-up');
+        }
+
+        function handleCopy() {
+            let text = "";
+            if (activeStep === 0) text = templates.review;
+            else if (activeStep === 1) text = templates.thankYou;
+            else text = templates.linkedin;
+
+            // Use legacy method for reliability in iframes/previews
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast();
+                
+                // Update Button State temporarily
+                const btn = document.getElementById('copy-btn');
+                const originalText = btn.innerHTML;
+                const originalClasses = btn.className;
+                
+                btn.className = "flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all transform scale-95 bg-green-500 text-white shadow-lg";
+                btn.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5"></i><span>已複製！</span>`;
+                lucide.createIcons();
+
+                setTimeout(() => {
+                    btn.className = originalClasses;
+                    btn.innerHTML = originalText;
+                    // Reset icon based on step
+                    const copyIcon = document.getElementById('copy-icon');
+                    if(activeStep === 0) copyIcon.setAttribute('data-lucide', 'file-spreadsheet');
+                    else copyIcon.setAttribute('data-lucide', 'copy');
+                    lucide.createIcons();
+                }, 2000);
+
+            } catch (err) {
+                console.error('無法複製文字', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toast-message');
+            
+            msg.textContent = activeStep === 0 ? '表格結構已複製，請至 Google Sheets 貼上！' : '模板內容已成功複製！';
+            
+            toast.classList.remove('hidden');
+            toast.classList.add('animate-fade-in-up');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Initialize First Tab on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            switchTab(0);
+        });
+
+    </script>
+</body>
+</html>
